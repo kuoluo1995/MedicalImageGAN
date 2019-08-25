@@ -128,7 +128,7 @@ class CycleGAN:
         """Train cyclegan"""
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
-        writer = tf.summary.FileWriter('./_logs/{}'.format(self.options.tag), self.sess.graph)
+        writer = tf.summary.FileWriter('../LiverDiscriminator/logs/{}'.format(self.options.tag), self.sess.graph)
 
         counter = 1
         for epoch in range(self.options.epoch):
