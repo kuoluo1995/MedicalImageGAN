@@ -23,5 +23,5 @@ model:
         channels: 64
     discriminator:
         name: patch_gan
-        channels: 32
+        channels: 64
 
