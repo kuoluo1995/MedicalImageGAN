@@ -5,8 +5,8 @@ from sklearn.model_selection import train_test_split
 a = 'T1'
 b = 'STIR'
 
-source = '/home/yf/datas/NF/'  # E:/Datasets/Neurofibromatosis/source
-output = '/home/yf/datas/NF/'  # E:/Datasets/Neurofibromatosis
+source = 'E:/Datasets/Neurofibromatosis/source'  #  /home/yf/datas/NF/
+output = 'E:/Datasets/Neurofibromatosis'  # E:/Datasets/Neurofibromatosis /home/yf/datas/NF/
 o_A = listdir(source + '/' + a)
 o_B = listdir(source + '/' + b)
 

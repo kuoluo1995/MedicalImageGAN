@@ -4,7 +4,7 @@ from configs.option import get_config
 from models.cycle_gan import CycleGAN
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '3'
     config = get_config('configs/cycle_gan.yaml')
     config['tag'] = 'nf_cycle_gan'
     tf.set_random_seed(19)

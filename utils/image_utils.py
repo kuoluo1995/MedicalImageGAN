@@ -2,6 +2,7 @@ import numpy as np
 import copy
 from scipy import misc
 from utils import nii_utils
+import cv2
 
 
 class ImagePool(object):
@@ -34,13 +35,18 @@ def save_images(images, size, image_path):
 def load_data(images_path, image_size, batch_size, is_training=True):  # todo batch_size
     result = list()
     image_A = nii_utils.nii_reader(images_path[0])
-    image_A = np.transpose(image_A, (2, 0, 1))
+    image_A = np.transpose(image_A, (2, 1, 0))
     image_A = np.clip(image_A, 0, 1500) / 1500
     image_B = nii_utils.nii_reader(images_path[1])
-    image_B = np.transpose(image_B, (2, 0, 1))
-    image_B = np.clip(image_B, 0, 380) / 380
+    image_B = np.transpose(image_B, (2, 1, 0))
+    image_B = np.clip(image_B, 0, 400) / 400
+
     for i in range(image_A.shape[0]):
-        a = np.resize(image_A[i], (image_size[0], image_size[1]))[np.newaxis, :, :, np.newaxis]
-        b = np.resize(image_B[i], (image_size[0], image_size[1]))[np.newaxis, :, :, np.newaxis]
+        a = cv2.resize(image_A[i], (image_size[0], image_size[1]), interpolation=cv2.INTER_AREA)[np.newaxis, :, :,
+            np.newaxis]
+        b = cv2.resize(image_B[i], (image_size[0], image_size[1]), interpolation=cv2.INTER_AREA)[np.newaxis, :, :,
+            np.newaxis]
         result.append(np.concatenate([a, b], axis=3))
+        # cv2.imshow('input_image', np.squeeze(result[i][:,:,:,1]))
+        # cv2.waitKey(100)
     return result
