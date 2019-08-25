@@ -1,151 +1,202 @@
 import numpy as np
-import tensorflow as tf
 from pathlib import Path
-from models.base_gan_model import BaseGanModel
-from models.loss_funcation import abs_loss
-from utils import nii_utils
-from utils.image_utils import ImagePool, save_images
+
+from configs.option import Option
+from models.networks import *
+from models.networks.patch_gan import patch_gan
+from models.networks.unet import unet
+from utils import yaml_utils, nii_utils
+from utils.image_utils import ImagePool, save_images, load_data
 
 
-class CycleGAN(BaseGanModel):
-    def __init__(self, **kwargs):
-        BaseGanModel.__init__(self, **kwargs)
-        self.L1_lambda = self.kwargs['model']['L1_lambda']
-        self.pool = ImagePool(self.kwargs['model']['maxsize'])
-        self.real_a = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.in_channels],
-                                     name='realA')
-        self.real_b = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.out_channels],
-                                     name='realB')
-        self.fake_a = None
-        self.fake_b = None
-        self.fake_a_ = None
-        self.fake_b_ = None
-        self.G_loss_a2b = None
-        self.G_loss_b2a = None
-        self.G_loss = None
+class CycleGAN:
+    def __init__(self, sess, option):
+        option = self.get_extend_options(option)
+        self.options = option
+        self.sess = sess
+        self.print_freq = option.print_freq
+        self.save_freq = option.save_freq
 
-        self.fake_a_sample = tf.placeholder(tf.float32,
+        self.batch_size = option.batch_size
+        self.image_size = option.dataset.image_size
+        self.in_channels = option.model.in_channels
+        self.out_channels = option.model.out_channels
+        self.L1_lambda = option.model.l1_lambda
+        self.is_training = option.phase == 'train'
+        self.train_dir = yaml_utils.read(option.dataset.train_path)
+        self.test_dir = yaml_utils.read(option.dataset.test_path)
+
+        self.generator = unet
+        self.discriminator = patch_gan
+        self.criterionGAN = lsgan_loss
+        # OPTIONS = namedtuple('OPTIONS',
+        #                      'batch_size image_size G_channels D_channels out_channels is_training')
+        # self.options = OPTIONS._make((self.batch_size, self.image_size, option.model.generator.channels,
+        #                               option.model.discriminator.channels, self.out_channels, self.is_training))
+        net_options = {'batch_size': self.batch_size, 'image_size': self.image_size, 'out_channels': self.out_channels,
+                       'G_channels': option.model.generator.channels, 'D_channels': option.model.discriminator.channels,
+                       'is_training': self.is_training}
+        self._build_model(net_options)
+        self.saver = tf.train.Saver()
+        self.pool = ImagePool(option.model.maxsize)
+
+    def _build_model(self, net_options):
+        self.real_data = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1],
+                                                     self.in_channels + self.out_channels], name='real_A_and_B_images')
+        real_A = self.real_data[:, :, :, :self.in_channels]
+        self.fake_B = self.generator(real_A, name='generatorA2B', **net_options)
+        fake_B_uint8 = tf.cast((self.fake_B + 1.0) * 255 // 2, tf.uint8)
+        fake_B_sum = tf.summary.image('{}/fake_B'.format(self.options.tag), fake_B_uint8, max_outputs=1)
+        self.fake_A_ = self.generator(self.fake_B, name='generatorB2A', **net_options)
+        DB_fake = self.discriminator(self.fake_B, name='discriminatorB', **net_options)
+
+        real_B = self.real_data[:, :, :, self.in_channels:self.in_channels + self.out_channels]
+        self.fake_A = self.generator(real_B, reuse=True, name='generatorB2A', **net_options)
+        fake_A_uint8 = tf.cast((self.fake_A + 1.0) * 255 // 2, tf.uint8)
+        fake_A_sum = tf.summary.image('{}/fake_A'.format(self.options.tag), fake_A_uint8, max_outputs=1)
+        self.fake_B_ = self.generator(self.fake_A, reuse=True, name='generatorA2B', **net_options)
+        DA_fake = self.discriminator(self.fake_A, name='discriminatorA', **net_options)  # todo read cycle
+
+        GA2B_loss = self.criterionGAN(DB_fake, tf.ones_like(DB_fake)) + \
+                    self.L1_lambda * abs_criterion(real_A, self.fake_A_) + \
+                    self.L1_lambda * abs_criterion(real_B, self.fake_B_)
+        GA2B_loss_sum = tf.summary.scalar('{}/GA2B_loss'.format(self.options.tag), GA2B_loss)
+
+        GB2A_loss = self.criterionGAN(DA_fake, tf.ones_like(DA_fake)) + \
+                    self.L1_lambda * abs_criterion(real_A, self.fake_A_) + \
+                    self.L1_lambda * abs_criterion(real_B, self.fake_B_)
+        GB2A_loss_sum = tf.summary.scalar('{}/GB2A_loss'.format(self.options.tag), GB2A_loss)
+
+        self.G_loss = self.criterionGAN(DA_fake, tf.ones_like(DA_fake)) + \
+                      self.criterionGAN(DB_fake, tf.ones_like(DB_fake)) + \
+                      self.L1_lambda * abs_criterion(real_A, self.fake_A_) + \
+                      self.L1_lambda * abs_criterion(real_B, self.fake_B_)
+        G_loss_sum = tf.summary.scalar('{}/G_loss'.format(self.options.tag), self.G_loss)
+        self.G_sum = tf.summary.merge([GA2B_loss_sum, GB2A_loss_sum, G_loss_sum, fake_A_sum, fake_B_sum])
+
+        DA_real = self.discriminator(real_A, reuse=True, name='discriminatorA', **net_options)
+        self.fake_A_sample = tf.placeholder(tf.float32,
                                             [None, self.image_size[0], self.image_size[1], self.in_channels],
-                                            name='fakeA')
-        self.fake_b_sample = tf.placeholder(tf.float32,
+                                            name='fake_A_sample')
+        DA_fake_sample = self.discriminator(self.fake_A_sample, reuse=True, name='discriminatorA', **net_options)
+        DA_loss_real = self.criterionGAN(DA_real, tf.ones_like(DA_real))
+        DA_loss_real_sum = tf.summary.scalar('{}/DA_loss_real'.format(self.options.tag), DA_loss_real)
+
+        DA_loss_fake = self.criterionGAN(DA_fake_sample, tf.zeros_like(DA_fake_sample))
+        DA_loss_fake_sum = tf.summary.scalar('{}/DA_loss_fake'.format(self.options.tag), DA_loss_fake)
+
+        DA_loss = (DA_loss_real + DA_loss_fake) / 2
+        DA_loss_sum = tf.summary.scalar('{}/DA_loss'.format(self.options.tag), DA_loss)
+
+        DB_real = self.discriminator(real_B, reuse=True, name='discriminatorB', **net_options)
+        self.fake_B_sample = tf.placeholder(tf.float32,
                                             [None, self.image_size[0], self.image_size[1], self.out_channels],
-                                            name='fakeB')
-        self.D_loss_real_a = None
-        self.D_loss_fake_a = None
-        self.D_loss_a = None
-        self.D_loss_real_b = None
-        self.D_loss_fake_b = None
-        self.D_loss_b = None
-        self.D_loss = None
-        self.learning_rate = tf.placeholder(tf.float32, None, name='learning_rate')
-        self.G_optimizer = None
-        self.D_optimizer = None
-        self.G_sum = None
-        self.D_sum = None
+                                            name='fake_B_sample')
+        DB_fake_sample = self.discriminator(self.fake_B_sample, reuse=True, name='discriminatorB', **net_options)
+        DB_loss_real = self.criterionGAN(DB_real, tf.ones_like(DB_real))
+        DB_loss_real_sum = tf.summary.scalar('{}/DB_loss_real'.format(self.options.tag), DB_loss_real)
 
-        self.test_a = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.in_channels],
-                                     name='testA')
-        self.test_b = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.out_channels],
-                                     name='testB')
-        self.test_G_a = None
-        self.test_G_b = None
+        DB_loss_fake = self.criterionGAN(DB_fake_sample, tf.zeros_like(DB_fake_sample))
+        DB_loss_fake_sum = tf.summary.scalar('{}/DB_loss_fake'.format(self.options.tag), DB_loss_fake)
 
-    def build_model(self, **kwargs):
-        self.fake_b = self.generator_class(self.real_a, name='generatorA2B', **self.__dict__)
-        self.fake_a_ = self.generator_class(self.fake_b, name='generatorB2A', **self.__dict__)
-        self.fake_a = self.generator_class(self.real_b, reuse=True, name='generatorB2A', **self.__dict__)
-        self.fake_b_ = self.generator_class(self.fake_a, reuse=True, name='generatorA2B', **self.__dict__)
+        DB_loss = (DB_loss_real + DB_loss_fake) / 2
+        DB_loss_sum = tf.summary.scalar('{}/DB_loss'.format(self.options.tag), DB_loss)
 
-        D_fake_b = self.discriminator_class(self.fake_b, name='discriminatorB', **self.__dict__)
-        D_fake_a = self.discriminator_class(self.fake_a, name='discriminatorA', **self.__dict__)
+        self.D_loss = DA_loss + DB_loss
+        D_loss_sum = tf.summary.scalar('{}/D_loss'.format(self.options.tag), self.D_loss)
 
-        self.G_loss_a2b = self.loss_fn(D_fake_b, tf.ones_like(D_fake_b)) + \
-                          self.L1_lambda * abs_loss(self.real_a, self.fake_a_) + \
-                          self.L1_lambda * abs_loss(self.real_b, self.fake_b_)
-        self.G_loss_b2a = self.loss_fn(D_fake_a, tf.ones_like(D_fake_a)) + \
-                          self.L1_lambda * abs_loss(self.real_a, self.fake_a_) + \
-                          self.L1_lambda * abs_loss(self.real_b, self.fake_b_)
+        self.D_sum = tf.summary.merge(
+            [DA_loss_sum, DA_loss_real_sum, DA_loss_fake_sum, DB_loss_sum, DB_loss_real_sum, DB_loss_fake_sum,
+             D_loss_sum])
 
-        self.G_loss = self.loss_fn(D_fake_a, tf.ones_like(D_fake_a)) + \
-                      self.loss_fn(D_fake_b, tf.ones_like(D_fake_b)) + \
-                      self.L1_lambda * abs_loss(self.real_a, self.fake_a_) + \
-                      self.L1_lambda * abs_loss(self.real_b, self.fake_b_)
-
-        D_real_a = self.discriminator_class(self.real_a, reuse=True, name='discriminatorA', **self.__dict__)
-        D_real_b = self.discriminator_class(self.real_b, reuse=True, name='discriminatorB', **self.__dict__)
-        D_fake_a = self.discriminator_class(self.fake_a_sample, reuse=True, name='discriminatorA', **self.__dict__)
-        D_fake_b = self.discriminator_class(self.fake_b_sample, reuse=True, name='discriminatorB', **self.__dict__)
-
-        self.D_loss_real_a = self.loss_fn(D_real_a, tf.ones_like(D_real_a))
-        self.D_loss_fake_a = self.loss_fn(D_fake_a, tf.zeros_like(D_fake_a))
-        self.D_loss_a = (self.D_loss_real_a + self.D_loss_fake_a) / 2
-
-        self.D_loss_real_b = self.loss_fn(D_real_b, tf.ones_like(D_real_b))
-        self.D_loss_fake_b = self.loss_fn(D_fake_b, tf.zeros_like(D_fake_b))
-        self.D_loss_b = (self.D_loss_real_b + self.D_loss_fake_b) / 2
-
-        self.D_loss = self.D_loss_a + self.D_loss_b
+        self.test_A = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.in_channels],
+                                     name='test_A')
+        self.test_GB = self.generator(self.test_A, reuse=True, name='generatorA2B', **net_options)
+        self.test_B = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.out_channels],
+                                     name='test_B')
+        self.test_GA = self.generator(self.test_B, reuse=True, name='generatorB2A', **net_options)
 
         train_vars = tf.trainable_variables()
-        # for var in train_vars:
-        #     print(var.name)
         G_vars = [var for var in train_vars if 'generator' in var.name]
         D_vars = [var for var in train_vars if 'discriminator' in var.name]
 
-        self.G_optimizer = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.G_loss, var_list=G_vars)
-        self.D_optimizer = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.D_loss, var_list=D_vars)
+        self.lr = tf.placeholder(tf.float32, None, name='learning_rate')
+        self.G_optim = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.G_loss, var_list=G_vars)
+        self.D_optim = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.D_loss, var_list=D_vars)
 
-        self.test_G_a = self.generator_class(self.test_b, reuse=True, name='generatorB2A', **self.__dict__)
-        self.test_G_b = self.generator_class(self.test_a, reuse=True, name='generatorA2B', **self.__dict__)
-        self.summary()
-
-    def summary(self):
-        fake_a_uint8 = tf.cast((self.fake_a + 1.0) * 255 // 2, tf.uint8)
-        fake_b_uint8 = tf.cast((self.fake_b + 1.0) * 255 // 2, tf.uint8)
-        fake_a_sum = tf.summary.image('{}/fakeA'.format(self.name), fake_a_uint8, max_outputs=1)
-        fake_b_sum = tf.summary.image('{}/fakeB'.format(self.name), fake_b_uint8, max_outputs=1)
-
-        G_loss_a2b_sum = tf.summary.scalar('{}/GLossA2B'.format(self.name), self.G_loss_a2b)
-        G_loss_b2a_sum = tf.summary.scalar('{}/GLossB2A'.format(self.name), self.G_loss_b2a)
-        G_loss_sum = tf.summary.scalar('{}/GLoss'.format(self.name), self.G_loss)
-        self.G_sum = tf.summary.merge([G_loss_a2b_sum, G_loss_b2a_sum, G_loss_sum, fake_a_sum, fake_b_sum])
-
-        D_loss_real_a_sum = tf.summary.scalar('{}/DLossRealA'.format(self.name), self.D_loss_real_a)
-        D_loss_real_b_sum = tf.summary.scalar('{}/DLossRealB'.format(self.name), self.D_loss_real_b)
-        D_loss_fake_a_sum = tf.summary.scalar('{}/DLossFakeA'.format(self.name), self.D_loss_fake_a)
-        D_loss_fake_b_sum = tf.summary.scalar('{}/DLossFakeB'.format(self.name), self.D_loss_fake_b)
-        D_loss_a_sum = tf.summary.scalar('{}/DLossA'.format(self.name), self.D_loss_a)
-        D_loss_b_sum = tf.summary.scalar('{}/DLossB'.format(self.name), self.D_loss_b)
-        D_loss_sum = tf.summary.scalar('{}/DLoss'.format(self.name), self.D_loss)
-        self.D_sum = tf.summary.merge([D_loss_real_a_sum, D_loss_real_b_sum, D_loss_fake_a_sum, D_loss_fake_b_sum,
-                                       D_loss_a_sum, D_loss_b_sum, D_loss_sum])
+        # for var in train_vars:
+        #     print(var.name)
 
     def train(self):
-        writer = tf.summary.FileWriter('./_logs/{}'.format(self.name), self.sess.graph)
-        train_generator = self.data_generator_fn(self.train_path, self.batch_size, self.image_size, self.in_channels,
-                                                 self.is_training)
-        for epoch in range(self.epoch):
-            lr = self.lr if epoch < self.epoch_step else self.lr * (self.epoch - epoch) / (self.epoch - self.epoch_step)
-            train_data = next(train_generator)
-            fake_a, fake_b, _, summary_str, G_loss = self.sess.run(
-                [self.fake_a, self.fake_b, self.G_optimizer, self.G_sum, self.G_loss],
-                feed_dict={self.real_a: train_data[0], self.real_b: train_data[1], self.learning_rate: lr})
-            writer.add_summary(summary_str, epoch)
-            _, summary_str, D_loss = self.sess.run([self.D_optimizer, self.D_sum, self.D_loss],
-                                                   feed_dict={self.real_a: train_data[0], self.real_b: train_data[1],
-                                                              self.learning_rate: lr, self.fake_a_sample: fake_a,
-                                                              self.fake_b_sample: fake_b})
-            writer.add_summary(summary_str, epoch)
-            print('Epoch:{:>5d} G_loss:{:<5.5f} D_loss:{:<5.5f}'.format(epoch, G_loss, D_loss))
-        if epoch % self.save_freq == 0:
-            self.save(self.checkpoint_dir, epoch)
+        """Train cyclegan"""
+        init_op = tf.global_variables_initializer()
+        self.sess.run(init_op)
+        writer = tf.summary.FileWriter('./_logs/{}'.format(self.options.tag), self.sess.graph)
 
-    # def load(self, checkpoint_dir):
-    #     checkpoint_dir = Path(checkpoint_dir)
-    #     ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir / 'cycle_gan.ckpt'))
-    #     if ckpt and ckpt.model_checkpoint_path:
-    #         ckpt_name = Path(ckpt.model_checkpoint_path).stem
-    #         self.saver.restore(self.sess, str(checkpoint_dir / ckpt_name))
+        counter = 1
+        for epoch in range(self.options.epoch):
+            # batch_idxs = len(data_A) // self.batch_size
+            lr = self.options.lr if epoch < self.options.epoch_step else self.options.lr * (
+                    self.options.epoch - epoch) / (self.options.epoch - self.options.epoch_step)
+            train_dirs = [[self.train_dir['A'][i], self.train_dir['B'][i]] for i in range(len(self.train_dir['A']))]
+            np.random.shuffle(train_dirs)
+            for i, train_data in enumerate(train_dirs):
+                nii_images = load_data(train_data, self.image_size, self.batch_size, self.is_training)
+                for j, slice_ in enumerate(nii_images):
+                    # Update G network and record fake outputs
+                    fake_A, fake_B, _, summary_str, G_loss = self.sess.run(
+                        [self.fake_A, self.fake_B, self.G_optim, self.G_sum, self.G_loss],
+                        feed_dict={self.real_data: slice_, self.lr: lr})
+                    writer.add_summary(summary_str, counter)
+                    # [fake_A, fake_B] = self.pool([fake_A, fake_B])
+                    # Update D network
+                    _, summary_str, D_loss = self.sess.run([self.D_optim, self.D_sum, self.D_loss],
+                                                           feed_dict={self.real_data: slice_, self.lr: lr,
+                                                                      self.fake_A_sample: fake_A,
+                                                                      self.fake_B_sample: fake_B})
+                    writer.add_summary(summary_str, counter)
+                    counter += 1
+                    print('Epoch:{:>2d}/{:<3d};Step:{:>3d}/{:<3d};Counter:{:>3d}/{:<3d} G_loss:{:<5.5f} D_loss:{:<5.5f}'
+                          .format(epoch, self.options.epoch, i, len(train_dirs), j, len(nii_images), G_loss, D_loss))
+                    if counter % self.print_freq == 0:
+                        (fake_A + 1.0) * 255 // 2
+                if (epoch * len(train_dirs) + i) % self.print_freq == 0:
+                    self.sample_model(self.options.model.sample_dir, epoch, i)
+                if (epoch * len(train_dirs) + i) % self.save_freq == 0:
+                    self.save(self.options.model.checkpoint_dir, counter)
+
+    def save(self, checkpoint_dir, counter):
+        checkpoint_dir = Path(checkpoint_dir)
+        checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        self.saver.save(self.sess, str(checkpoint_dir / 'cycle_gan.ckpt'), global_step=counter)
+
+    def load(self, checkpoint_dir):
+        checkpoint_dir = Path(checkpoint_dir)
+        ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir / 'cycle_gan.ckpt'))
+        if ckpt and ckpt.model_checkpoint_path:
+            ckpt_name = Path(ckpt.model_checkpoint_path).stem
+            self.saver.restore(self.sess, str(checkpoint_dir / ckpt_name))
+
+    def sample_model(self, sample_dir, epoch, step):
+        test_dirs = [[self.test_dir['A'][i], self.test_dir['B'][i]] for i in range(len(self.test_dir['A']))]
+        np.random.shuffle(test_dirs)
+        for i, test_data in enumerate(test_dirs):
+            nii_images = load_data(test_data, self.image_size, self.is_training)
+            test_nii_a = list()
+            test_nii_b = list()
+            for slice_ in nii_images:
+                fake_A, fake_B = self.sess.run([self.fake_A, self.fake_B], feed_dict={self.real_data: slice_})
+                test_nii_a.append(np.squeeze(fake_A))
+                test_nii_b.append(np.squeeze(fake_B))
+
+            test_nii_a = np.array(test_nii_a).transpose((2, 0, 1))
+            header_a = nii_utils.nii_header_reader(test_data[0])
+            nii_utils.nii_writer('{}/A/{:^2d}_{:^4d}/{}.nii'.format(sample_dir, epoch, step, i), header_a, test_nii_a)
+
+            test_nii_b = np.array(test_nii_b).transpose((2, 0, 1))
+            header_b = nii_utils.nii_header_reader(test_data[1])
+            nii_utils.nii_writer('{}/B/{:^2d}_{:^4d}/{}.nii'.format(sample_dir, epoch, step, i), header_b, test_nii_b)
+
     # def test(self, option):
     #     """Test cyclegan"""
     #     init_op = tf.global_variables_initializer()
@@ -172,3 +223,25 @@ class CycleGAN(BaseGanModel):
     #         index.write('<td><img src="{}"></td>'.format(image_path))
     #         index.write('</tr>')
     #     index.close()
+
+    @staticmethod
+    def get_extend_options(option):
+        extend_config = 'configs/models/' + option['model']['name'] + '.yaml'
+        if Path(extend_config).exists():
+            extend_config = yaml_utils.read(extend_config)
+            if extend_config is not None:
+                option['model'].update(extend_config)
+            if 'gan' in option['model']['name']:
+                generator_config = 'configs/models/networks/' + extend_config['generator']['name'] + '.yaml'
+                if Path(generator_config).exists():
+                    generator_config = yaml_utils.read(generator_config)
+                    if generator_config is not None:
+                        option['model']['generator'].update(generator_config)
+
+                discriminator_config = 'configs/models/networks/' + extend_config['discriminator']['name'] + '.yaml'
+                if Path(discriminator_config).exists():
+                    discriminator_config = yaml_utils.read(discriminator_config)
+                    if discriminator_config is not None:
+                        option['model']['discriminator'].update(discriminator_config)
+
+        return Option(option)

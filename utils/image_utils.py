@@ -30,3 +30,17 @@ class ImagePool(object):
 def save_images(images, size, image_path):
     return misc.imsave(images, size, image_path)
 
+
+def load_data(images_path, image_size, batch_size, is_training=True):  # todo batch_size
+    result = list()
+    image_A = nii_utils.nii_reader(images_path[0])
+    image_A = np.transpose(image_A, (2, 0, 1))
+    image_A = np.clip(image_A, 0, 400)
+    image_B = nii_utils.nii_reader(images_path[1])
+    image_B = np.transpose(image_B, (2, 0, 1))
+    image_B = np.clip(image_B, 0, 400) / 400
+    for i in range(image_A.shape[0]):
+        a = np.resize(image_A[i], (image_size[0], image_size[1]))[np.newaxis, :, :, np.newaxis]
+        b = np.resize(image_B[i], (image_size[0], image_size[1]))[np.newaxis, :, :, np.newaxis]
+        result.append(np.concatenate([a, b], axis=3))
+    return result
