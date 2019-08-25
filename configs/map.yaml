@@ -1,0 +1,5 @@
+phase: train
+dataset:
+    image_size: [384,1152]
+    train_path: '/home/yf/datas/NF/T12STIR_train.yaml' # E:/Datasets/Neurofibromatosis/t12stir_train.yaml
+    test_path: '/home/yf/datas/NF/T12STIR_test.yaml' # E:/Datasets/Neurofibromatosis/t12stir_test.yaml

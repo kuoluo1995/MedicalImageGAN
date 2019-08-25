@@ -1,0 +1,24 @@
+phase: train
+
+print_freq: 100
+save_freq: 200
+
+dataset:
+    data_loader: gan_data_generator
+    image_size: [0,0]
+    train_path: ''
+    test_path: ''
+
+model:
+    name:
+    epoch: 20000
+    batch_size: 8
+    in_channels: 1
+    out_channels: 1
+    learning_rate: 0.0002
+    beta1: 0.5
+    checkpoint_dir: _checkpoint
+    sample_dir: _sample
+    test_epoch:
+
+
