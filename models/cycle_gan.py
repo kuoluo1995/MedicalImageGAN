@@ -101,10 +101,6 @@ class CycleGAN:
         self.D_loss = DA_loss + DB_loss
         D_loss_sum = tf.summary.scalar('{}/D_loss'.format(self.options.tag), self.D_loss)
 
-        self.D_sum = tf.summary.merge(
-            [DA_loss_sum, DA_loss_real_sum, DA_loss_fake_sum, DB_loss_sum, DB_loss_real_sum, DB_loss_fake_sum,
-             D_loss_sum])
-
         self.test_A = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.in_channels],
                                      name='test_A')
         self.test_GB = self.generator(self.test_A, reuse=True, name='generatorA2B', **net_options)
@@ -119,6 +115,11 @@ class CycleGAN:
         self.lr = tf.placeholder(tf.float32, None, name='learning_rate')
         self.G_optim = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.G_loss, var_list=G_vars)
         self.D_optim = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.D_loss, var_list=D_vars)
+
+        lr_sum = tf.summary.scalar('{}/lr'.format(self.options.tag), self.lr)
+        self.D_sum = tf.summary.merge(
+            [DA_loss_sum, DA_loss_real_sum, DA_loss_fake_sum, DB_loss_sum, DB_loss_real_sum, DB_loss_fake_sum,
+             D_loss_sum, lr_sum])
 
     def train(self):
         """Train cyclegan"""
@@ -136,7 +137,7 @@ class CycleGAN:
             for i, train_data in enumerate(train_dirs):
                 nii_images = load_data(train_data, self.image_size, self.batch_size, self.is_training)
                 for j, slice_ in enumerate(nii_images):
-                    batch_images = np.array([slice_],dtype=np.float32)
+                    batch_images = np.array([slice_], dtype=np.float32)
                     # Update G network and record fake outputs
                     fake_A, fake_B, _, summary_str, G_loss = self.sess.run(
                         [self.fake_A, self.fake_B, self.G_optim, self.G_sum, self.G_loss],
