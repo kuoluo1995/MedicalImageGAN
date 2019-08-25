@@ -140,7 +140,7 @@ class CycleGAN:
             for i, train_data in enumerate(train_dirs):
                 nii_images = load_data(train_data, self.image_size, self.batch_size, self.is_training)
                 for j, slice_ in enumerate(nii_images):
-                    batch_images = [slice_]
+                    batch_images = np.array([slice_])
                     # Update G network and record fake outputs
                     fake_A, fake_B, _, summary_str, G_loss = self.sess.run(
                         [self.fake_A, self.fake_B, self.G_optim, self.G_sum, self.G_loss],
