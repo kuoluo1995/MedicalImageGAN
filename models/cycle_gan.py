@@ -32,8 +32,8 @@ class CycleGAN:
         net_options = {'batch_size': self.batch_size, 'image_size': self.image_size, 'out_channels': self.out_channels,
                        'G_channels': option.model.generator.channels, 'D_channels': option.model.discriminator.channels,
                        'is_training': self.is_training}
-        # self._build_model(net_options)
-        # self.saver = tf.train.Saver()
+        self._build_model(net_options)
+        self.saver = tf.train.Saver()
 
     def _build_model(self, net_options):
         self.real_data = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1],

@@ -35,10 +35,10 @@ def load_data(images_path, image_size, batch_size, is_training=True):  # todo ba
     result = list()
     image_A = nii_utils.nii_reader(images_path[0])
     image_A = np.transpose(image_A, (2, 0, 1))
-    image_A = np.clip(image_A, 0, 400)
+    image_A = np.clip(image_A, 0, 1500) / 1500
     image_B = nii_utils.nii_reader(images_path[1])
     image_B = np.transpose(image_B, (2, 0, 1))
-    image_B = np.clip(image_B, 0, 400) / 400
+    image_B = np.clip(image_B, 0, 380) / 380
     for i in range(image_A.shape[0]):
         a = np.resize(image_A[i], (image_size[0], image_size[1]))[np.newaxis, :, :, np.newaxis]
         b = np.resize(image_B[i], (image_size[0], image_size[1]))[np.newaxis, :, :, np.newaxis]
