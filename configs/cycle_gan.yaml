@@ -20,7 +20,7 @@ model:
     l1_lambda: 10.0
     generator:
         name: unet
-        channels: 32
+        channels: 64
     discriminator:
         name: patch_gan
         channels: 32
