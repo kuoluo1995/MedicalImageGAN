@@ -6,7 +6,7 @@ epoch: 200
 epoch_step: 100
 lr: 0.0002
 dataset:
-    image_size: [384,1152]
+    image_size: [192,576]
     train_path: '/home/yf/datas/NF/T12STIR_train.yaml' # E:/Datasets/Neurofibromatosis/t12stir_train.yaml
     test_path: '/home/yf/datas/NF/T12STIR_test.yaml' # E:/Datasets/Neurofibromatosis/t12stir_test.yaml
 model:
@@ -16,5 +16,12 @@ model:
     out_channels: 1
     beta1: 0.5
     sample_dir: _sample
-
+    maxsize: 0
+    l1_lambda: 10.0
+    generator:
+        name: unet
+        channels: 64
+    discriminator:
+        name: patch_gan
+        channels: 64
 
