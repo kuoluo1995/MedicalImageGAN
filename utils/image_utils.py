@@ -42,8 +42,8 @@ def load_data(images_path, image_size, batch_size, is_training=True):  # todo ba
     image_B = np.clip(image_B, 0, 400) / 400
 
     for i in range(image_A.shape[0]):
-        a = cv2.resize(image_A[i], (image_size[0], image_size[1]), interpolation=cv2.INTER_AREA)[:, :, np.newaxis]
-        b = cv2.resize(image_B[i], (image_size[0], image_size[1]), interpolation=cv2.INTER_AREA)[:, :, np.newaxis]
+        a = cv2.resize(image_A[i], (image_size[1], image_size[0]), interpolation=cv2.INTER_AREA)[:, :, np.newaxis]
+        b = cv2.resize(image_B[i], (image_size[1], image_size[0]), interpolation=cv2.INTER_AREA)[:, :, np.newaxis]
         result.append(np.concatenate((a, b), axis=2))
         # cv2.imshow('input_image', np.squeeze(result[i][:,:,:,1]))
         # cv2.waitKey(100)
