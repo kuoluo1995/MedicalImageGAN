@@ -1,8 +1,0 @@
-maxsize: 0
-l1_lambda: 10.0
-generator:
-    name: unet
-    channels: 64
-discriminator:
-    name: patch_gan
-    channels: 64

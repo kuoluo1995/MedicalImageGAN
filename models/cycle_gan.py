@@ -5,15 +5,15 @@ from configs.option import Option
 from models.networks import *
 from models.networks.patch_gan import patch_gan
 from models.networks.unet import unet
-from utils import yaml_utils, nii_utils
-from utils.image_utils import ImagePool, save_images, load_data
+from utils import yaml_utils
+from utils.image_utils import load_data
 
 
 class CycleGAN:
     def __init__(self, sess, option):
-        option = self.get_extend_options(option)
-        self.options = option
+        option = Option(option)
         self.sess = sess
+        self.options = option
         self.print_freq = option.print_freq
         self.save_freq = option.save_freq
 
@@ -29,21 +29,18 @@ class CycleGAN:
         self.generator = unet
         self.discriminator = patch_gan
         self.criterionGAN = lsgan_loss
-        # OPTIONS = namedtuple('OPTIONS',
-        #                      'batch_size image_size G_channels D_channels out_channels is_training')
-        # self.options = OPTIONS._make((self.batch_size, self.image_size, option.model.generator.channels,
-        #                               option.model.discriminator.channels, self.out_channels, self.is_training))
         net_options = {'batch_size': self.batch_size, 'image_size': self.image_size, 'out_channels': self.out_channels,
                        'G_channels': option.model.generator.channels, 'D_channels': option.model.discriminator.channels,
                        'is_training': self.is_training}
         self._build_model(net_options)
         self.saver = tf.train.Saver()
-        self.pool = ImagePool(option.model.maxsize)
 
     def _build_model(self, net_options):
         self.real_data = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1],
                                                      self.in_channels + self.out_channels], name='real_A_and_B_images')
         real_A = self.real_data[:, :, :, :self.in_channels]
+        real_A_uint8 = tf.cast((real_A + 1.0) * 255 // 2, tf.uint8)
+        real_A_sum = tf.summary.image('{}/real_A'.format(self.options.tag), real_A_uint8, max_outputs=1)
         self.fake_B = self.generator(real_A, name='generatorA2B', **net_options)
         fake_B_uint8 = tf.cast((self.fake_B + 1.0) * 255 // 2, tf.uint8)
         fake_B_sum = tf.summary.image('{}/fake_B'.format(self.options.tag), fake_B_uint8, max_outputs=1)
@@ -51,6 +48,8 @@ class CycleGAN:
         DB_fake = self.discriminator(self.fake_B, name='discriminatorB', **net_options)
 
         real_B = self.real_data[:, :, :, self.in_channels:self.in_channels + self.out_channels]
+        real_B_uint8 = tf.cast((real_B + 1.0) * 255 // 2, tf.uint8)
+        real_B_sum = tf.summary.image('{}/real_B'.format(self.options.tag), real_B_uint8, max_outputs=1)
         self.fake_A = self.generator(real_B, reuse=True, name='generatorB2A', **net_options)
         fake_A_uint8 = tf.cast((self.fake_A + 1.0) * 255 // 2, tf.uint8)
         fake_A_sum = tf.summary.image('{}/fake_A'.format(self.options.tag), fake_A_uint8, max_outputs=1)
@@ -72,7 +71,8 @@ class CycleGAN:
                       self.L1_lambda * abs_criterion(real_A, self.fake_A_) + \
                       self.L1_lambda * abs_criterion(real_B, self.fake_B_)
         G_loss_sum = tf.summary.scalar('{}/G_loss'.format(self.options.tag), self.G_loss)
-        self.G_sum = tf.summary.merge([GA2B_loss_sum, GB2A_loss_sum, G_loss_sum, fake_A_sum, fake_B_sum])
+        self.G_sum = tf.summary.merge(
+            [GA2B_loss_sum, GB2A_loss_sum, G_loss_sum, real_A_sum, fake_A_sum, real_B_sum, fake_B_sum])
 
         DA_real = self.discriminator(real_A, reuse=True, name='discriminatorA', **net_options)
         self.fake_A_sample = tf.placeholder(tf.float32,
@@ -124,9 +124,6 @@ class CycleGAN:
         self.G_optim = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.G_loss, var_list=G_vars)
         self.D_optim = tf.train.AdamOptimizer(self.lr, beta1=0.5).minimize(self.D_loss, var_list=D_vars)
 
-        # for var in train_vars:
-        #     print(var.name)
-
     def train(self):
         """Train cyclegan"""
         init_op = tf.global_variables_initializer()
@@ -158,10 +155,8 @@ class CycleGAN:
                     counter += 1
                     print('Epoch:{:>2d}/{:<3d};Step:{:>3d}/{:<3d};Counter:{:>3d}/{:<3d} G_loss:{:<5.5f} D_loss:{:<5.5f}'
                           .format(epoch, self.options.epoch, i, len(train_dirs), j, len(nii_images), G_loss, D_loss))
-                    if counter % self.print_freq == 0:
-                        (fake_A + 1.0) * 255 // 2
-                if (epoch * len(train_dirs) + i) % self.print_freq == 0:
-                    self.sample_model(self.options.model.sample_dir, epoch, i)
+                # if (epoch * len(train_dirs) + i) % self.print_freq == 0:
+                #     self.sample_model(self.options.model.sample_dir, epoch, i)
                 if (epoch * len(train_dirs) + i) % self.save_freq == 0:
                     self.save(self.options.model.checkpoint_dir, counter)
 
@@ -170,32 +165,32 @@ class CycleGAN:
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
         self.saver.save(self.sess, str(checkpoint_dir / 'cycle_gan.ckpt'), global_step=counter)
 
-    def load(self, checkpoint_dir):
-        checkpoint_dir = Path(checkpoint_dir)
-        ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir / 'cycle_gan.ckpt'))
-        if ckpt and ckpt.model_checkpoint_path:
-            ckpt_name = Path(ckpt.model_checkpoint_path).stem
-            self.saver.restore(self.sess, str(checkpoint_dir / ckpt_name))
-
-    def sample_model(self, sample_dir, epoch, step):
-        test_dirs = [[self.test_dir['A'][i], self.test_dir['B'][i]] for i in range(len(self.test_dir['A']))]
-        np.random.shuffle(test_dirs)
-        for i, test_data in enumerate(test_dirs):
-            nii_images = load_data(test_data, self.image_size, self.is_training)
-            test_nii_a = list()
-            test_nii_b = list()
-            for slice_ in nii_images:
-                fake_A, fake_B = self.sess.run([self.fake_A, self.fake_B], feed_dict={self.real_data: slice_})
-                test_nii_a.append(np.squeeze(fake_A))
-                test_nii_b.append(np.squeeze(fake_B))
-
-            test_nii_a = np.array(test_nii_a).transpose((2, 0, 1))
-            header_a = nii_utils.nii_header_reader(test_data[0])
-            nii_utils.nii_writer('{}/A/{:^2d}_{:^4d}/{}.nii'.format(sample_dir, epoch, step, i), header_a, test_nii_a)
-
-            test_nii_b = np.array(test_nii_b).transpose((2, 0, 1))
-            header_b = nii_utils.nii_header_reader(test_data[1])
-            nii_utils.nii_writer('{}/B/{:^2d}_{:^4d}/{}.nii'.format(sample_dir, epoch, step, i), header_b, test_nii_b)
+    # def sample_model(self, sample_dir, epoch, step):
+    #     test_dirs = [[self.test_dir['A'][i], self.test_dir['B'][i]] for i in range(len(self.test_dir['A']))]
+    #     np.random.shuffle(test_dirs)
+    #     for i, test_data in enumerate(test_dirs):
+    #         nii_images = load_data(test_data, self.image_size, self.is_training)
+    #         test_nii_a = list()
+    #         test_nii_b = list()
+    #         for slice_ in nii_images:
+    #             fake_A, fake_B = self.sess.run([self.fake_A, self.fake_B], feed_dict={self.real_data: slice_})
+    #             test_nii_a.append(np.squeeze(fake_A))
+    #             test_nii_b.append(np.squeeze(fake_B))
+    #
+    #         test_nii_a = np.array(test_nii_a).transpose((2, 0, 1))
+    #         header_a = nii_utils.nii_header_reader(test_data[0])
+    #         nii_utils.nii_writer('{}/A/{:^2d}_{:^4d}/{}.nii'.format(sample_dir, epoch, step, i), header_a, test_nii_a)
+    #
+    #         test_nii_b = np.array(test_nii_b).transpose((2, 0, 1))
+    #         header_b = nii_utils.nii_header_reader(test_data[1])
+    #         nii_utils.nii_writer('{}/B/{:^2d}_{:^4d}/{}.nii'.format(sample_dir, epoch, step, i), header_b, test_nii_b)
+    #
+    # def load(self, checkpoint_dir):
+    #     checkpoint_dir = Path(checkpoint_dir)
+    #     ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir / 'cycle_gan.ckpt'))
+    #     if ckpt and ckpt.model_checkpoint_path:
+    #         ckpt_name = Path(ckpt.model_checkpoint_path).stem
+    #         self.saver.restore(self.sess, str(checkpoint_dir / ckpt_name))
 
     # def test(self, option):
     #     """Test cyclegan"""
@@ -223,25 +218,3 @@ class CycleGAN:
     #         index.write('<td><img src="{}"></td>'.format(image_path))
     #         index.write('</tr>')
     #     index.close()
-
-    @staticmethod
-    def get_extend_options(option):
-        extend_config = 'configs/models/' + option['model']['name'] + '.yaml'
-        if Path(extend_config).exists():
-            extend_config = yaml_utils.read(extend_config)
-            if extend_config is not None:
-                option['model'].update(extend_config)
-            if 'gan' in option['model']['name']:
-                generator_config = 'configs/models/networks/' + extend_config['generator']['name'] + '.yaml'
-                if Path(generator_config).exists():
-                    generator_config = yaml_utils.read(generator_config)
-                    if generator_config is not None:
-                        option['model']['generator'].update(generator_config)
-
-                discriminator_config = 'configs/models/networks/' + extend_config['discriminator']['name'] + '.yaml'
-                if Path(discriminator_config).exists():
-                    discriminator_config = yaml_utils.read(discriminator_config)
-                    if discriminator_config is not None:
-                        option['model']['discriminator'].update(discriminator_config)
-
-        return Option(option)
