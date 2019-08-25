@@ -41,14 +41,14 @@ class CycleGAN:
         real_A = self.real_data[:, :, :, :self.in_channels]
         real_A_sum = tf.summary.image('{}/real_A'.format(self.options.tag), real_A, max_outputs=1)
         self.fake_B = self.generator(real_A, name='generatorA2B', **net_options)
-        fake_B_sum = tf.summary.image('{}/A2fake_B'.format(self.options.tag), self.fake_B, max_outputs=1)
+        fake_B_sum = tf.summary.image('{}/real_A2fake_B'.format(self.options.tag), self.fake_B, max_outputs=1)
         self.fake_A_ = self.generator(self.fake_B, name='generatorB2A', **net_options)
         DB_fake = self.discriminator(self.fake_B, name='discriminatorB', **net_options)
 
         real_B = self.real_data[:, :, :, self.in_channels:self.in_channels + self.out_channels]
         real_B_sum = tf.summary.image('{}/real_B'.format(self.options.tag), real_B, max_outputs=1)
         self.fake_A = self.generator(real_B, reuse=True, name='generatorB2A', **net_options)
-        fake_A_sum = tf.summary.image('{}/B2fake_A'.format(self.options.tag), self.fake_A, max_outputs=1)
+        fake_A_sum = tf.summary.image('{}/real_B2fake_A'.format(self.options.tag), self.fake_A, max_outputs=1)
         self.fake_B_ = self.generator(self.fake_A, reuse=True, name='generatorA2B', **net_options)
         DA_fake = self.discriminator(self.fake_A, name='discriminatorA', **net_options)  # todo read cycle
 
