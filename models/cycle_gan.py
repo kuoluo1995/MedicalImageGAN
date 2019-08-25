@@ -39,20 +39,16 @@ class CycleGAN:
         self.real_data = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1],
                                                      self.in_channels + self.out_channels], name='real_A_and_B_images')
         real_A = self.real_data[:, :, :, :self.in_channels]
-        real_A_uint8 = tf.cast(real_A, tf.uint8)
-        real_A_sum = tf.summary.image('{}/real_A'.format(self.options.tag), real_A_uint8, max_outputs=1)
+        real_A_sum = tf.summary.image('{}/real_A'.format(self.options.tag), real_A, max_outputs=1)
         self.fake_B = self.generator(real_A, name='generatorA2B', **net_options)
-        fake_B_uint8 = tf.cast(self.fake_B, tf.uint8)
-        fake_B_sum = tf.summary.image('{}/fake_B'.format(self.options.tag), fake_B_uint8, max_outputs=1)
+        fake_B_sum = tf.summary.image('{}/A2fake_B'.format(self.options.tag), self.fake_B, max_outputs=1)
         self.fake_A_ = self.generator(self.fake_B, name='generatorB2A', **net_options)
         DB_fake = self.discriminator(self.fake_B, name='discriminatorB', **net_options)
 
         real_B = self.real_data[:, :, :, self.in_channels:self.in_channels + self.out_channels]
-        real_B_uint8 = tf.cast(real_B, tf.uint8)
-        real_B_sum = tf.summary.image('{}/real_B'.format(self.options.tag), real_B_uint8, max_outputs=1)
+        real_B_sum = tf.summary.image('{}/real_B'.format(self.options.tag), real_B, max_outputs=1)
         self.fake_A = self.generator(real_B, reuse=True, name='generatorB2A', **net_options)
-        fake_A_uint8 = tf.cast(self.fake_A, tf.uint8)
-        fake_A_sum = tf.summary.image('{}/fake_A'.format(self.options.tag), fake_A_uint8, max_outputs=1)
+        fake_A_sum = tf.summary.image('{}/B2fake_A'.format(self.options.tag), self.fake_A, max_outputs=1)
         self.fake_B_ = self.generator(self.fake_A, reuse=True, name='generatorA2B', **net_options)
         DA_fake = self.discriminator(self.fake_A, name='discriminatorA', **net_options)  # todo read cycle
 
@@ -140,7 +136,7 @@ class CycleGAN:
             for i, train_data in enumerate(train_dirs):
                 nii_images = load_data(train_data, self.image_size, self.batch_size, self.is_training)
                 for j, slice_ in enumerate(nii_images):
-                    batch_images = np.array([slice_])
+                    batch_images = np.array([slice_],dtype=np.float32)
                     # Update G network and record fake outputs
                     fake_A, fake_B, _, summary_str, G_loss = self.sess.run(
                         [self.fake_A, self.fake_B, self.G_optim, self.G_sum, self.G_loss],
