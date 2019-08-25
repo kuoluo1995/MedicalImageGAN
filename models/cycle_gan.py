@@ -149,7 +149,7 @@ class CycleGAN:
                     # [fake_A, fake_B] = self.pool([fake_A, fake_B])
                     # Update D network
                     _, summary_str, D_loss = self.sess.run([self.D_optim, self.D_sum, self.D_loss],
-                                                           feed_dict={self.real_data: slice_, self.lr: lr,
+                                                           feed_dict={self.real_data: batch_images, self.lr: lr,
                                                                       self.fake_A_sample: fake_A,
                                                                       self.fake_B_sample: fake_B})
                     writer.add_summary(summary_str, counter)
