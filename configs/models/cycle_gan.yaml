@@ -1,10 +1,10 @@
 maxsize: 0
-L1_lambda: 10.0
+lambda: 10.0
 generator:
     name: unet
-    channels: 64
+    filter_channels: 64
 discriminator:
     name: patch_gan
-    channels: 64
+    filter_channels: 64
 gan_loss:
     name: lsgan_loss

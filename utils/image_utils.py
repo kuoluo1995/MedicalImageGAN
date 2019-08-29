@@ -1,7 +1,6 @@
 import numpy as np
 import copy
 from scipy import misc
-from utils import nii_utils
 
 
 class ImagePool(object):

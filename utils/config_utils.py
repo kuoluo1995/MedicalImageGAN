@@ -1,19 +1,22 @@
 from utils import yaml_utils
-from pathlib import Path
 
 
-def get_config(path):
-    _dict = yaml_utils.read(path)
-    _dict['name'] = Path(path).stem
-    return _dict
+def get_config(name):
+    base_config = yaml_utils.read('configs/base.yaml')
+    config_ = dict_update(base_config, yaml_utils.read('configs/' + name + '.yaml'))
+    config_['tag'] = name
+    return config_
 
-def dict_update(_dict,extend_dict):
+
+# 对比dict的update只能进行下一层的update，无法实现迭代。所以才写了这个函数
+def dict_update(_dict, extend_dict):
     for key, value in extend_dict.items():
-        if isinstance(value, dict):
+        if isinstance(value, dict) and key in _dict.keys() and isinstance(_dict[key], dict):
             _dict[key] = dict_update(_dict[key], extend_dict[key])
         else:
             _dict[key] = value
-        return _dict
+    return _dict
+
 
 def object2dict(option):
     _dict = dict()

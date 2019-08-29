@@ -13,5 +13,5 @@ def sce_loss(logits, labels):
     return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=labels))
 
 
-def abs_loss(logits, labels):
+def l1_loss(logits, labels):
     return tf.reduce_mean(tf.abs(logits - labels))

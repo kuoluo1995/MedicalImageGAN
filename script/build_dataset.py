@@ -3,41 +3,43 @@ from os import listdir
 from pathlib import Path
 from utils import yaml_utils, nii_utils
 
-a = 'T1'
-b = 'STIR'
+A = 'T1'
+B = 'STIR'
 
-source = '/home/yf/datas/NF/'  # E:/Datasets/Neurofibromatosis/source
-output = '/home/yf/datas/NF/'  # E:/Datasets/Neurofibromatosis
-oa = listdir(source + '/' + a)
-ob = listdir(source + '/' + b)
+source = 'E:/Datasets/Neurofibromatosis/source'  # /home/yf/datas/NF
+output = 'E:/Datasets/Neurofibromatosis'  # /home/yf/datas/NF
 
-datasets = list()
-error = list()
-for i in range(len(oa)):
-    image_a = nii_utils.nii_reader(source + '/' + a + '/' + oa[i])
-    image_b = nii_utils.nii_reader(source + '/' + b + '/' + ob[i])
-    print('\r>>dataset {} name: {}'.format(i, oa[i]), end='')
-    if image_a.shape[2] == image_b.shape[2] and oa[i] == ob[i]:
-        path = output + 'dataset/' + oa[i] + '.npz'
+sourceA_dirs = listdir(source + '/' + A)
+sourceB_dirs = listdir(source + '/' + B)
+
+dataset = list()
+error_data_info = list()
+for i in range(len(sourceA_dirs)):
+    a_nii = nii_utils.nii_reader(source + '/' + A + '/' + sourceA_dirs[i])
+    b_nii = nii_utils.nii_reader(source + '/' + B + '/' + sourceB_dirs[i])
+    print('\r>>dataset {}/{} name: {}'.format(i, len(sourceA_dirs), sourceA_dirs[i]), end='')
+    if a_nii.shape[2] == b_nii.shape[2] and sourceA_dirs[i] == sourceB_dirs[i]:
+        path = output + '/dataset/' + sourceA_dirs[i] + '.npz'
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        np.savez(path, a=image_a, b=image_b, a_size=[400], b_size=[1500])
-        datasets.append(path)
+        np.savez(path, A=a_nii, max_valueA=[1500], B=b_nii, max_valueB=[400])
+        dataset.append(path)
     else:
-        error.append(
-            'dataset {:3d} error, {}:{} {}, {}:{} {}'.format(i, a, oa[i], image_a.shape, b, ob[i], image_b.shape))
-        print('\r dataset {:3d} error, {}:{} {}, {}:{} {}'.format(i, a, oa[i], image_a.shape, b, ob[i], image_b.shape))
-np.random.shuffle(datasets)
+        error_data_info.append(
+            'dataset error, {}-name:{} shape:{}, {}-name:{} shape:{}'.format(A, sourceA_dirs[i], a_nii.shape, B,
+                                                                             sourceB_dirs[i], b_nii.shape))
+        print('\r dataset error, {}-name:{} shape:{}, {}-name:{} shape:{}'.format(A, sourceA_dirs[i], a_nii.shape, B,
+                                                                                  sourceB_dirs[i], b_nii.shape))
+np.random.shuffle(dataset)
+train_dataset = dataset[:len(dataset) * 8 // 10]
+print('\r! train dataset size: {}'.format(len(train_dataset)))
+yaml_utils.write(output + '/' + A + '2' + B + '_train.yaml', train_dataset)
 
-train_datasets = datasets[:len(datasets) * 8 // 10]
-print('\r! train dataset size: {}'.format(len(train_datasets)))
-yaml_utils.write(output + '/' + a + '2' + b + '_train.yaml', train_datasets)
+eval_dataset = dataset[len(train_dataset): len(dataset) * 9 // 10]
+print('\r! eval dataset size: {}'.format(len(eval_dataset)))
+yaml_utils.write(output + '/' + A + '2' + B + '_eval.yaml', eval_dataset)
 
-eval_datasets = datasets[len(train_datasets): len(datasets) * 9 // 10]
-print('\r! eval dataset size: {}'.format(len(eval_datasets)))
-yaml_utils.write(output + '/' + a + '2' + b + '_eval.yaml', eval_datasets)
+test_dataset = dataset[len(dataset) * 9 // 10:]
+print('\r! test dataset size: {}'.format(len(test_dataset)))
+yaml_utils.write(output + '/' + A + '2' + B + '_test.yaml', test_dataset)
 
-test_datasets = datasets[len(train_datasets) + len(eval_datasets):]
-print('\r! test dataset size: {}'.format(len(test_datasets)))
-yaml_utils.write(output + '/' + a + '2' + b + '_test.yaml', test_datasets)
-
-yaml_utils.write(output + '/error.yaml', error)
+yaml_utils.write(output + '/error.yaml', error_data_info)

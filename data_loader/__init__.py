@@ -2,7 +2,7 @@ import numpy as np
 from utils import yaml_utils
 
 
-def get_data_generator_fn_by_name(name):
+def get_data_loader_by_name(name):
     return eval(name)
 
 
@@ -43,6 +43,10 @@ def gan_data_generator(dataset_path, batch_size, image_size, channels, is_train=
                     yield np.array(batch_data_a), np.array(batch_data_b)
                     batch_data_a = list()
                     batch_data_b = list()
+
+
+def get_epoch_step(dataset):
+    return 0
 
 
 if __name__ == '__main__':
