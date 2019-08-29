@@ -1,31 +1,27 @@
-import numpy as np
 import copy
-from scipy import misc
+import numpy as np
 
 
 class ImagePool(object):
     def __init__(self, maxsize=50):
         self.maxsize = maxsize
-        self.images = []
+        self.imagesA = []
+        self.imagesB = []
 
-    def __call__(self, image):
+    def __call__(self, imageA, imageB):
         if self.maxsize <= 0:
-            return image
-        if len(self.images) < self.maxsize:
-            self.images.append(image)
-            return image
+            return imageA, imageB
+        if len(self.imagesA) < self.maxsize:
+            self.imagesA.append(imageA)
+            self.imagesB.append(imageB)
+            return imageA, imageB
         if np.random.rand() > 0.5:
-            id = int(np.random.rand() * self.maxsize)
-            A = copy.copy(self.images[id])[0]
-            self.images[id][0] = image[0]
-            # id = int(np.random.rand() * self.maxsize)
-            B = copy.copy(self.images[id])[1]
-            self.images[id][1] = image[1]
-            return [A, B]
+            idx = int(np.random.rand() * self.maxsize)
+            _imageA = copy.copy(self.imagesA[idx])
+            self.imagesA[idx] = imageA
+            idx = int(np.random.rand() * self.maxsize)
+            _imageB = copy.copy(self.imagesB[idx])
+            self.imagesB[idx] = imageB
+            return _imageA, _imageB
         else:
-            return image
-
-
-def save_images(images, size, image_path):
-    return misc.imsave(images, size, image_path)
-
+            return imageA, imageB

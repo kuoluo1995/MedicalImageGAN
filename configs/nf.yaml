@@ -3,7 +3,7 @@ phase: train
 dataset:
     name: NF
     data_loader: gan_data_generator
-    image_size: [1152,384]
+    image_size: [512,256]
     train_path: 'E:/Datasets/Neurofibromatosis/t12stir_train.yaml' #  /home/yf/datas/NF/T12STIR_train.yaml
     test_path: 'E:/Datasets/Neurofibromatosis/t12stir_test.yaml' #  /home/yf/datas/NF/T12STIR_test.yaml
 

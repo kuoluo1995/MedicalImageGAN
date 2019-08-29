@@ -18,9 +18,8 @@ class BaseModel(ABC):
         self.save_freq = kwargs['save_freq']
         # dataset
         dataset = kwargs['dataset']
-        self.dataset_name = dataset['name']
         self.data_loader = get_data_loader_by_name(dataset['data_loader'])
-        self.image_size = dataset['image_size']
+        self.image_size = tuple(dataset['image_size'])
         self.train_dataset = yaml_utils.read(dataset['train_path'])
         self.train_size = len(self.train_dataset)
         self.test_dataset = yaml_utils.read(dataset['test_path'])
@@ -32,9 +31,9 @@ class BaseModel(ABC):
         self.in_channels = model['in_channels']
         self.out_channels = model['out_channels']
         self.filter_channels = model['filter_channels']
-        self.loss_fn = get_loss_fn_by_name(model['loss']['name'])
-        self.scheduler_fn = get_scheduler_fn(model['scheduler'])
-        self.checkpoint_dir = Path(model['checkpoint_dir']) / kwargs['tag']
+        self.loss_fn = get_loss_fn_by_name(model['loss'])
+        self.scheduler_fn = get_scheduler_fn(total_epoch=self.epoch, **model['scheduler'])
+        self.checkpoint_dir = Path(model['checkpoint_dir']) / model['name']
 
     @abstractmethod
     def build_model(self, **kwargs):
@@ -50,12 +49,12 @@ class BaseModel(ABC):
     def save(self, checkpoint_dir, epoch, **kwargs):
         checkpoint_dir = Path(checkpoint_dir)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        self.saver.save(self.sess, str(checkpoint_dir / self.dataset_name + '.ckpt'), global_step=epoch)
+        self.saver.save(self.sess, str(checkpoint_dir / self.tag + '.ckpt'), global_step=epoch)
 
     def load(self, checkpoint_dir, **kwargs):
         checkpoint_dir = Path(checkpoint_dir)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir / self.dataset_name + '.ckpt'))
+        ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir / self.tag + '.ckpt'))
         if ckpt and ckpt.model_checkpoint_path:
             ckpt_name = Path(ckpt.model_checkpoint_path).stem
             self.saver.restore(self.sess, str(checkpoint_dir / ckpt_name))

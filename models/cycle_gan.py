@@ -9,7 +9,7 @@ class CycleGAN(BaseGanModel):
     def __init__(self, **kwargs):
         BaseGanModel.__init__(self, **kwargs)
         self._lambda = self.kwargs['model']['lambda']
-        self.pool = ImagePool(self.kwargs['model']['maxsize'])
+        self.image_pool = ImagePool(self.kwargs['model']['maxsize'])
         self.build_model()
         self.summary()
         self.saver = tf.train.Saver()
@@ -49,13 +49,13 @@ class CycleGAN(BaseGanModel):
 
         self.d_loss_realA = self.loss_fn(realA_logit, tf.ones_like(realA_logit))
         self.d_loss_fakeA = self.loss_fn(fakeA_logit, tf.zeros_like(fakeA_logit))
-        self.d_loss_A = (self.d_loss_realA + self.d_loss_fakeA) / 2
+        self.d_loss_A = self.d_loss_realA + self.d_loss_fakeA
 
         self.d_loss_realB = self.loss_fn(realB_logit, tf.ones_like(realB_logit))
         self.d_loss_fakeB = self.loss_fn(fakeB_logit, tf.zeros_like(fakeB_logit))
-        self.d_loss_B = (self.d_loss_realB + self.d_loss_fakeB) / 2
+        self.d_loss_B = self.d_loss_realB + self.d_loss_fakeB
 
-        self.d_loss = (self.d_loss_A + self.d_loss_B) / 2
+        self.d_loss = self.d_loss_A + self.d_loss_B
 
         train_vars = tf.trainable_variables()
         self.g_vars = [var for var in train_vars if 'generator' in var.name]
@@ -80,6 +80,7 @@ class CycleGAN(BaseGanModel):
                                        d_loss_A_sum, d_loss_B_sum, d_loss_sum])
 
     def train(self):
+        """Train cyclegan"""
         lr_tensor = tf.placeholder(tf.float32, None, name='learning_rate')
         g_optimizer = tf.train.AdamOptimizer(lr_tensor, beta1=0.5).minimize(self.g_loss, var_list=self.g_vars)
         d_optimizer = tf.train.AdamOptimizer(lr_tensor, beta1=0.5).minimize(self.d_loss, var_list=self.d_vars)
@@ -94,13 +95,19 @@ class CycleGAN(BaseGanModel):
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
             for step in range(epoch_step):
-                train_data = next(train_generator)
+                realA, realB = next(train_generator)
+
+                # Update G network and record fake outputs
                 fakeA, fakeB, _, g_sum, g_loss = self.sess.run(
                     [self.fakeA, self.fakeB, g_optimizer, self.g_sum, self.g_loss],
-                    feed_dict={self.realA: train_data[0], self.realB: train_data[1], lr_tensor: lr})
+                    feed_dict={self.realA: realA, self.realB: realB, lr_tensor: lr})
                 writer.add_summary(g_sum, epoch * epoch_step + step)
+
+                fakeA, fakeB = self.image_pool(fakeA, fakeB)
+
+                # Update D network
                 _, d_sum, d_loss = self.sess.run([d_optimizer, self.d_sum, self.d_loss],
-                                                 feed_dict={self.realA: train_data[0], self.realB: train_data[1],
+                                                 feed_dict={self.realA: realA, self.realB: realB,
                                                             self.fakeA_sample: fakeA, self.fakeB_sample: fakeB,
                                                             lr_tensor: lr})
                 writer.add_summary(d_sum, epoch * epoch_step + step)

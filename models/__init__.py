@@ -21,7 +21,7 @@ def get_model_class_by_name(name):
     return target_cls
 
 
-def get_model_fn(model_type, _config):
+def get_model_fn(model_type, **_config):
     file_name = 'models.' + model_type + '.' + _config['name']
     libs = importlib.import_module(file_name)
     if 'build_model' in libs.__dict__.keys():
@@ -35,5 +35,5 @@ def get_model_fn(model_type, _config):
 
 
 if __name__ == '__main__':
-    model_fn = get_model_fn('generator', {'name': 'unet', 'filter_channels': 32})
+    model_fn = get_model_fn('generator', **{'name': 'unet', 'filter_channels': 32})
     model_fn(image=np.array([[1]]), out_channels=1)
