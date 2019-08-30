@@ -1,5 +1,5 @@
 import tensorflow as tf
-from models.utils.layers import conv2d, instance_norm, leaky_relu, deconv2d
+from models.utils.layers import conv2d, instance_norm, deconv2d
 
 
 def residule_block(x, num_outputs, kernel_size=3, stride=1, name='res'):
