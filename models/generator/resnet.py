@@ -5,7 +5,7 @@ from models.utils.layers import conv2d, instance_norm, deconv2d
 def residule_block(x, num_outputs, kernel_size=3, stride=1, name='res'):
     padding = int((kernel_size - 1) / 2)
     y = tf.pad(x, [[0, 0], [padding, padding], [padding, padding], [0, 0]], 'REFLECT')
-    y = instance_norm(conv2d(y, num_outputs, kernel_size, stride, padding='VADLID', name=name + '_c1'), name + '_bn1')
+    y = instance_norm(conv2d(y, num_outputs, kernel_size, stride, padding='VALID', name=name + '_c1'), name + '_bn1')
     y = tf.nn.relu(y)
     y = tf.pad(y, [[0, 0], [padding, padding], [padding, padding], [0, 0]], 'REFLECT')
     y = instance_norm(conv2d(y, num_outputs, kernel_size, stride, padding='VALID', name=name + '_c2'), name + '_bn2')
