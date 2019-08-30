@@ -25,8 +25,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/models/generator/resnet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="350">
-              <caret line="37" column="77" selection-end-line="41" />
+            <state relative-caret-position="210">
+              <caret line="21" column="41" selection-start-line="21" selection-start-column="41" selection-end-line="21" selection-end-column="41" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -457,7 +457,7 @@
       <workItem from="1567037618665" duration="1902000" />
       <workItem from="1567041468652" duration="18346000" />
       <workItem from="1567083874781" duration="1098000" />
-      <workItem from="1567093110464" duration="4584000" />
+      <workItem from="1567093110464" duration="4619000" />
     </task>
     <task id="LOCAL-00001" summary="临时版本">
       <created>1566722228954</created>
@@ -704,11 +704,18 @@
       <option name="project" value="LOCAL" />
       <updated>1567134812383</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="to be test">
+      <created>1567135209578</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1567135209579</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="252970000" />
+    <option name="totallyTimeSpent" value="253005000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1159,15 +1166,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/models/utils/layers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="735">
-          <caret line="22" column="4" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
+        <state relative-caret-position="206">
+          <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/models/generator/resnet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="37" column="77" selection-end-line="41" />
+        <state relative-caret-position="210">
+          <caret line="21" column="41" selection-start-line="21" selection-start-column="41" selection-end-line="21" selection-end-column="41" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
