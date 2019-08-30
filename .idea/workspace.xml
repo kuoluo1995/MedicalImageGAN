@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5d7f70ea-3200-466f-a543-4a455c848d08" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/generator/resnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/generator/resnet.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -11,25 +10,35 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DockManager">
+    <window id="1">
+      <content type="file-editors">
+        <state>
+          <leaf>
+            <file pinned="false" current-in-tab="true">
+              <entry file="file://$PROJECT_DIR$/models/generator/resnet.py">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="245">
+                    <caret line="7" column="77" selection-start-line="7" selection-start-column="77" selection-end-line="7" selection-end-column="77" />
+                    <folding>
+                      <element signature="e#0#23#0" expanded="true" />
+                    </folding>
+                  </state>
+                </provider>
+              </entry>
+            </file>
+          </leaf>
+        </state>
+      </content>
+    </window>
+  </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/configs/models/cycle_gan.yaml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="245">
+            <state relative-caret-position="6">
               <caret line="7" column="23" lean-forward="true" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/models/generator/resnet.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="21" column="41" selection-start-line="21" selection-start-column="41" selection-end-line="21" selection-end-column="41" />
-              <folding>
-                <element signature="e#0#23#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -457,7 +466,7 @@
       <workItem from="1567037618665" duration="1902000" />
       <workItem from="1567041468652" duration="18346000" />
       <workItem from="1567083874781" duration="1098000" />
-      <workItem from="1567093110464" duration="4619000" />
+      <workItem from="1567093110464" duration="4878000" />
     </task>
     <task id="LOCAL-00001" summary="临时版本">
       <created>1566722228954</created>
@@ -711,11 +720,25 @@
       <option name="project" value="LOCAL" />
       <updated>1567135209579</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="to be test">
+      <created>1567135242272</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1567135242272</updated>
+    </task>
+    <task id="LOCAL-00038" summary="to be test">
+      <created>1567135303711</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1567135303711</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="253005000" />
+    <option name="totallyTimeSpent" value="253264000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -743,8 +766,8 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" sideWeight="0.4993573" weight="0.32960895" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.2947761" side_tool="true" visible="true" weight="0.265625" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.70522386" visible="true" weight="0.265625" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.2947761" side_tool="true" visible="true" weight="0.96651787" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.70522386" visible="true" weight="0.96651787" />
       <window_info anchor="bottom" id="Python Console" order="12" sideWeight="0.49946696" weight="0.37569833" />
       <window_info anchor="bottom" id="File Transfer" order="13" sideWeight="0.81876606" weight="0.34217876" />
       <window_info active="true" anchor="bottom" id="Concurrent Activities Diagram" order="14" weight="0.32924107" />
@@ -1140,13 +1163,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/configs/models/cycle_gan.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="7" column="23" lean-forward="true" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/train.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="58">
@@ -1171,10 +1187,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/configs/models/cycle_gan.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6">
+          <caret line="7" column="23" lean-forward="true" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/models/generator/resnet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="21" column="41" selection-start-line="21" selection-start-column="41" selection-end-line="21" selection-end-column="41" />
+        <state relative-caret-position="245">
+          <caret line="7" column="77" selection-start-line="7" selection-start-column="77" selection-end-line="7" selection-end-column="77" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
