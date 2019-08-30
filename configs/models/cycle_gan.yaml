@@ -1,7 +1,7 @@
 maxsize: 0
 lambda: 10.0
 generator:
-    name: resnet
+    name: unet
     filter_channels: 64
 discriminator:
     name: patch_gan

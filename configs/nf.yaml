@@ -9,3 +9,5 @@ dataset:
 
 model:
     name: cycle_gan
+    generator:
+        name: unet
