@@ -57,8 +57,8 @@ def get_multi_channel_image(s_id, a_nii, b_nii, image_size, channels, is_trainin
         channels_imagesA.append(np.zeros(image_size, dtype=float))
         channels_imagesB.append(np.zeros(image_size, dtype=float))
 
-    channels_imagesA = np.array(channels_imagesA).transpose((2, 1, 0))
-    channels_imagesB = np.array(channels_imagesB).transpose((2, 1, 0))
+    channels_imagesA = np.array(channels_imagesA).transpose((1, 2, 0))
+    channels_imagesB = np.array(channels_imagesB).transpose((1, 2, 0))
     return channels_imagesA, channels_imagesB
 
 
