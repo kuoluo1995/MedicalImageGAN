@@ -105,7 +105,7 @@ class CycleGAN(BaseGanModel):
                 # Update G network and record fake outputs
                 fakeA, fakeB, _, g_sum, g_loss = self.sess.run(
                     [self.fakeA, self.fakeB, g_optimizer, self.g_sum, self.g_loss],
-                    feed_dict={self.realA: realA, self.realB: realB, lr_tensor: lr})
+                    feed_dict={self.realA: realA, self.realB: realB, self.lr_tensor: lr})
                 writer.add_summary(g_sum, epoch * epoch_step + step)
 
                 fakeA, fakeB = self.image_pool(fakeA, fakeB)
@@ -114,7 +114,7 @@ class CycleGAN(BaseGanModel):
                 _, d_sum, d_loss = self.sess.run([d_optimizer, self.d_sum, self.d_loss],
                                                  feed_dict={self.realA: realA, self.realB: realB,
                                                             self.fakeA_sample: fakeA, self.fakeB_sample: fakeB,
-                                                            lr_tensor: lr})
+                                                            self.lr_tensor: lr})
                 writer.add_summary(d_sum, epoch * epoch_step + step)
                 print('Epoch:{:>3d}/{:<3d} Step:{:>4d}/{:<4d} g_loss:{:<5.5f} d_loss:{:<5.5f}'.format(epoch, self.epoch,
                                                                                                       step, epoch_step,
