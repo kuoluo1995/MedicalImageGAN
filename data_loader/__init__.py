@@ -44,8 +44,8 @@ def get_multi_channel_image(s_id, a_nii, b_nii, image_size, channels, is_trainin
     padding = len(channels_imagesA)
 
     for _id in range(s_id - channels // 2 + padding, min(s_id + channels - channels // 2, a_nii.shape[0])):
-        sliceA = cv2.resize(a_nii[_id], image_size, interpolation=cv2.INTER_AREA)
-        sliceB = cv2.resize(b_nii[_id], image_size, interpolation=cv2.INTER_AREA)
+        sliceA = cv2.resize(a_nii[_id], (image_size[1], image_size[0]), interpolation=cv2.INTER_AREA)
+        sliceB = cv2.resize(b_nii[_id], (image_size[1], image_size[0]), interpolation=cv2.INTER_AREA)
         if is_training:
             # todo 数据增广
             pass
