@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5d7f70ea-3200-466f-a543-4a455c848d08" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/models/cycle_gan.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/models/cycle_gan.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/nf.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/nf.yaml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -12,11 +13,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/models/cycle_gan.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="279">
-              <caret line="90" column="21" selection-start-line="90" selection-start-column="21" selection-end-line="90" selection-end-column="21" />
+            <state relative-caret-position="249">
+              <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/configs/nf.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="3" column="12" lean-forward="true" selection-start-line="3" selection-start-column="12" selection-end-line="3" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -102,7 +115,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="fast" />
+        <entry key="$PROJECT_DIR$" value="rule_code" />
       </map>
     </option>
   </component>
@@ -134,14 +147,14 @@
         <option value="$PROJECT_DIR$/models/utils/scheduler.py" />
         <option value="$PROJECT_DIR$/utils/image_utils.py" />
         <option value="$PROJECT_DIR$/configs/base.yaml" />
-        <option value="$PROJECT_DIR$/configs/nf.yaml" />
         <option value="$PROJECT_DIR$/train.py" />
-        <option value="$PROJECT_DIR$/configs/models/cycle_gan.yaml" />
         <option value="$PROJECT_DIR$/models/generator/resnet.py" />
         <option value="$PROJECT_DIR$/script/build_dataset.py" />
         <option value="$PROJECT_DIR$/data_loader/__init__.py" />
         <option value="$PROJECT_DIR$/models/base_model.py" />
         <option value="$PROJECT_DIR$/models/cycle_gan.py" />
+        <option value="$PROJECT_DIR$/configs/models/cycle_gan.yaml" />
+        <option value="$PROJECT_DIR$/configs/nf.yaml" />
       </list>
     </option>
   </component>
@@ -151,11 +164,11 @@
     <other-services-enabled>true</other-services-enabled>
     <auto-save>true</auto-save>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1912" />
-    <option name="y" value="-8" />
-    <option name="width" value="1616" />
-    <option name="height" value="876" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1957" />
+    <option name="y" value="28" />
+    <option name="width" value="1377" />
+    <option name="height" value="777" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -179,7 +192,13 @@
             <path>
               <item name="CycleGAN-medical-image" type="b2602c69:ProjectViewProjectNode" />
               <item name="CycleGAN-medical-image" type="462c0819:PsiDirectoryNode" />
-              <item name="data_loader" type="462c0819:PsiDirectoryNode" />
+              <item name="configs" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="CycleGAN-medical-image" type="b2602c69:ProjectViewProjectNode" />
+              <item name="CycleGAN-medical-image" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -395,14 +414,7 @@
       <workItem from="1567037618665" duration="1902000" />
       <workItem from="1567041468652" duration="18346000" />
       <workItem from="1567083874781" duration="1098000" />
-      <workItem from="1567093110464" duration="15130000" />
-    </task>
-    <task id="LOCAL-00001" summary="临时版本">
-      <created>1566722228954</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1566722228954</updated>
+      <workItem from="1567093110464" duration="18954000" />
     </task>
     <task id="LOCAL-00002" summary="临时版本">
       <created>1566724610361</created>
@@ -740,11 +752,18 @@
       <option name="project" value="LOCAL" />
       <updated>1567142289586</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="add learning rat summary">
+      <created>1567146787700</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1567146787701</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="263516000" />
+    <option name="totallyTimeSpent" value="267340000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -756,23 +775,24 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1912" y="-8" width="1616" height="876" extended-state="6" />
+    <frame x="1957" y="28" width="1377" height="777" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49799198" visible="true" weight="0.14395887" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49799198" visible="true" weight="0.17008352" />
       <window_info id="Structure" order="1" sideWeight="0.502008" side_tool="true" weight="0.14395887" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32924107" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49733475" weight="0.32243517" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.82196164" weight="0.41629463" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.82196164" weight="0.54189944" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49871466" weight="0.32960895" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" sideWeight="0.49871466" weight="0.32960895" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.29755783" side_tool="true" weight="0.29748604" />
-      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.70244217" visible="true" weight="0.31564245" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.29755783" side_tool="true" weight="0.31424582" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.70244217" weight="0.4489465" />
       <window_info anchor="bottom" id="Python Console" order="12" sideWeight="0.49807197" weight="0.37569833" />
       <window_info anchor="bottom" id="File Transfer" order="13" sideWeight="0.8181234" weight="0.34217876" />
       <window_info active="true" anchor="bottom" id="Concurrent Activities Diagram" order="14" weight="0.32924107" />
@@ -1170,44 +1190,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/base_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-483">
-          <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="337">
-          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/89760744/tensorflow/python/ops/array_ops.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-504">
           <caret line="1705" column="4" selection-start-line="1705" selection-start-column="4" selection-end-line="1705" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configs/nf.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="9" column="6" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configs/models/cycle_gan.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="7" column="23" lean-forward="true" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="23" />
         </state>
       </provider>
     </entry>
@@ -1223,8 +1209,42 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/models/cycle_gan.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="90" column="21" selection-start-line="90" selection-start-column="21" selection-end-line="90" selection-end-column="21" />
+        <state relative-caret-position="-386">
+          <caret line="89" column="22" lean-forward="true" selection-start-line="89" selection-start-column="22" selection-end-line="89" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/base_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="35">
+          <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/models/cycle_gan.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="4" column="23" lean-forward="true" selection-start-line="4" selection-start-column="23" selection-end-line="4" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/nf.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="3" column="12" lean-forward="true" selection-start-line="3" selection-start-column="12" selection-end-line="3" selection-end-column="12" />
         </state>
       </provider>
     </entry>
