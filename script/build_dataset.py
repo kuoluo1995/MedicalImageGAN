@@ -6,8 +6,8 @@ from utils import yaml_utils, nii_utils
 A = 'T1'
 B = 'STIR'
 
-source = 'E:/Datasets/Neurofibromatosis/source'  # /home/yf/datas/NF
-output = 'E:/Datasets/Neurofibromatosis'  # /home/yf/datas/NF
+source = '/home/yf/datas/NF'  # /home/yf/datas/NF E:/Datasets/Neurofibromatosis/source
+output = '/home/yf/datas/NF'  # E:/Datasets/Neurofibromatosis
 
 sourceA_dirs = listdir(source + '/' + A)
 sourceB_dirs = listdir(source + '/' + B)
