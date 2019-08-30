@@ -1,19 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5d7f70ea-3200-466f-a543-4a455c848d08" name="Default Changelist" comment="run version">
-      <change afterPath="$PROJECT_DIR$/models/generator/resnet.py" afterDir="false" />
+    <list default="true" id="5d7f70ea-3200-466f-a543-4a455c848d08" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/CycleGAN-medical-image.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CycleGAN-medical-image.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs/base.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/base.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs/nf.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/nf.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_loader/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_loader/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/base_gan_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/base_gan_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/base_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/base_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/cycle_gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/cycle_gan.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/utils/scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/utils/scheduler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/script/build_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/script/build_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/image_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/image_utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,32 +13,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/train.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="350">
-              <caret line="13" selection-start-line="13" selection-end-line="13" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/models/generator/resnet.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="700">
-              <caret line="38" column="66" selection-start-line="38" selection-start-column="59" selection-end-line="38" selection-end-column="66" />
-              <folding>
-                <element signature="e#0#23#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -188,6 +154,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -195,43 +162,10 @@
               <item name="CycleGAN-medical-image" type="b2602c69:ProjectViewProjectNode" />
               <item name="CycleGAN-medical-image" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="CycleGAN-medical-image" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CycleGAN-medical-image" type="462c0819:PsiDirectoryNode" />
-              <item name="configs" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CycleGAN-medical-image" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CycleGAN-medical-image" type="462c0819:PsiDirectoryNode" />
-              <item name="models" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CycleGAN-medical-image" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CycleGAN-medical-image" type="462c0819:PsiDirectoryNode" />
-              <item name="models" type="462c0819:PsiDirectoryNode" />
-              <item name="discriminator" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CycleGAN-medical-image" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CycleGAN-medical-image" type="462c0819:PsiDirectoryNode" />
-              <item name="models" type="462c0819:PsiDirectoryNode" />
-              <item name="generator" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CycleGAN-medical-image" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CycleGAN-medical-image" type="462c0819:PsiDirectoryNode" />
-              <item name="script" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CycleGAN-medical-image" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CycleGAN-medical-image" type="462c0819:PsiDirectoryNode" />
-              <item name="utils" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -441,7 +375,8 @@
       <workItem from="1567006793310" duration="5004000" />
       <workItem from="1567037618665" duration="1902000" />
       <workItem from="1567041468652" duration="18346000" />
-      <workItem from="1567083874781" duration="855000" />
+      <workItem from="1567083874781" duration="1098000" />
+      <workItem from="1567093110464" duration="183000" />
     </task>
     <task id="LOCAL-00001" summary="临时版本">
       <created>1566722228954</created>
@@ -660,11 +595,18 @@
       <option name="project" value="LOCAL" />
       <updated>1566751936474</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="to be test">
+      <created>1567085843933</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1567085843933</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="248143000" />
+    <option name="totallyTimeSpent" value="248569000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -677,9 +619,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="0" width="1934" height="1047" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11846318" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11953042" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -738,7 +679,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="临时版本" />
-    <option name="LAST_COMMIT_MESSAGE" value="临时版本" />
+    <MESSAGE value="to be test" />
+    <option name="LAST_COMMIT_MESSAGE" value="to be test" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1114,22 +1056,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/train.py">
+    <entry file="file://$PROJECT_DIR$/models/generator/resnet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        <state relative-caret-position="945">
+          <caret line="27" column="48" selection-start-line="27" selection-start-column="48" selection-end-line="27" selection-end-column="48" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/generator/resnet.py">
+    <entry file="file://$PROJECT_DIR$/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="700">
-          <caret line="38" column="66" selection-start-line="38" selection-start-column="59" selection-end-line="38" selection-end-column="66" />
+        <state relative-caret-position="369">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
           <folding>
-            <element signature="e#0#23#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
