@@ -17,10 +17,10 @@ def build_model(image, out_channels, filter_channels=64, reuse=False, name='resn
         if reuse:
             tf.get_variable_scope().reuse_variables()
 
-        c0 = tf.pad(image, [[0, 0], [3, 3], [3, 3], [0, 0], 'REFLECT'])
+        c0 = tf.pad(image, [[0, 0], [3, 3], [3, 3], [0, 0]], 'REFLECT')
         c1 = tf.nn.relu(instance_norm(conv2d(c0, filter_channels, 7, 1, padding='VALID', name='g_e1_c'), 'g_e1_bn'))
-        c2 = tf.nn.relu(instance_norm(conv2d(c1, filter_channels * 2, 3, 2, padding='VALID', name='g_e2_c'), 'g_e2_bn'))
-        c3 = tf.nn.relu(instance_norm(conv2d(c2, filter_channels * 4, 3, 2, padding='VALID', name='g_e3_c'), 'g_e3_bn'))
+        c2 = tf.nn.relu(instance_norm(conv2d(c1, filter_channels * 2, 3, 2, name='g_e2_c'), 'g_e2_bn'))
+        c3 = tf.nn.relu(instance_norm(conv2d(c2, filter_channels * 4, 3, 2, name='g_e3_c'), 'g_e3_bn'))
         # define G network with 9 resnet blocks
         r1 = residule_block(c3, filter_channels * 4, name='g_r1')
         r2 = residule_block(r1, filter_channels * 4, name='g_r2')
@@ -32,10 +32,10 @@ def build_model(image, out_channels, filter_channels=64, reuse=False, name='resn
         r8 = residule_block(r7, filter_channels * 4, name='g_r8')
         r9 = residule_block(r8, filter_channels * 4, name='g_r9')
 
-        d1 = deconv2d(r9, filter_channels * 2, 3, 2, name='g_d1_dc')
-        d1 = tf.nn.relu(instance_norm(d1, 'g_d1_bn'))
-        d2 = deconv2d(d1, filter_channels, 3, 2, name='g_d2_dc')
-        d2 = tf.nn.relu(instance_norm(d2, 'g_d2_bn'))
+        d1 = tf.nn.relu(instance_norm(deconv2d(r9, filter_channels * 2, 3, 2, name='g_d1_dc'), 'g_d1_bn'))
+        d2 = tf.nn.relu(instance_norm(deconv2d(d1, filter_channels, 3, 2, name='g_d2_dc'), 'g_d2_bn'))
         d2 = tf.pad(d2, [[0, 0], [3, 3], [3, 3], [0, 0]], 'REFLECT')
-        pred = tf.nn.tanh(conv2d(d2, out_channels, 7, 1, padding='VALID', name='g_pred_c'))
+        d2 = conv2d(d2, out_channels, 7, 1, padding='VALID', name='g_pred_c')
+
+        pred = tf.nn.tanh(d2)
         return pred
