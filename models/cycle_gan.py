@@ -81,7 +81,7 @@ class CycleGAN(BaseGanModel):
         d_loss_B_sum = tf.summary.scalar('{}/DLossB'.format(self.tag), self.d_loss_B)
         d_loss_sum = tf.summary.scalar('{}/DLoss'.format(self.tag), self.d_loss)
 
-        lr_sum = tf.summary.scalar('{}/LearningRate'.format(self.lr_tensor))
+        lr_sum = tf.summary.scalar('{}/LearningRate'.format(self.tag), self.lr_tensor)
         self.d_sum = tf.summary.merge([d_loss_realA_sum, d_loss_realB_sum, d_loss_fakeA_sum, d_loss_fakeB_sum,
                                        d_loss_A_sum, d_loss_B_sum, d_loss_sum, lr_sum])
 
