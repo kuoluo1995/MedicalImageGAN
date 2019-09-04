@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/CycleGAN-medical-image.iml" filepath="$PROJECT_DIR$/.idea/CycleGAN-medical-image.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MedicalImageGAN.iml" filepath="$PROJECT_DIR$/.idea/MedicalImageGAN.iml" />
     </modules>
   </component>
 </project>
