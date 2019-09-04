@@ -16,5 +16,5 @@ def train(args):
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    config = get_config('nf')
+    config = get_config('base_pix')
     train(config)

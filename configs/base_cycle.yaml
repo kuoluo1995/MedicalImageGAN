@@ -8,6 +8,6 @@ dataset:
     test_path: '/home/yf/datas/NF/T12STIR_test.yaml' # E:/Datasets/Neurofibromatosis/t12stir_test.yaml
 
 model:
-    name: cycle_gan
+    name: pix2pix_gan
     generator:
         name: unet

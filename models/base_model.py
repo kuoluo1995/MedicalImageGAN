@@ -16,8 +16,10 @@ class BaseModel(ABC):
         self.is_training = (kwargs['phase'] == 'train')
         self.print_freq = kwargs['print_freq']
         self.save_freq = kwargs['save_freq']
+        self.lr_tensor = tf.placeholder(tf.float32, None, name='learning_rate')
         # dataset
         dataset = kwargs['dataset']
+        self.dataset_name = dataset['name']
         self.data_loader = get_data_loader_by_name(dataset['data_loader'])
         self.image_size = tuple(dataset['image_size'])
         self.train_dataset = yaml_utils.read(dataset['train_path'])
@@ -26,6 +28,7 @@ class BaseModel(ABC):
         self.test_size = len(self.test_dataset)
         # model
         model = kwargs['model']
+        self.name = model['name']
         self.epoch = model['epoch']
         self.batch_size = model['batch_size']
         self.in_channels = model['in_channels']
@@ -33,7 +36,7 @@ class BaseModel(ABC):
         self.filter_channels = model['filter_channels']
         self.loss_fn = get_loss_fn_by_name(model['loss'])
         self.scheduler_fn = get_scheduler_fn(total_epoch=self.epoch, **model['scheduler'])
-        self.checkpoint_dir = Path(model['checkpoint_dir']) / model['name']
+        self.checkpoint_dir = Path(model['checkpoint_dir']) / self.dataset_name / self.name
 
     @abstractmethod
     def build_model(self, **kwargs):

@@ -11,7 +11,6 @@ class CycleGAN(BaseGanModel):
         self._lambda = self.kwargs['model']['lambda']
         self.image_pool = ImagePool(self.kwargs['model']['maxsize'])
         self.build_model()
-        self.lr_tensor = tf.placeholder(tf.float32, None, name='learning_rate')
         self.summary()
         self.saver = tf.train.Saver()
 
@@ -63,25 +62,38 @@ class CycleGAN(BaseGanModel):
         self.d_vars = [var for var in train_vars if 'discriminator' in var.name]
 
     def summary(self):
-        realA_sum = tf.summary.image('{}/AReal'.format(self.tag), self.realA, max_outputs=1)
-        realB_sum = tf.summary.image('{}/BReal'.format(self.tag), self.realB, max_outputs=1)
-        fakeA_sum = tf.summary.image('{}/AFake'.format(self.tag), self.fakeA, max_outputs=1)
-        fakeB_sum = tf.summary.image('{}/BFake'.format(self.tag), self.fakeB, max_outputs=1)
-        g_loss_A2B_sum = tf.summary.scalar('{}/GLossA2B'.format(self.tag), self.g_loss_A2B)
-        g_loss_B2A_sum = tf.summary.scalar('{}/GLossB2A'.format(self.tag), self.g_loss_B2A)
-        g_loss_sum = tf.summary.scalar('{}/GLoss'.format(self.tag), self.g_loss)
+        realA_sum = tf.summary.image('{}/{}/{}/AReal'.format(self.dataset_name, self.name, self.tag), self.realA,
+                                     max_outputs=1)
+        realB_sum = tf.summary.image('{}/{}/{}/BReal'.format(self.dataset_name, self.name, self.tag), self.realB,
+                                     max_outputs=1)
+        fakeA_sum = tf.summary.image('{}/{}/{}/AFake'.format(self.dataset_name, self.name, self.tag), self.fakeA,
+                                     max_outputs=1)
+        fakeB_sum = tf.summary.image('{}/{}/{}/BFake'.format(self.dataset_name, self.name, self.tag), self.fakeB,
+                                     max_outputs=1)
+        g_loss_A2B_sum = tf.summary.scalar('{}/{}/{}/GLossA2B'.format(self.dataset_name, self.name, self.tag),
+                                           self.g_loss_A2B)
+        g_loss_B2A_sum = tf.summary.scalar('{}/{}/{}/GLossB2A'.format(self.dataset_name, self.name, self.tag),
+                                           self.g_loss_B2A)
+        g_loss_sum = tf.summary.scalar('{}/{}/{}/GLoss'.format(self.dataset_name, self.name, self.tag), self.g_loss)
         self.g_sum = tf.summary.merge(
             [g_loss_A2B_sum, g_loss_B2A_sum, g_loss_sum, realA_sum, fakeA_sum, realB_sum, fakeB_sum])
 
-        d_loss_realA_sum = tf.summary.scalar('{}/DLossRealA'.format(self.tag), self.d_loss_realA)
-        d_loss_realB_sum = tf.summary.scalar('{}/DLossRealB'.format(self.tag), self.d_loss_realB)
-        d_loss_fakeA_sum = tf.summary.scalar('{}/DLossFakeA'.format(self.tag), self.d_loss_fakeA)
-        d_loss_fakeB_sum = tf.summary.scalar('{}/DLossFakeB'.format(self.tag), self.d_loss_fakeB)
-        d_loss_A_sum = tf.summary.scalar('{}/DLossA'.format(self.tag), self.d_loss_A)
-        d_loss_B_sum = tf.summary.scalar('{}/DLossB'.format(self.tag), self.d_loss_B)
-        d_loss_sum = tf.summary.scalar('{}/DLoss'.format(self.tag), self.d_loss)
+        d_loss_realA_sum = tf.summary.scalar('{}/{}/{}/DLossRealA'.format(self.dataset_name, self.name, self.tag),
+                                             self.d_loss_realA)
+        d_loss_realB_sum = tf.summary.scalar('{}/{}/{}/DLossRealB'.format(self.dataset_name, self.name, self.tag),
+                                             self.d_loss_realB)
+        d_loss_fakeA_sum = tf.summary.scalar('{}/{}/{}/DLossFakeA'.format(self.dataset_name, self.name, self.tag),
+                                             self.d_loss_fakeA)
+        d_loss_fakeB_sum = tf.summary.scalar('{}/{}/{}/DLossFakeB'.format(self.dataset_name, self.name, self.tag),
+                                             self.d_loss_fakeB)
+        d_loss_A_sum = tf.summary.scalar('{}/{}/{}/DLossA'.format(self.dataset_name, self.name, self.tag),
+                                         self.d_loss_A)
+        d_loss_B_sum = tf.summary.scalar('{}/{}/{}/DLossB'.format(self.dataset_name, self.name, self.tag),
+                                         self.d_loss_B)
+        d_loss_sum = tf.summary.scalar('{}/{}/{}/DLoss'.format(self.dataset_name, self.name, self.tag), self.d_loss)
 
-        lr_sum = tf.summary.scalar('{}/LearningRate'.format(self.tag), self.lr_tensor)
+        lr_sum = tf.summary.scalar('{}/{}/{}/LearningRate'.format(self.dataset_name, self.name, self.tag),
+                                   self.lr_tensor)
         self.d_sum = tf.summary.merge([d_loss_realA_sum, d_loss_realB_sum, d_loss_fakeA_sum, d_loss_fakeB_sum,
                                        d_loss_A_sum, d_loss_B_sum, d_loss_sum, lr_sum])
 
@@ -92,7 +104,8 @@ class CycleGAN(BaseGanModel):
 
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
-        writer = tf.summary.FileWriter('../LiverDiscriminator/logs/{}'.format(self.tag), self.sess.graph)
+        writer = tf.summary.FileWriter(
+            '../LiverDiscriminator/logs/{}/{}/{}'.format(self.dataset_name, self.name, self.tag), self.sess.graph)
 
         train_generator = self.data_loader(self.train_dataset, self.batch_size, self.image_size, self.in_channels,
                                            self.is_training)

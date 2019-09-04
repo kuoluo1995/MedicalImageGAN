@@ -1,0 +1,9 @@
+lambda: 100.0
+generator:
+    name: unet
+    filter_channels: 64
+discriminator:
+    name: patch_gan
+    filter_channels: 64
+gan_loss:
+    name: lsgan_loss
