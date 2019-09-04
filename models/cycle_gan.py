@@ -105,7 +105,7 @@ class CycleGAN(BaseGanModel):
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
         writer = tf.summary.FileWriter(
-            '../LiverDiscriminator/logs/{}/{}/{}'.format(self.dataset_name, self.name, self.tag), self.sess.graph)
+            '../tensorboard_logs/{}/{}/{}'.format(self.dataset_name, self.name, self.tag), self.sess.graph)
 
         train_generator = self.data_loader(self.train_dataset, self.batch_size, self.image_size, self.in_channels,
                                            self.is_training)
