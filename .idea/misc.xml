@@ -112,9 +112,5 @@
       </profile-state>
     </entry>
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.6 (medical)" project-jdk-type="Python SDK" />
-  <component name="VagrantProjectSettings">
-    <option name="instanceFolder" value="" />
-    <option name="provider" value="" />
-  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 3.6.9 (sftp://yf@47.98.111.221:6800/home/yf/anaconda3/envs/gan_tf/bin/python3)" project-jdk-type="Python SDK" />
 </project>
