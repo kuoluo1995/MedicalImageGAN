@@ -14,5 +14,5 @@ class BaseDataGenerator:
         pass
 
     @abstractmethod
-    def get_data(self):
+    def get_data_generator(self):
         pass

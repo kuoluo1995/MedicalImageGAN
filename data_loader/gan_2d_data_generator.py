@@ -17,10 +17,12 @@ class Gan2dDataGenerator(BaseDataGenerator):
             size += npz['A'].shape[0]
         return math.ceil(size / self.batch_size)
 
-    def get_data(self):
+    def get_data_generator(self):
         while True:
             batchA = list()
             batchB = list()
+            a_path = ''
+            b_path = ''
             for item in self.dataset:
                 npz = np.load(item)
                 a_nii = npz['A']
@@ -72,4 +74,5 @@ if __name__ == '__main__':
     dataset = yaml_utils.read('E:/Datasets/Neurofibromatosis/t12stir_train.yaml')
     train_generator = Gan2dDataGenerator(dataset, 8, (512, 256), 1, True)
     data = train_generator.get_data()
-    print(1)
+
+    print(next(data))

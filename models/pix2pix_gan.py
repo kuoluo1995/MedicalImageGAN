@@ -71,48 +71,46 @@ class Pix2PixGAN(BaseGanModel):
         self.sess.run(init_op)
         writer = tf.summary.FileWriter('../tensorboard_logs/{}/{}/{}'.format(self.dataset_name, self.name, self.tag),
                                        self.sess.graph)
-
+        data_generator = self.train_data_loader.get_data_generator()
+        data_size = self.train_data_loader.get_size()
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
-            for step in range(self.train_data_loader.get_size()):
-                pass
-                # realA, realB =
-                #
-                # # Update G network and record fake outputs
-                # fakeB, _, g_sum, g_loss = self.sess.run([self.fakeB, g_optimizer, self.g_sum, self.g_lossA2B],
-                #                                         feed_dict={self.realA: realA, self.realB: realB,
-                #                                                    self.lr_tensor: lr})
-                # writer.add_summary(g_sum, epoch * epoch_step + step)
-                #
-                # # Update D network
-                # _, d_sum, d_loss = self.sess.run([d_optimizer, self.d_sum, self.d_lossB],
-                #                                  feed_dict={self.realB: realB, self.fakeB_sample: fakeB,
-                #                                             self.lr_tensor: lr})
-                # writer.add_summary(d_sum, epoch * epoch_step + step)
-                # print('Epoch:{:>3d}/{:<3d} Step:{:>4d}/{:<4d} g_loss:{:<5.5f} d_loss:{:<5.5f}'.format(epoch, self.epoch,
-                #                                                                                       step, epoch_step,
-                #                                                                                       g_loss, d_loss))
+            for step in range(data_size):
+                a_path, batchA, b_path, batchB = next(data_generator)
+
+                # Update G network and record fake outputs
+                fakeB, _, g_sum, g_loss = self.sess.run([self.fakeB, g_optimizer, self.g_sum, self.g_lossA2B],
+                                                        feed_dict={self.realA: batchA, self.realB: batchB,
+                                                                   self.lr_tensor: lr})
+                writer.add_summary(g_sum, epoch * data_size + step)
+
+                # Update D network
+                _, d_sum, d_loss = self.sess.run([d_optimizer, self.d_sum, self.d_lossB],
+                                                 feed_dict={self.realB: batchB, self.fakeB_sample: fakeB,
+                                                            self.lr_tensor: lr})
+                writer.add_summary(d_sum, epoch * data_size + step)
+                print('Epoch:{:>3d}/{:<3d} Step:{:>4d}/{:<4d} g_loss:{:<5.5f} d_loss:{:<5.5f}'.format(epoch, self.epoch,
+                                                                                                      step, data_size,
+                                                                                                      g_loss, d_loss))
             if epoch % self.save_freq == 0:
                 self.save(self.checkpoint_dir, epoch)
 
     def test(self):
         self.load(self.checkpoint_dir)
-        for epoch, item in enumerate(self.test_dataset):
-            npz = np.load(item)
-            a_nii = npz['A']
-            b_nii = npz['B']
-            b_path = npz['B_path']
-            sum_loss = 0.0
-            result = list()
-            for s_id in range(a_nii.shape[0]):
-                sliceA, sliceB = get_multi_channel_image(s_id, a_nii, b_nii, self.image_size, self.in_channels, False)
-                batch_realA = np.array([sliceA])
-                batch_realB = np.array([sliceB])
-                fakeB, g_loss = self.sess.run([self.fakeB, self.g_lossA2B],
-                                              feed_dict={self.realA: batch_realA, self.realB: batch_realB})
-                result.append(fakeB[0, :, :, 2])
-                sum_loss += g_loss
-            result = np.array(result)
-            b_nii_head = nii_header_reader(b_path)
-            nii_writer('./result/fake_{}.nii'.format(Path(b_path).stem), b_nii_head, result)
-            print('Epoch:{:>3d}/{:<3d} g_loss:{:<5.5f}'.format(epoch, self.epoch, sum_loss / a_nii.shape[0]))
+        data_generator = self.test_data_loader.get_data_generator()
+        data_size = self.test_data_loader.get_size()
+        pre_b_path = ''
+        nii_model = list()
+        sum_loss = 0
+        for step in range(data_size):
+            a_path, batchA, b_path, batchB = next(data_generator)
+            fakeB, g_loss = self.sess.run([self.fakeB, self.g_lossA2B],
+                                          feed_dict={self.realA: batchA, self.realB: batchB})
+            if pre_b_path != b_path:
+                if pre_b_path != '':
+                    b_nii_head = nii_header_reader(b_path)
+                    nii_writer('./result/fake_{}.nii'.format(Path(b_path).stem), b_nii_head, np.array(nii_model))
+                    print('Path:{}  g_loss:{:<5.5f}'.format(Path(b_path).stem, g_loss))
+                pre_b_path = b_path
+            nii_model.append(np.squeeze(batchB))
+            sum_loss += g_loss
