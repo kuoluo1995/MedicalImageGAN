@@ -57,12 +57,12 @@ class BaseModel(ABC):
     def save(self, checkpoint_dir, epoch, **kwargs):
         checkpoint_dir = Path(checkpoint_dir)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        self.saver.save(self.sess, str(checkpoint_dir / self.tag) + '.ckpt', global_step=epoch)
+        self.saver.save(self.sess, str(checkpoint_dir / self.tag), global_step=epoch)
 
     def load(self, checkpoint_dir, **kwargs):
         checkpoint_dir = Path(checkpoint_dir)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir / self.tag) + '.ckpt')
+        ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir / self.tag))
         if ckpt and ckpt.model_checkpoint_path:
             ckpt_name = Path(ckpt.model_checkpoint_path).stem
             self.saver.restore(self.sess, str(checkpoint_dir / ckpt_name))
