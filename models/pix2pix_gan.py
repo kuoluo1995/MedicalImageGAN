@@ -101,16 +101,13 @@ class Pix2PixGAN(BaseGanModel):
         data_size = self.test_data_loader.get_size()
         pre_b_path = ''
         nii_model = list()
-        sum_loss = 0
         for step in range(data_size):
             a_path, batchA, b_path, batchB = next(data_generator)
-            fakeB, g_loss = self.sess.run([self.fakeB, self.g_lossA2B],
-                                          feed_dict={self.realA: batchA, self.realB: batchB})
+            fakeB = self.sess.run([self.fakeB], feed_dict={self.realA: batchA})
             if pre_b_path != b_path:
                 if pre_b_path != '':
                     b_nii_head = nii_header_reader(b_path)
                     nii_writer('./result/fake_{}.nii'.format(Path(b_path).stem), b_nii_head, np.array(nii_model))
-                    print('Path:{}  g_loss:{:<5.5f}'.format(Path(b_path).stem, g_loss))
+                    print('Path:{}'.format(Path(b_path).stem))
                 pre_b_path = b_path
-            nii_model.append(np.squeeze(batchB))
-            sum_loss += g_loss
+            nii_model.append(np.squeeze(fakeB))
