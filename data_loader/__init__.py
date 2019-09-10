@@ -9,7 +9,7 @@ def get_data_loader_by_name(name):
     return eval(name)
 
 
-def gan_data_generator(dataset, batch_size, image_size, channels, is_training=True, **kwargs):
+def gan_train_generator(dataset, batch_size, image_size, channels, **kwargs):
     batchA = list()
     batchB = list()
     while True:
@@ -18,7 +18,7 @@ def gan_data_generator(dataset, batch_size, image_size, channels, is_training=Tr
             a_nii = npz['A']
             b_nii = npz['B']
             for s_id in range(a_nii.shape[0]):
-                a, b = get_multi_channel_image(s_id, a_nii, b_nii, image_size, channels, is_training)
+                a, b = get_multi_channel_image(s_id, a_nii, b_nii, image_size, channels, True)
                 batchA.append(a)
                 batchB.append(b)
                 if len(batchA) == batch_size:
@@ -64,5 +64,5 @@ def get_multi_channel_image(s_id, a_nii, b_nii, image_size, channels, is_trainin
 
 if __name__ == '__main__':
     dataset = yaml_utils.read('E:/Datasets/Neurofibromatosis/t12stir_train.yaml')
-    train_generator = gan_data_generator(dataset, 8, (512, 256), 1)
+    train_generator = gan_train_generator(dataset, 8, (512, 256), 1)
     data = next(train_generator)

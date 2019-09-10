@@ -49,6 +49,10 @@ class BaseModel(ABC):
     def train(self):
         pass
 
+    @abstractmethod
+    def test(self):
+        pass
+
     def save(self, checkpoint_dir, epoch, **kwargs):
         checkpoint_dir = Path(checkpoint_dir)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)

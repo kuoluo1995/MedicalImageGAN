@@ -13,9 +13,22 @@ def conv2d(input, num_outputs, kernel_size=4, stride=2, stddev=0.02, padding='SA
                            weights_initializer=tf.truncated_normal_initializer(stddev=stddev), biases_initializer=None)
 
 
+def conv3d(input, num_outputs, kernel_size=4, stride=2, stddev=0.02, padding='SAME', name='conv3d'):
+    with tf.variable_scope(name):
+        return slim.conv3d(input, num_outputs, kernel_size, stride, padding, activation_fn=None,
+                           weights_initializer=tf.truncated_normal_initializer(stddev=stddev), biases_initializer=None)
+
+
 def deconv2d(input, num_outputs, kernel_size=4, stride=2, stddev=0.02, name='deconv2d'):
     with tf.variable_scope(name):
         return slim.conv2d_transpose(input, num_outputs, kernel_size, stride, padding='SAME', activation_fn=None,
+                                     weights_initializer=tf.truncated_normal_initializer(stddev=stddev),
+                                     biases_initializer=None)
+
+
+def deconv3d(input, num_outputs, kernel_size=4, stride=2, stddev=0.02, name='deconv3d'):
+    with tf.variable_scope(name):
+        return slim.conv3d_transpose(input, num_outputs, kernel_size, stride, padding='SAME', activation_fn=None,
                                      weights_initializer=tf.truncated_normal_initializer(stddev=stddev),
                                      biases_initializer=None)
 

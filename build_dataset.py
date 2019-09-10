@@ -25,7 +25,8 @@ for i in range(len(sourceA_dirs)):
     if a_nii.shape[0] == b_nii.shape[0] and sourceA_dirs[i] == sourceB_dirs[i]:
         path = output + '/dataset/' + sourceA_dirs[i] + '.npz'
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        np.savez(path, A=a_nii, B=b_nii)
+        np.savez(path, A=a_nii, B=b_nii, A_path=source + '/' + A + '/' + sourceA_dirs[i],
+                 B_path=source + '/' + B + '/' + sourceB_dirs[i])
         dataset.append(path)
     else:
         error_data_info.append(

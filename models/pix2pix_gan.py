@@ -1,7 +1,11 @@
+from pathlib import Path
+
+import numpy as np
 import tensorflow as tf
 from models.base_gan_model import BaseGanModel
 from models.utils.loss_funcation import l1_loss
-from data_loader import get_epoch_step
+from data_loader import get_epoch_step, get_multi_channel_image
+from utils.nii_utils import nii_header_reader, nii_writer
 
 
 class Pix2PixGAN(BaseGanModel):
@@ -94,10 +98,24 @@ class Pix2PixGAN(BaseGanModel):
             if epoch % self.save_freq == 0:
                 self.save(self.checkpoint_dir, epoch)
 
-    # def test(self):
-    #     test_generator = self.data_loader(self.test_dataset, self.batch_size, self.image_size, self.in_channels,
-    #                                       self.is_training)
-    #     self.load(self.checkpoint_dir)
-    #     epoch_step = get_epoch_step(self.test_dataset)
-    #     for epoch in range(self.test_size):
-    #         test_data = next(test_generator)
+    def test(self):
+        self.load(self.checkpoint_dir)
+        for epoch, item in enumerate(self.test_dataset):
+            npz = np.load(item)
+            a_nii = npz['A']
+            b_nii = npz['B']
+            b_path = npz['B_path']
+            sum_loss = 0.0
+            result = list()
+            for s_id in range(a_nii.shape[0]):
+                sliceA, sliceB = get_multi_channel_image(s_id, a_nii, b_nii, self.image_size, self.in_channels, False)
+                batch_realA = np.array([sliceA])
+                batch_realB = np.array([sliceB])
+                fakeB, g_loss = self.sess.run([self.fakeB, self.g_lossA2B],
+                                              feed_dict={self.realA: batch_realA, self.realB: batch_realB})
+                result.append(fakeB[0, :, :, 2])
+                sum_loss += g_loss
+            result = np.array(result)
+            b_nii_head = nii_header_reader(b_path)
+            nii_writer('./result/fake_{}.nii'.format(Path(b_path).stem), b_nii_head, result)
+            print('Epoch:{:>3d}/{:<3d} g_loss:{:<5.5f}'.format(epoch, self.epoch, sum_loss / a_nii.shape[0]))
