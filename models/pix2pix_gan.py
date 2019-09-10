@@ -97,6 +97,8 @@ class Pix2PixGAN(BaseGanModel):
 
     def test(self):
         self.load(self.checkpoint_dir)
+        init_op = tf.global_variables_initializer()
+        self.sess.run(init_op)
         data_generator = self.test_data_loader.get_data_generator()
         data_size = self.test_data_loader.get_size()
         pre_b_path = ''
