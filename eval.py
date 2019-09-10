@@ -4,7 +4,7 @@ from models import get_model_class_by_name
 from utils.config_utils import get_config
 
 
-def test(args):
+def eval(args):
     tf.set_random_seed(19)
     tf_config = tf.ConfigProto(allow_soft_placement=True)
     tf_config.gpu_options.allow_growth = True
@@ -18,4 +18,4 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     config = get_config('base_pix')
     config['phase'] = 'test'
-    test(config)
+    eval(config)
