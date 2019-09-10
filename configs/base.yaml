@@ -22,6 +22,6 @@ model:
         name: linear_decay
         learning_rate: 0.0002
         epoch_decay: 100
-    checkpoint_dir: _checkpoint
+    checkpoint_dir: ./_checkpoint
 
 
