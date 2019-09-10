@@ -17,4 +17,5 @@ def test(args):
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     config = get_config('base_pix')
+    config['phase'] = 'test'
     test(config)
