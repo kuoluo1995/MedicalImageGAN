@@ -4,7 +4,6 @@ import numpy as np
 import tensorflow as tf
 from models.base_gan_model import BaseGanModel
 from models.utils.loss_funcation import l1_loss
-from data_loader import get_epoch_step, get_multi_channel_image
 from utils.nii_utils import nii_header_reader, nii_writer
 
 
@@ -73,28 +72,26 @@ class Pix2PixGAN(BaseGanModel):
         writer = tf.summary.FileWriter('../tensorboard_logs/{}/{}/{}'.format(self.dataset_name, self.name, self.tag),
                                        self.sess.graph)
 
-        train_generator = self.data_loader(self.train_dataset, self.batch_size, self.image_size, self.in_channels,
-                                           self.is_training)
-        epoch_step = get_epoch_step(self.train_dataset)
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
-            for step in range(epoch_step):
-                realA, realB = next(train_generator)
-
-                # Update G network and record fake outputs
-                fakeB, _, g_sum, g_loss = self.sess.run([self.fakeB, g_optimizer, self.g_sum, self.g_lossA2B],
-                                                        feed_dict={self.realA: realA, self.realB: realB,
-                                                                   self.lr_tensor: lr})
-                writer.add_summary(g_sum, epoch * epoch_step + step)
-
-                # Update D network
-                _, d_sum, d_loss = self.sess.run([d_optimizer, self.d_sum, self.d_lossB],
-                                                 feed_dict={self.realB: realB, self.fakeB_sample: fakeB,
-                                                            self.lr_tensor: lr})
-                writer.add_summary(d_sum, epoch * epoch_step + step)
-                print('Epoch:{:>3d}/{:<3d} Step:{:>4d}/{:<4d} g_loss:{:<5.5f} d_loss:{:<5.5f}'.format(epoch, self.epoch,
-                                                                                                      step, epoch_step,
-                                                                                                      g_loss, d_loss))
+            for step in range(self.train_data_loader.get_size()):
+                pass
+                # realA, realB =
+                #
+                # # Update G network and record fake outputs
+                # fakeB, _, g_sum, g_loss = self.sess.run([self.fakeB, g_optimizer, self.g_sum, self.g_lossA2B],
+                #                                         feed_dict={self.realA: realA, self.realB: realB,
+                #                                                    self.lr_tensor: lr})
+                # writer.add_summary(g_sum, epoch * epoch_step + step)
+                #
+                # # Update D network
+                # _, d_sum, d_loss = self.sess.run([d_optimizer, self.d_sum, self.d_lossB],
+                #                                  feed_dict={self.realB: realB, self.fakeB_sample: fakeB,
+                #                                             self.lr_tensor: lr})
+                # writer.add_summary(d_sum, epoch * epoch_step + step)
+                # print('Epoch:{:>3d}/{:<3d} Step:{:>4d}/{:<4d} g_loss:{:<5.5f} d_loss:{:<5.5f}'.format(epoch, self.epoch,
+                #                                                                                       step, epoch_step,
+                #                                                                                       g_loss, d_loss))
             if epoch % self.save_freq == 0:
                 self.save(self.checkpoint_dir, epoch)
 

@@ -20,12 +20,8 @@ class BaseModel(ABC):
         # dataset
         dataset = kwargs['dataset']
         self.dataset_name = dataset['name']
-        self.data_loader = get_data_loader_by_name(dataset['data_loader'])
+        data_loader_class = get_data_loader_by_name(dataset['data_loader'])
         self.image_size = tuple(dataset['image_size'])
-        self.train_dataset = yaml_utils.read(dataset['train_path'])
-        self.train_size = len(self.train_dataset)
-        self.test_dataset = yaml_utils.read(dataset['test_path'])
-        self.test_size = len(self.test_dataset)
         # model
         model = kwargs['model']
         self.name = model['name']
@@ -37,6 +33,11 @@ class BaseModel(ABC):
         self.loss_fn = get_loss_fn_by_name(model['loss'])
         self.scheduler_fn = get_scheduler_fn(total_epoch=self.epoch, **model['scheduler'])
         self.checkpoint_dir = Path(model['checkpoint_dir']) / self.dataset_name / self.name
+
+        self.train_data_loader = data_loader_class(yaml_utils.read(dataset['train_path']), self.batch_size,
+                                                   self.image_size, self.in_channels)
+        self.test_data_loader = data_loader_class(yaml_utils.read(dataset['test_path']), 1, self.image_size,
+                                                  self.in_channels)
 
     @abstractmethod
     def build_model(self, **kwargs):
