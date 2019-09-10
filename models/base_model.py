@@ -35,9 +35,9 @@ class BaseModel(ABC):
         self.checkpoint_dir = Path(model['checkpoint_dir']) / self.dataset_name / self.name
 
         self.train_data_loader = data_loader_class(yaml_utils.read(dataset['train_path']), self.batch_size,
-                                                   self.image_size, self.in_channels)
+                                                   self.image_size, self.in_channels, True)
         self.test_data_loader = data_loader_class(yaml_utils.read(dataset['test_path']), 1, self.image_size,
-                                                  self.in_channels)
+                                                  self.in_channels, False)
 
     @abstractmethod
     def build_model(self, **kwargs):
