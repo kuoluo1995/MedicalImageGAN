@@ -73,6 +73,5 @@ class Gan2dDataGenerator(BaseDataGenerator):
 if __name__ == '__main__':
     dataset = yaml_utils.read('E:/Datasets/Neurofibromatosis/t12stir_train.yaml')
     train_generator = Gan2dDataGenerator(dataset, 8, (512, 256), 1, True)
-    data = train_generator.get_data()
-
+    data = train_generator.get_data_generator()
     print(next(data))

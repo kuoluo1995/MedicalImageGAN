@@ -1,7 +1,7 @@
 phase: train
 
 print_freq: 100
-save_freq: 200
+save_freq: 10
 
 dataset:
     name:
@@ -18,6 +18,7 @@ model:
     filter_channels: 64
     out_channels: 1
     loss: lsgan_loss
+    metrics: ssim_metrics
     scheduler:
         name: linear_decay
         learning_rate: 0.0002
