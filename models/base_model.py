@@ -56,14 +56,19 @@ class BaseModel(ABC):
     def test(self):
         pass
 
-    def save(self, checkpoint_dir, tag, epoch, **kwargs):
-        checkpoint_dir = Path(checkpoint_dir)
+    def save(self, checkpoint_dir, epoch, is_best, **kwargs):
+        if is_best:
+            checkpoint_dir = Path(checkpoint_dir) / self.tag / 'best'
+        else:
+            checkpoint_dir = Path(checkpoint_dir) / self.tag / self.tag
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        self.saver.save(self.sess, str(checkpoint_dir / tag), global_step=epoch)
+        self.saver.save(self.sess, str(checkpoint_dir / 'model'), global_step=epoch)
 
-    def load(self, checkpoint_dir, tag, **kwargs):
-        checkpoint_dir = Path(checkpoint_dir)
-        checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    def load(self, checkpoint_dir, is_best, **kwargs):
+        if is_best:
+            checkpoint_dir = Path(checkpoint_dir) / self.tag / 'best'
+        else:
+            checkpoint_dir = Path(checkpoint_dir) / self.tag / self.tag
         ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir))
         if ckpt and ckpt.model_checkpoint_path:
             ckpt_name = Path(ckpt.model_checkpoint_path).stem

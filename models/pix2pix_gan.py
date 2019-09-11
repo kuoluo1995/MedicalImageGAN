@@ -126,14 +126,14 @@ class Pix2PixGAN(BaseGanModel):
                 writer.add_summary(test_sum, epoch * data_size + step)
                 eval_metric += test_metric
             if eval_metric < best_eval_metric:
-                self.save(self.checkpoint_dir, 'best', epoch)
+                self.save(self.checkpoint_dir, epoch, True)
             if epoch % self.save_freq == 0:
-                self.save(self.checkpoint_dir, self.tag, epoch)
+                self.save(self.checkpoint_dir, epoch, False)
 
     def test(self):
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
-        self.load(self.checkpoint_dir, self.tag)
+        self.load(self.checkpoint_dir, False)
         data_generator = self.test_data_loader.get_data_generator()
         data_size = self.test_data_loader.get_size()
         pre_b_path = ''
