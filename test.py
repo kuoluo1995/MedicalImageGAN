@@ -18,4 +18,5 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     config = get_config('base_pix')
     config['phase'] = 'test'
+    config['tag'] = 'add_metric'
     _test(config)
