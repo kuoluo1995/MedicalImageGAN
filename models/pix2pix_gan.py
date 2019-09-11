@@ -22,7 +22,7 @@ class Pix2PixGAN(BaseGanModel):
         self.realB = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.out_channels],
                                     name='realB')
         self.fakeB = self.generator(self.realA, name='generatorA2B')
-        self.metric = self.metrics_fn(self.fakeB, self.realB)
+        self.metricB = self.metrics_fn(self.fakeB, self.realB)
 
         fakeB_logit = self.discriminator(self.fakeB, name='discriminatorB')
         self.g_lossA2B = self.loss_fn(fakeB_logit, tf.ones_like(fakeB_logit)) + self._lambda * l1_loss(self.realB,
@@ -58,7 +58,7 @@ class Pix2PixGAN(BaseGanModel):
                                      max_outputs=1)
         realB_sum = tf.summary.image('{}/{}/{}/BReal'.format(self.dataset_name, self.name, self.tag), self.realB,
                                      max_outputs=1)
-        metric_sum = tf.summary.scalar('{}/{}/{}/metric'.format(self.dataset_name, self.name, self.tag), self.metric)
+        metric_sum = tf.summary.scalar('{}/{}/{}/metricB'.format(self.dataset_name, self.name, self.tag), self.metricB)
         g_loss_A2B_sum = tf.summary.scalar('{}/{}/{}/GLossA2B'.format(self.dataset_name, self.name, self.tag),
                                            self.g_lossA2B)
         self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum, realB_sum, fakeB_sum, metric_sum])
