@@ -64,7 +64,6 @@ class BaseModel(ABC):
     def load(self, checkpoint_dir, tag, **kwargs):
         checkpoint_dir = Path(checkpoint_dir)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        checkpoint_dir = checkpoint_dir / tag
         ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir))
         if ckpt and ckpt.model_checkpoint_path:
             ckpt_name = Path(ckpt.model_checkpoint_path).stem
