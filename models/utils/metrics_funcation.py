@@ -9,7 +9,7 @@ def get_metrics_fn_by_name(name):
 def ssim_metrics(synthesis_image, original_image):
     # ssim = compare_ssim(synthesis_image, original_image)
     ssim = tf.image.ssim(synthesis_image, original_image, max_val=1.0)
-    return ssim
+    return tf.reduce_mean(ssim)
 
 
 def mse_metrics(synthesis_image, original_image):
