@@ -7,7 +7,7 @@ from models.utils.loss_funcation import l1_loss
 from utils.nii_utils import nii_header_reader, nii_writer
 
 
-class Pix2Pix3dGAN(BaseGanModel):
+class Pix2PixGAN3D(BaseGanModel):
     def __init__(self, **kwargs):
         BaseGanModel.__init__(self, **kwargs)
         self._lambda = self.kwargs['model']['lambda']
