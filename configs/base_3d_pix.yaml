@@ -9,7 +9,12 @@ dataset:
 
 model:
     name: pix2pix_3dgan
+    lambda: 100.0
     generator:
         name: unet_3d
+        filter_channels: 64
     discriminator:
         name: patch_gan_3d
+        filter_channels: 64
+    gan_loss:
+        name: lsgan_loss
