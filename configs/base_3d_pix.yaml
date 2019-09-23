@@ -10,6 +10,6 @@ dataset:
 model:
     name: pix2pix_3dgan
     generator:
-        name: unet3d
+        name: unet_3d
     discriminator:
-        name: patch_gan3d
+        name: patch_gan_3d
