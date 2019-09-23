@@ -35,10 +35,10 @@ def deconv3d(input, num_outputs, kernel_size=4, stride=2, stddev=0.02, name='dec
 
 def instance_norm(input, name='instance_norm'):
     with tf.variable_scope(name):
-        depth = input.get_shape()[3]
+        depth = input.get_shape()[1]
         scale = tf.get_variable('scale', [depth], initializer=tf.random_normal_initializer(1.0, 0.02, dtype=tf.float32))
         offset = tf.get_variable('offset', [depth], initializer=tf.constant_initializer(0.0))
-        mean, variance = tf.nn.moments(input, axes=[1, 2], keep_dims=True)
+        mean, variance = tf.nn.moments(input, axes=[2, 3, 4], keep_dims=True)
         epsilon = 1e-5
         inv = tf.rsqrt(variance + epsilon)
         normalized = (input - mean) * inv
