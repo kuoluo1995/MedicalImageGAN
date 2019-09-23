@@ -8,7 +8,7 @@ dataset:
     test_path: '/home/yf/datas/NF/T12STIR_test.yaml' # E:/Datasets/Neurofibromatosis/t12stir_test.yaml
 
 model:
-    name: pix2pix_3dgan
+    name: pix2pix_gan_3d
     lambda: 100.0
     generator:
         name: unet_3d
