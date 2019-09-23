@@ -1,4 +1,3 @@
-import cv2
 import math
 import numpy as np
 from skimage import transform
@@ -38,9 +37,9 @@ class Gan3dDataGenerator(BaseDataGenerator):
                     batchB = list()
             for _ in range(self.batch_size - len(batchA)):
                 batchA.append(
-                    np.zeros((self.channels, self.image_size[0], self.image_size[1], self.image_size[2]), dtype=float))
+                    np.zeros((self.image_size[0], self.image_size[1], self.image_size[2], self.channels), dtype=float))
                 batchB.append(
-                    np.zeros((self.channels, self.image_size[0], self.image_size[1], self.image_size[2]), dtype=float))
+                    np.zeros((self.image_size[0], self.image_size[1], self.image_size[2], self.channels), dtype=float))
             yield a_path, np.array(batchA), b_path, np.array(batchB)
 
     def get_multi_channel_image(self, a_nii, b_nii):
@@ -54,8 +53,8 @@ class Gan3dDataGenerator(BaseDataGenerator):
         channels_imagesA.append(a_nii)
         channels_imagesB.append(b_nii)
 
-        channels_imagesA = np.array(channels_imagesA)
-        channels_imagesB = np.array(channels_imagesB)
+        channels_imagesA = np.array(channels_imagesA).transpose((1, 2, 3, 0))
+        channels_imagesB = np.array(channels_imagesB).transpose((1, 2, 3, 0))
         return channels_imagesA, channels_imagesB
 
 

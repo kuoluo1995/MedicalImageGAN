@@ -17,10 +17,10 @@ class Pix2PixGAN3D(BaseGanModel):
 
     def build_model(self):
         # train generator
-        self.realA = tf.placeholder(tf.float32, [None, self.in_channels, self.image_size[0], self.image_size[1],
-                                                 self.image_size[2]], name='realA')
-        self.realB = tf.placeholder(tf.float32, [None, self.in_channels, self.image_size[0], self.image_size[1],
-                                                 self.image_size[2]], name='realB')
+        self.realA = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.image_size[2],
+                                                 self.in_channels], name='realA')
+        self.realB = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.image_size[2],
+                                                 self.in_channels], name='realB')
         self.fakeB = self.generator(self.realA, name='generatorA2B')
         self.metricB = self.metrics_fn(self.fakeB, self.realB)
 
@@ -29,8 +29,9 @@ class Pix2PixGAN3D(BaseGanModel):
                                                                                                        self.fakeB)
 
         # train discriminator
-        self.fakeB_sample = tf.placeholder(tf.float32, [None, self.in_channels, self.image_size[0], self.image_size[1],
-                                                        self.image_size[2]], name='fakeB')
+        self.fakeB_sample = tf.placeholder(tf.float32,
+                                           [None, self.image_size[0], self.image_size[1], self.image_size[2],
+                                            self.in_channels], name='fakeB')
         realB_logit = self.discriminator(self.realB, reuse=True, name='discriminatorB')
         fakeB_logit = self.discriminator(self.fakeB_sample, reuse=True, name='discriminatorB')
 
@@ -43,10 +44,10 @@ class Pix2PixGAN3D(BaseGanModel):
         self.d_vars = [var for var in train_vars if 'discriminator' in var.name]
 
         # eval
-        self.testA = tf.placeholder(tf.float32, [None, self.in_channels, self.image_size[0], self.image_size[1],
-                                                 self.image_size[2]], name='testA')
-        self.testB = tf.placeholder(tf.float32, [None, self.in_channels, self.image_size[0], self.image_size[1],
-                                                 self.image_size[2]], name='testB')
+        self.testA = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.image_size[2],
+                                                 self.in_channels], name='testA')
+        self.testB = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.image_size[2],
+                                                 self.in_channels], name='testB')
         self.test_fakeB = self.generator(self.testA, reuse=True, name='generatorA2B')
         self.test_loss = l1_loss(self.testB, self.test_fakeB)
         self.test_metric = self.metrics_fn(self.test_fakeB, self.testB)
