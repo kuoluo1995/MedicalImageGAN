@@ -63,4 +63,4 @@ if __name__ == '__main__':
     data = train_generator.get_data_generator()
     a_path, batchA, b_path, batchB = next(data)
     b_nii_head = nii_header_reader(b_path)
-    nii_writer('./fake_{}.nii'.format(Path(b_path).stem), b_nii_head, np.squeeze(batchB))
+    nii_writer('./fake.nii', b_nii_head, np.squeeze(batchB))
