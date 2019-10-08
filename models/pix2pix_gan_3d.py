@@ -94,7 +94,6 @@ class Pix2PixGAN3D(BaseGanModel):
             eval_metric = 0
             for step in range(data_size):
                 a_path, batchA, b_path, batchB = next(data_generator)
-
                 # Update G network and record fake outputs
                 fakeB, _, g_sum, g_loss = self.sess.run([self.fakeB, g_optimizer, self.g_sum, self.g_lossA2B],
                                                         feed_dict={self.realA: batchA, self.realB: batchB,
