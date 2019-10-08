@@ -1,8 +1,10 @@
 import math
 import numpy as np
+from pathlib import Path
 from skimage import transform
 from data_loader.base_data_generator import BaseDataGenerator
 from utils import yaml_utils
+from utils.nii_utils import nii_header_reader, nii_writer
 
 
 class Gan3dDataGenerator(BaseDataGenerator):
@@ -56,7 +58,9 @@ class Gan3dDataGenerator(BaseDataGenerator):
 
 
 if __name__ == '__main__':
-    dataset = yaml_utils.read('E:/Datasets/Neurofibromatosis/t12stir_train.yaml')
-    train_generator = Gan3dDataGenerator(dataset, 8, (512, 256), 1, True)
+    dataset = yaml_utils.read('E:/Dataset/Neurofibromatosis/t12stir_train.yaml')
+    train_generator = Gan3dDataGenerator(dataset, 1, (512, 256), 1, True)
     data = train_generator.get_data_generator()
-    print(next(data))
+    a_path, batchA, b_path, batchB = next(data)
+    b_nii_head = nii_header_reader(b_path)
+    nii_writer('./fake_{}.nii'.format(Path(b_path).stem), b_nii_head, np.squeeze(batchB))
