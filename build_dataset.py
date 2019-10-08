@@ -16,10 +16,10 @@ dataset = list()
 error_data_info = list()
 for i in range(len(sourceA_dirs)):
     a_nii = nii_utils.nii_reader(source + '/' + A + '/' + sourceA_dirs[i])
-    a_nii = np.transpose(a_nii, (2, 1, 0))
+    a_nii = np.transpose(a_nii, (1, 0, 2))
     a_nii = np.clip(a_nii, 0, 1500) / 1500
     b_nii = nii_utils.nii_reader(source + '/' + B + '/' + sourceB_dirs[i])
-    b_nii = np.transpose(b_nii, (2, 1, 0))
+    b_nii = np.transpose(b_nii, (1, 0, 2))
     b_nii = np.clip(b_nii, 0, 400) / 400
     print('\r>>dataset {}/{} name: {}'.format(i, len(sourceA_dirs), sourceA_dirs[i]), end='')
     if a_nii.shape[0] == b_nii.shape[0] and sourceA_dirs[i] == sourceB_dirs[i]:
