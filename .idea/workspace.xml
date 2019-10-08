@@ -6,10 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="64d7f1e0-e78f-4c60-b715-09c201e3fc54" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_loader/gan_3d_data_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_loader/gan_3d_data_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/generator/unet.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/generator/unet.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/generator/unet_3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/generator/unet_3d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/utils/layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/utils/layers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -34,10 +30,22 @@
   <component name="FileEditorManager">
     <leaf>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/data_loader/gan_3d_data_generator.py">
+        <entry file="file://$PROJECT_DIR$/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="659">
-              <caret line="52" column="59" selection-start-line="52" selection-start-column="59" selection-end-line="52" selection-end-column="59" />
+            <state relative-caret-position="148">
+              <caret line="7" column="14" selection-start-line="7" selection-start-column="14" selection-end-line="7" selection-end-column="14" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/models/pix2pix_gan_3d.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="107">
+              <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
             </state>
           </provider>
         </entry>
@@ -55,6 +63,7 @@
     <findStrings>
       <find>self.is_training</find>
       <find>instance_norm</find>
+      <find>ImageSummary</find>
     </findStrings>
     <replaceStrings>
       <replace>instance_norm3d</replace>
@@ -75,7 +84,6 @@
         <option value="$PROJECT_DIR$/data_loader/gan_2d_generator.py" />
         <option value="$PROJECT_DIR$/data_loader/base_generator.py" />
         <option value="$PROJECT_DIR$/data_loader/__init__.py" />
-        <option value="$PROJECT_DIR$/configs/base_pix.yaml" />
         <option value="$PROJECT_DIR$/data_loader/base_data_generator.py" />
         <option value="$PROJECT_DIR$/data_loader/gan_2d_data_generator.py" />
         <option value="$PROJECT_DIR$/configs/base.yaml" />
@@ -87,12 +95,14 @@
         <option value="$PROJECT_DIR$/configs/models/pix2pix_3d_gan.yaml" />
         <option value="$PROJECT_DIR$/models/pix2pix_3dgan.py" />
         <option value="$PROJECT_DIR$/train.py" />
-        <option value="$PROJECT_DIR$/configs/base_3d_pix.yaml" />
-        <option value="$PROJECT_DIR$/models/pix2pix_gan_3d.py" />
         <option value="$PROJECT_DIR$/models/generator/unet.py" />
         <option value="$PROJECT_DIR$/models/generator/unet_3d.py" />
         <option value="$PROJECT_DIR$/models/utils/layers.py" />
         <option value="$PROJECT_DIR$/data_loader/gan_3d_data_generator.py" />
+        <option value="$PROJECT_DIR$/configs/base_3d_pix.yaml" />
+        <option value="$PROJECT_DIR$/configs/base_cycle.yaml" />
+        <option value="$PROJECT_DIR$/configs/base_pix.yaml" />
+        <option value="$PROJECT_DIR$/models/pix2pix_gan_3d.py" />
       </list>
     </option>
   </component>
@@ -122,22 +132,12 @@
             <path>
               <item name="MedicalImageGAN" type="b2602c69:ProjectViewProjectNode" />
               <item name="MedicalImageGAN" type="462c0819:PsiDirectoryNode" />
-              <item name="configs" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MedicalImageGAN" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MedicalImageGAN" type="462c0819:PsiDirectoryNode" />
-              <item name="data_loader" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MedicalImageGAN" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MedicalImageGAN" type="462c0819:PsiDirectoryNode" />
               <item name="models" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="MedicalImageGAN" type="b2602c69:ProjectViewProjectNode" />
               <item name="MedicalImageGAN" type="462c0819:PsiDirectoryNode" />
-              <item name="utils" type="462c0819:PsiDirectoryNode" />
+              <item name="script" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -183,7 +183,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.layers">
+  <component name="RunManager" selected="Python.train">
     <configuration name="layers" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="MedicalImageGAN" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -296,8 +296,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.layers" />
         <item itemvalue="Python.train" />
+        <item itemvalue="Python.layers" />
         <item itemvalue="Python.unet_3d" />
         <item itemvalue="Python.test" />
         <item itemvalue="Python.pix2pix_gan" />
@@ -346,7 +346,8 @@
       <workItem from="1570514969211" duration="628000" />
       <workItem from="1570517181064" duration="846000" />
       <workItem from="1570525076203" duration="67000" />
-      <workItem from="1570534059881" duration="1644000" />
+      <workItem from="1570534059881" duration="1910000" />
+      <workItem from="1570546254353" duration="1562000" />
     </task>
     <task id="LOCAL-00001" summary="changeProject">
       <created>1567598552037</created>
@@ -635,7 +636,28 @@
       <option name="project" value="LOCAL" />
       <updated>1569820770064</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="repair 3d unet">
+      <created>1570535754811</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1570535754811</updated>
+    </task>
+    <task id="LOCAL-00043" summary="repair 3d unet">
+      <created>1570535913838</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1570535913838</updated>
+    </task>
+    <task id="LOCAL-00044" summary="repair 3d unet">
+      <created>1570547490466</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1570547490466</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -647,17 +669,17 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="86633000" />
+    <option name="totallyTimeSpent" value="88461000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="0" width="1934" height="1047" extended-state="0" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18836713" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12700106" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4989339" weight="0.4341518" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4989339" visible="true" weight="0.43404734" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49946696" weight="0.14508928" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -708,7 +730,8 @@
     <MESSAGE value="change model save function" />
     <MESSAGE value="add_3d_pix_gan" />
     <MESSAGE value="reduce net layer" />
-    <option name="LAST_COMMIT_MESSAGE" value="reduce net layer" />
+    <MESSAGE value="repair 3d unet" />
+    <option name="LAST_COMMIT_MESSAGE" value="repair 3d unet" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -738,7 +761,7 @@
     <SUITE FILE_PATH="coverage/MedicalImageGAN$eval.coverage" NAME="eval Coverage Results" MODIFIED="1568103397034" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$gan_2d_data_generator.coverage" NAME="gan_2d_data_generator Coverage Results" MODIFIED="1568109561708" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_loader" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$build_dataset.coverage" NAME="build_dataset Coverage Results" MODIFIED="1568100972371" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/MedicalImageGAN$train.coverage" NAME="train Coverage Results" MODIFIED="1570455320905" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MedicalImageGAN$train.coverage" NAME="train Coverage Results" MODIFIED="1570547504647" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$unet_3d.coverage" NAME="unet_3d Coverage Results" MODIFIED="1569251529602" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/models/generator" />
   </component>
   <component name="debuggerHistoryManager">
@@ -799,9 +822,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/828128772/tokenize.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="166">
@@ -898,12 +918,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/configs/base_cycle.yaml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configs/models/cycle_gan.yaml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/models/utils/scheduler.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
@@ -939,20 +953,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/configs/models/pix2pix_3d_gan.yaml" />
-    <entry file="file://$PROJECT_DIR$/configs/models/pix2pix_gan.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="8" column="20" lean-forward="true" selection-start-line="8" selection-start-column="20" selection-end-line="8" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configs/base_pix.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="4" column="11" lean-forward="true" selection-start-line="4" selection-start-column="11" selection-end-line="4" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/models/discriminator/patch_gan_3d.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
@@ -1025,13 +1025,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/configs/base_3d_pix.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/yaml_utils.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -1046,16 +1039,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="12880">
           <caret line="381" column="12" selection-start-line="381" selection-start-column="12" selection-end-line="381" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="7" column="23" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1096,16 +1079,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/build_dataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="439">
-          <caret line="27" column="17" lean-forward="true" selection-start-line="27" selection-start-column="17" selection-end-line="27" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data_loader/gan_2d_data_generator.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2415">
@@ -1116,17 +1089,71 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/pix2pix_gan_3d.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
-          <caret line="97" column="38" selection-start-line="97" selection-start-column="38" selection-end-line="97" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data_loader/gan_3d_data_generator.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="659">
           <caret line="52" column="59" selection-start-line="52" selection-start-column="59" selection-end-line="52" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/base_cycle.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="5" column="25" lean-forward="true" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/base_pix.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="245">
+          <caret line="7" column="66" selection-start-line="7" selection-start-column="66" selection-end-line="7" selection-end-column="66" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/models/cycle_gan.yaml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/models/pix2pix_gan.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="8" column="20" lean-forward="true" selection-start-line="8" selection-start-column="20" selection-end-line="8" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/base_3d_pix.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="7" column="65" lean-forward="true" selection-start-line="7" selection-start-column="65" selection-end-line="7" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build_dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-401">
+          <caret line="21" column="17" lean-forward="true" selection-start-line="21" selection-start-column="17" selection-end-line="21" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/pix2pix_gan_3d.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="107">
+          <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="148">
+          <caret line="7" column="14" selection-start-line="7" selection-start-column="14" selection-end-line="7" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
