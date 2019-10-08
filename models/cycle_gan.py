@@ -1,7 +1,6 @@
 import tensorflow as tf
 from models.base_gan_model import BaseGanModel
 from models.utils.loss_funcation import l1_loss
-from data_loader import get_epoch_step
 from utils.image_utils import ImagePool
 
 
@@ -109,7 +108,7 @@ class CycleGAN(BaseGanModel):
 
         train_generator = self.data_loader(self.train_dataset, self.batch_size, self.image_size, self.in_channels,
                                            self.is_training)
-        epoch_step = get_epoch_step(self.train_dataset)
+        epoch_step = len(self.train_dataset)  # todo 临时修改
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
             for step in range(epoch_step):
