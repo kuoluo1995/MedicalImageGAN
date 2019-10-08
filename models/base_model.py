@@ -32,7 +32,7 @@ class BaseModel(ABC):
         self.out_channels = model['out_channels']
         self.filter_channels = model['filter_channels']
         self.loss_fn = get_loss_fn_by_name(model['loss'])
-        self.metrics_fn = get_metrics_fn_by_name(model['metrics'])
+        self.metrics_fn = {metric: get_metrics_fn_by_name(metric) for metric in model['metrics']}
         self.scheduler_fn = get_scheduler_fn(total_epoch=self.epoch, **model['scheduler'])
         self.checkpoint_dir = Path(model['checkpoint_dir']) / self.dataset_name / self.name
 

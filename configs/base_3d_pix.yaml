@@ -10,6 +10,7 @@ dataset:
 model:
     name: pix2pix_gan_3d
     lambda: 100.0
+    metrics: [ssim_metrics,mse_metrics,psnr_metrics]
     generator:
         name: unet_3d
         filter_channels: 64

@@ -22,7 +22,7 @@ class Pix2PixGAN(BaseGanModel):
         self.realB = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.out_channels],
                                     name='realB')
         self.fakeB = self.generator(self.realA, name='generatorA2B')
-        self.metricB = self.metrics_fn(self.fakeB, self.realB)
+        self.metricB = {name: fn(self.fakeB, self.realB) for name, fn in self.metrics_fn.items()}
 
         fakeB_logit = self.discriminator(self.fakeB, name='discriminatorB')
         self.g_lossA2B = self.loss_fn(fakeB_logit, tf.ones_like(fakeB_logit)) + self._lambda * l1_loss(self.realB,
@@ -49,40 +49,35 @@ class Pix2PixGAN(BaseGanModel):
                                     name='testB')
         self.test_fakeB = self.generator(self.testA, reuse=True, name='generatorA2B')
         self.test_loss = l1_loss(self.testB, self.test_fakeB)
-        self.test_metric = self.metrics_fn(self.test_fakeB, self.testB)
+        self.test_metric = {name: fn(self.test_fakeB, self.testB) for name, fn in self.metrics_fn.items()}
 
     def summary(self):
-        realA_sum = tf.summary.image('{}/{}/{}/AReal'.format(self.dataset_name, self.name, self.tag), self.realA,
-                                     max_outputs=1)
+        realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name), self.realA, max_outputs=1)
         offset = tf.ones_like(self.fakeB)
         fakeB = tf.add(self.fakeB, offset)
         value_min = tf.reduce_min(fakeB)
         fakeB = tf.subtract(fakeB, value_min)
         fakeB = tf.subtract(fakeB, offset)
-        fakeB_sum = tf.summary.image('{}/{}/{}/BFake'.format(self.dataset_name, self.name, self.tag), fakeB,
-                                     max_outputs=1)
-        realB_sum = tf.summary.image('{}/{}/{}/BReal'.format(self.dataset_name, self.name, self.tag), self.realB,
-                                     max_outputs=1)
-        metric_sum = tf.summary.scalar('{}/{}/{}/metricB'.format(self.dataset_name, self.name, self.tag), self.metricB)
-        g_loss_A2B_sum = tf.summary.scalar('{}/{}/{}/GLossA2B'.format(self.dataset_name, self.name, self.tag),
-                                           self.g_lossA2B)
-        self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum, realB_sum, fakeB_sum, metric_sum])
+        fakeB_sum = tf.summary.image('{}/{}/BFake'.format(self.dataset_name, self.name), fakeB, max_outputs=1)
+        realB_sum = tf.summary.image('{}/{}/BReal'.format(self.dataset_name, self.name), self.realB, max_outputs=1)
+        metric_sum = []
+        for name, value in self.metricB.items():
+            metric_sum += tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value)
+        g_loss_A2B_sum = tf.summary.scalar('{}/{}/GLossA2B'.format(self.dataset_name, self.name), self.g_lossA2B)
+        self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum, realB_sum, fakeB_sum] + metric_sum)
 
-        d_loss_realB_sum = tf.summary.scalar('{}/{}/{}/DLossRealB'.format(self.dataset_name, self.name, self.tag),
-                                             self.d_loss_realB)
-        d_loss_fakeB_sum = tf.summary.scalar('{}/{}/{}/DLossFakeB'.format(self.dataset_name, self.name, self.tag),
-                                             self.d_loss_fakeB)
-        d_loss_B_sum = tf.summary.scalar('{}/{}/{}/DLossB'.format(self.dataset_name, self.name, self.tag), self.d_lossB)
+        d_loss_realB_sum = tf.summary.scalar('{}/{}/DLossRealB'.format(self.dataset_name, self.name), self.d_loss_realB)
+        d_loss_fakeB_sum = tf.summary.scalar('{}/{}/DLossFakeB'.format(self.dataset_name, self.name), self.d_loss_fakeB)
+        d_loss_B_sum = tf.summary.scalar('{}/{}/DLossB'.format(self.dataset_name, self.name), self.d_lossB)
 
-        lr_sum = tf.summary.scalar('{}/{}/{}/LearningRate'.format(self.dataset_name, self.name, self.tag),
-                                   self.lr_tensor)
+        lr_sum = tf.summary.scalar('{}/{}/LearningRate'.format(self.dataset_name, self.name), self.lr_tensor)
         self.d_sum = tf.summary.merge([d_loss_realB_sum, d_loss_fakeB_sum, d_loss_B_sum, lr_sum])
 
-        test_loss = tf.summary.scalar('{}/{}/{}/test_loss'.format(self.dataset_name, self.name, self.tag),
-                                      self.test_loss)
-        test_metric = tf.summary.scalar('{}/{}/{}/test_metric'.format(self.dataset_name, self.name, self.tag),
-                                        self.test_metric)
-        self.test_sum = tf.summary.merge([test_loss, test_metric])
+        test_loss = tf.summary.scalar('{}/{}/test_loss'.format(self.dataset_name, self.name), self.test_loss)
+        test_metric = []
+        for name, value in self.test_metric.items():
+            test_metric += tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value)
+        self.test_sum = tf.summary.merge([test_loss] + test_metric)
 
     def train(self):
         """Train cyclegan"""
