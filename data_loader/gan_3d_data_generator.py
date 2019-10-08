@@ -10,10 +10,7 @@ class Gan3dDataGenerator(BaseDataGenerator):
         BaseDataGenerator.__init__(self, dataset, batch_size, image_size, channels, is_training)
 
     def get_size(self):
-        size = 0
-        for item in self.dataset:
-            npz = np.load(item)
-            size += npz['A'].shape[0]
+        size = len(self.dataset)
         return math.ceil(size / self.batch_size)
 
     def get_data_generator(self):
