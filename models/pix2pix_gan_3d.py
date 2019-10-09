@@ -55,9 +55,9 @@ class Pix2PixGAN3D(BaseGanModel):
     def summary(self):
         realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
                                      self.realA[:, :, :, self.image_size[2] // 2, :], max_outputs=1)
-        metric_sum = list()
+        metric_sum = []
         for name, value in self.metricB.items():
-            metric_sum.append(tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value))
+            metric_sum += [tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value)]
         g_loss_A2B_sum = tf.summary.scalar('{}/{}/GLossA2B'.format(self.dataset_name, self.name), self.g_lossA2B)
         self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum] + metric_sum)
 
