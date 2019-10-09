@@ -55,11 +55,20 @@ class Pix2PixGAN3D(BaseGanModel):
     def summary(self):
         realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
                                      self.realA[:, :, :, self.image_size[2] // 2, :], max_outputs=1)
+        offset = tf.ones_like(self.fakeB)
+        fakeB = tf.add(self.fakeB, offset)
+        value_min = tf.reduce_min(fakeB)
+        value_max = tf.reduce_max(fakeB)
+        fakeB = (fakeB - value_min) / (value_max - value_min)
+        fakeB_sum = tf.summary.image('{}/{}/BFake'.format(self.dataset_name, self.name),
+                                     fakeB[:, :, :, self.image_size[2] // 2, :], max_outputs=1)
+        realB_sum = tf.summary.image('{}/{}/BReal'.format(self.dataset_name, self.name),
+                                     self.realB[:, :, :, self.image_size[2] // 2, :], max_outputs=1)
         metric_sum = list()
         for name, value in self.metricB.items():
             metric_sum.append(tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value))
         g_loss_A2B_sum = tf.summary.scalar('{}/{}/GLossA2B'.format(self.dataset_name, self.name), self.g_lossA2B)
-        self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum] + metric_sum)
+        self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum, fakeB_sum, realB_sum] + metric_sum)
 
         d_loss_realB_sum = tf.summary.scalar('{}/{}/DLossRealB'.format(self.dataset_name, self.name), self.d_loss_realB)
         d_loss_fakeB_sum = tf.summary.scalar('{}/{}/DLossFakeB'.format(self.dataset_name, self.name), self.d_loss_fakeB)
