@@ -56,7 +56,7 @@ class Pix2PixGAN3D(BaseGanModel):
         realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
                                      self.realA[:, :, :, self.image_size[2] // 2, :], max_outputs=1)
         offset = tf.ones_like(self.fakeB)
-        fakeB = tf.add(self.fakeB, offset)
+        fakeB = self.fakeB + offset
         value_min = tf.reduce_min(fakeB)
         value_max = tf.reduce_max(fakeB)
         fakeB = (fakeB - value_min) / (value_max - value_min)

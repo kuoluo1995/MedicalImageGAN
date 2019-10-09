@@ -54,10 +54,10 @@ class Pix2PixGAN(BaseGanModel):
     def summary(self):
         realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name), self.realA, max_outputs=1)
         offset = tf.ones_like(self.fakeB)
-        fakeB = tf.add(self.fakeB, offset)
+        fakeB = self.fakeB + offset
         value_min = tf.reduce_min(fakeB)
-        fakeB = tf.subtract(fakeB, value_min)
-        fakeB = tf.subtract(fakeB, offset)
+        value_max = tf.reduce_max(fakeB)
+        fakeB = (fakeB - value_min) / (value_max - value_min)
         fakeB_sum = tf.summary.image('{}/{}/BFake'.format(self.dataset_name, self.name), fakeB, max_outputs=1)
         realB_sum = tf.summary.image('{}/{}/BReal'.format(self.dataset_name, self.name), self.realB, max_outputs=1)
         metric_sum = list()
