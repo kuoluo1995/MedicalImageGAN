@@ -1,7 +1,6 @@
-import cv2
 import math
 import numpy as np
-
+from skimage import transform
 from data_loader.base_data_generator import BaseDataGenerator
 from utils import yaml_utils
 
@@ -29,7 +28,7 @@ class Gan2dDataGenerator(BaseDataGenerator):
                 a_path = npz['A_path']
                 b_nii = npz['B']
                 b_path = npz['B_path']
-                for s_id in range(a_nii.shape[0]):
+                for s_id in range(a_nii.shape[3]):
                     a, b = self.get_multi_channel_image(s_id, a_nii, b_nii)
                     batchA.append(a)
                     batchB.append(b)
@@ -52,8 +51,8 @@ class Gan2dDataGenerator(BaseDataGenerator):
 
         for _id in range(s_id - self.channels // 2 + padding,
                          min(s_id + self.channels - self.channels // 2, a_nii.shape[0])):
-            sliceA = cv2.resize(a_nii[_id], (self.image_size[1], self.image_size[0]), interpolation=cv2.INTER_AREA)
-            sliceB = cv2.resize(b_nii[_id], (self.image_size[1], self.image_size[0]), interpolation=cv2.INTER_AREA)
+            sliceA = transform.resize(a_nii[:, :, _id], self.image_size)
+            sliceB = transform.resize(b_nii[:, :, _id], self.image_size)
             if self.is_training:
                 # todo 数据增广
                 pass

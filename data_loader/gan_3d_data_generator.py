@@ -1,6 +1,5 @@
 import math
 import numpy as np
-from pathlib import Path
 from skimage import transform
 from data_loader.base_data_generator import BaseDataGenerator
 from utils import yaml_utils
