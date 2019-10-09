@@ -13,7 +13,7 @@ class Gan2dDataGenerator(BaseDataGenerator):
         size = 0
         for item in self.dataset:
             npz = np.load(item)
-            size += npz['A'].shape[0]
+            size += npz['A'].shape[2]
         return math.ceil(size / self.batch_size)
 
     def get_data_generator(self):
@@ -50,7 +50,7 @@ class Gan2dDataGenerator(BaseDataGenerator):
         padding = len(channels_imagesA)
 
         for _id in range(s_id - self.channels // 2 + padding,
-                         min(s_id + self.channels - self.channels // 2, a_nii.shape[0])):
+                         min(s_id + self.channels - self.channels // 2, a_nii.shape[2])):
             sliceA = transform.resize(a_nii[:, :, _id], self.image_size)
             sliceB = transform.resize(b_nii[:, :, _id], self.image_size)
             if self.is_training:
