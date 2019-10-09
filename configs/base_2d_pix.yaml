@@ -9,5 +9,13 @@ dataset:
 
 model:
     name: pix2pix_gan
+    lambda: 100.0
+    metrics: [ssim_metrics,mse_metrics,psnr_metrics]
     generator:
         name: unet
+        filter_channels: 64
+    discriminator:
+        name: patch_gan
+        filter_channels: 64
+    gan_loss:
+        name: lsgan_loss

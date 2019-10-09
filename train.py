@@ -15,7 +15,7 @@ def train(args):
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '2'
-    config = get_config('base_3d_pix')
+    os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+    config = get_config('base_2d_pix')
     config['tag'] = 'basic'
     train(config)
