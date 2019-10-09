@@ -55,9 +55,9 @@ class Pix2PixGAN3D(BaseGanModel):
     def summary(self):
         realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
                                      self.realA[:, :, :, self.image_size[2] // 2, :], max_outputs=1)
-        metric_sum = []
+        metric_sum = list()
         for name, value in self.metricB.items():
-            metric_sum += [tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value)]
+            metric_sum.append(tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value))
         g_loss_A2B_sum = tf.summary.scalar('{}/{}/GLossA2B'.format(self.dataset_name, self.name), self.g_lossA2B)
         self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum] + metric_sum)
 
@@ -69,9 +69,9 @@ class Pix2PixGAN3D(BaseGanModel):
         self.d_sum = tf.summary.merge([d_loss_realB_sum, d_loss_fakeB_sum, d_loss_B_sum, lr_sum])
 
         test_loss = tf.summary.scalar('{}/{}/test_loss'.format(self.dataset_name, self.name), self.test_loss)
-        test_metric = []
+        test_metric = list()
         for name, value in self.test_metric.items():
-            test_metric += tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value)
+            test_metric.append(tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value))
         self.test_sum = tf.summary.merge([test_loss] + test_metric)
 
     def train(self):
