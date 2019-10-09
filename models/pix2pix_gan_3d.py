@@ -113,7 +113,7 @@ class Pix2PixGAN3D(BaseGanModel):
                 test_metric, test_sum = self.sess.run([self.test_metric, self.test_sum],
                                                       feed_dict={self.testA: batchA, self.testB: batchB})
                 writer.add_summary(test_sum, epoch * data_size + step)
-                eval_metric += test_metric
+                eval_metric += test_metric[0]
             if eval_metric < best_eval_metric:
                 self.save(self.checkpoint_dir, epoch, True)
             if epoch % self.save_freq == 0:
