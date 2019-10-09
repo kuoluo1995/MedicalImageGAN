@@ -76,7 +76,7 @@ class Pix2PixGAN(BaseGanModel):
         test_loss = tf.summary.scalar('{}/{}/test_loss'.format(self.dataset_name, self.name), self.test_loss)
         test_metric = list()
         for name, value in self.test_metric.items():
-            test_metric.append(tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value))
+            test_metric.append(tf.summary.scalar('{}/{}/test_{}'.format(self.dataset_name, self.name, name), value))
         self.test_sum = tf.summary.merge([test_loss] + test_metric)
 
     def train(self):
