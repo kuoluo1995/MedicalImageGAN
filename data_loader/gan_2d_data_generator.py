@@ -6,12 +6,12 @@ from utils import yaml_utils
 
 
 class Gan2dDataGenerator(BaseDataGenerator):
-    def __init__(self, dataset, batch_size, image_size, channels, is_training, **kwargs):
-        BaseDataGenerator.__init__(self, dataset, batch_size, image_size, channels, is_training)
+    def __init__(self, dataset_list, batch_size, image_size, channels, is_training, **kwargs):
+        BaseDataGenerator.__init__(self, dataset_list, batch_size, image_size, channels, is_training)
 
     def get_size(self):
         size = 0
-        for item in self.dataset:
+        for item in self.dataset_list:
             npz = np.load(item)
             size += npz['A'].shape[2]
         return math.ceil(size / self.batch_size)
@@ -22,7 +22,7 @@ class Gan2dDataGenerator(BaseDataGenerator):
             batchB = list()
             a_path = ''
             b_path = ''
-            for item in self.dataset:
+            for item in self.dataset_list:
                 npz = np.load(item)
                 a_nii = npz['A']
                 a_path = npz['A_path']

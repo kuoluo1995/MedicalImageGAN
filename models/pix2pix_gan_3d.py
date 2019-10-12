@@ -17,21 +17,21 @@ class Pix2PixGAN3D(BaseGanModel):
 
     def build_model(self):
         # train generator
-        self.realA = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.image_size[2],
-                                                 self.in_channels], name='realA')
-        self.realB = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.image_size[2],
-                                                 self.in_channels], name='realB')
+        base_patch = self.kwargs['dataset']['base_patch']
+        self.realA = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
+                                    name='realA')
+        self.realB = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
+                                    name='realB')
         self.fakeB = self.generator(self.realA, name='generatorA2B')
-        self.metricB = {name: fn(self.fakeB, self.realB) for name, fn in self.metrics_fn.items()}
+        self.metricB = {name: fn(self.realB, self.fakeB) for name, fn in self.metrics_fn.items()}
 
         fakeB_logit = self.discriminator(self.fakeB, name='discriminatorB')
-        self.g_lossA2B = self.loss_fn(fakeB_logit, tf.ones_like(fakeB_logit)) + self._lambda * l1_loss(self.realB,
-                                                                                                       self.fakeB)
+        self.g_lossA2B = self.loss_fn(fakeB_logit, tf.ones_like(fakeB_logit)) + self._lambda * l1_loss(self.fakeB,
+                                                                                                       self.realB)
 
         # train discriminator
-        self.fakeB_sample = tf.placeholder(tf.float32,
-                                           [None, self.image_size[0], self.image_size[1], self.image_size[2],
-                                            self.in_channels], name='fakeB')
+        self.fakeB_sample = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
+                                           name='fakeB')
         realB_logit = self.discriminator(self.realB, reuse=True, name='discriminatorB')
         fakeB_logit = self.discriminator(self.fakeB_sample, reuse=True, name='discriminatorB')
 
@@ -44,26 +44,32 @@ class Pix2PixGAN3D(BaseGanModel):
         self.d_vars = [var for var in train_vars if 'discriminator' in var.name]
 
         # eval
-        self.testA = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.image_size[2],
-                                                 self.in_channels], name='testA')
-        self.testB = tf.placeholder(tf.float32, [None, self.image_size[0], self.image_size[1], self.image_size[2],
-                                                 self.in_channels], name='testB')
+        self.testA = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
+                                    name='testA')
+        self.testB = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
+                                    name='testB')
         self.test_fakeB = self.generator(self.testA, reuse=True, name='generatorA2B')
-        self.test_loss = l1_loss(self.testB, self.test_fakeB)
+        self.test_loss = l1_loss(self.test_fakeB, self.testB)
         self.test_metric = {name: fn(self.test_fakeB, self.testB) for name, fn in self.metrics_fn.items()}
 
     def summary(self):
+        value_min = tf.reduce_min(self.realA)
+        value_max = tf.reduce_max(self.realA)
+        realA = (self.realA - value_min) / (value_max - value_min)
         realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
-                                     self.realA[:, :, :, self.image_size[2] // 2, :], max_outputs=1)
-        offset = tf.ones_like(self.fakeB)
-        fakeB = self.fakeB + offset
-        value_min = tf.reduce_min(fakeB)
-        value_max = tf.reduce_max(fakeB)
-        fakeB = (fakeB - value_min) / (value_max - value_min)
+                                     realA[:, :, :, self.kwargs['dataset']['base_patch'] // 2, :], max_outputs=1)
+
+        value_min = tf.reduce_min(self.fakeB)
+        value_max = tf.reduce_max(self.fakeB)
+        fakeB = (self.fakeB - value_min) / (value_max - value_min)
         fakeB_sum = tf.summary.image('{}/{}/BFake'.format(self.dataset_name, self.name),
-                                     fakeB[:, :, :, self.image_size[2] // 2, :], max_outputs=1)
+                                     fakeB[:, :, :, self.kwargs['dataset']['base_patch'] // 2, :], max_outputs=1)
+
+        value_min = tf.reduce_min(self.realB)
+        value_max = tf.reduce_max(self.realB)
+        realB = (self.realB - value_min) / (value_max - value_min)
         realB_sum = tf.summary.image('{}/{}/BReal'.format(self.dataset_name, self.name),
-                                     self.realB[:, :, :, self.image_size[2] // 2, :], max_outputs=1)
+                                     realB[:, :, :, self.kwargs['dataset']['base_patch'] // 2, :], max_outputs=1)
         metric_sum = list()
         for name, value in self.metricB.items():
             metric_sum.append(tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value))
@@ -95,8 +101,8 @@ class Pix2PixGAN3D(BaseGanModel):
         data_generator = self.train_data_loader.get_data_generator()
         data_size = self.train_data_loader.get_size()
 
-        eval_generator = self.test_data_loader.get_data_generator()
-        best_eval_metric = float("inf")
+        eval_generator = self.eval_data_loader.get_data_generator()
+        best_eval_metric = float("-inf")
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
             eval_metric = 0
@@ -123,8 +129,9 @@ class Pix2PixGAN3D(BaseGanModel):
                                                       feed_dict={self.testA: batchA, self.testB: batchB})
                 writer.add_summary(test_sum, epoch * data_size + step)
                 eval_metric += test_metric['ssim_metrics']  # todo 带改善
-            if eval_metric < best_eval_metric:
+            if eval_metric >= best_eval_metric:
                 self.save(self.checkpoint_dir, epoch, True)
+                best_eval_metric = eval_metric
             if epoch % self.save_freq == 0:
                 self.save(self.checkpoint_dir, epoch, False)
 
