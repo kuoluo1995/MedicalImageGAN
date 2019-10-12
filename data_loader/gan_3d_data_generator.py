@@ -32,7 +32,7 @@ class Gan3dDataGenerator(BaseDataGenerator):
                 b_nii = npz['B']
                 a_path = npz['A_path']
                 b_path = npz['B_path']
-                shape = self.image_size // self.base_patch
+                shape = np.array(self.image_size) // self.base_patch
                 for n_d in shape[0]:
                     for n_h in shape[1]:
                         for n_w in shape[2]:
