@@ -25,8 +25,8 @@ class Gan2dDataGenerator(BaseDataGenerator):
             for item in self.dataset_list:
                 npz = np.load(item)
                 a_nii = npz['A']
-                a_path = npz['A_path']
                 b_nii = npz['B']
+                a_path = npz['A_path']
                 b_path = npz['B_path']
                 for s_id in range(a_nii.shape[2]):
                     a, b = self.get_multi_channel_image(s_id, a_nii, b_nii)

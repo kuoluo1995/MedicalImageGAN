@@ -19,6 +19,9 @@ class Gan3dDataGenerator(BaseDataGenerator):
         shape = self.image_size // self.base_patch
         return shape[0] * shape[1] * shape[2]
 
+    def get_image_size(self):
+        return self.image_size
+
     def get_data_generator(self):
         while True:
             batchA = list()
@@ -26,8 +29,8 @@ class Gan3dDataGenerator(BaseDataGenerator):
             for item in self.dataset_list:
                 npz = np.load(item)
                 a_nii = npz['A']
-                a_path = npz['A_path']
                 b_nii = npz['B']
+                a_path = npz['A_path']
                 b_path = npz['B_path']
                 shape = self.image_size // self.base_patch
                 for n_d in shape[0]:
