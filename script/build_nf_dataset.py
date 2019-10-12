@@ -4,8 +4,8 @@ from pathlib import Path
 from scipy import ndimage
 from utils import yaml_utils, nii_utils
 
-A = 't1'
-B = 'stir'
+A = 'T1'
+B = 'STIR'
 
 data_shape = [1088, 320, 32]
 
