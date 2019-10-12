@@ -11,7 +11,7 @@ class Gan3dDataGenerator(BaseDataGenerator):
 
     def get_size(self):
         size = len(self.dataset_list)
-        shape = self.image_size // self.base_patch
+        shape = np.array(self.image_size) // self.base_patch
         size *= shape[0] * shape[1] * shape[2]
         return math.ceil(size / self.batch_size)
 
