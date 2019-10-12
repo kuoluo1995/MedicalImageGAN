@@ -33,9 +33,9 @@ class Gan3dDataGenerator(BaseDataGenerator):
                 a_path = npz['A_path']
                 b_path = npz['B_path']
                 shape = np.array(self.image_size) // self.base_patch
-                for n_d in shape[0]:
-                    for n_h in shape[1]:
-                        for n_w in shape[2]:
+                for n_d in range(shape[0]):
+                    for n_h in range(shape[1]):
+                        for n_w in range(shape[2]):
                             a_patch = a_nii[(n_d - 1) * self.base_patch:self.base_patch * n_d,
                                       self.base_patch * (n_h - 1):self.base_patch * n_h,
                                       self.base_patch * (n_w - 1):self.base_patch * n_w]
