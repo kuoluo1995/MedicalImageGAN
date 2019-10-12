@@ -16,6 +16,9 @@ class Gan2dDataGenerator(BaseDataGenerator):
             size += npz['A'].shape[2]
         return math.ceil(size / self.batch_size)
 
+    def get_image_size(self):
+        return self.image_size
+
     def get_data_generator(self):
         while True:
             batchA = list()
