@@ -95,7 +95,7 @@ class Pix2PixGAN(BaseGanModel):
         data_generator = self.train_data_loader.get_data_generator()
         data_size = self.train_data_loader.get_size()
 
-        eval_generator = self.test_data_loader.get_data_generator()
+        eval_generator = self.eval_data_loader.get_data_generator()
         best_eval_metric = float("-inf")
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
