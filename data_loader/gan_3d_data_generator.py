@@ -36,12 +36,12 @@ class Gan3dDataGenerator(BaseDataGenerator):
                 for n_d in range(shape[0]):
                     for n_h in range(shape[1]):
                         for n_w in range(shape[2]):
-                            a_patch = a_nii[(n_d - 1) * self.base_patch:self.base_patch * n_d,
-                                      self.base_patch * (n_h - 1):self.base_patch * n_h,
-                                      self.base_patch * (n_w - 1):self.base_patch * n_w]
-                            b_patch = b_nii[(n_d - 1) * self.base_patch:self.base_patch * n_d,
-                                      self.base_patch * (n_h - 1):self.base_patch * n_h,
-                                      self.base_patch * (n_w - 1):self.base_patch * n_w]
+                            a_patch = a_nii[n_d * self.base_patch:self.base_patch * (n_d + 1),
+                                      self.base_patch * n_h:self.base_patch * (n_h + 1),
+                                      self.base_patch * n_w:self.base_patch * (n_w + 1)]
+                            b_patch = b_nii[n_d * self.base_patch:self.base_patch * (n_d + 1),
+                                      self.base_patch * n_h:self.base_patch * (n_h + 1),
+                                      self.base_patch * n_w:self.base_patch * (n_w + 1)]
                             a_patch = self.get_multi_channel_image(a_patch)
                             b_patch = self.get_multi_channel_image(b_patch)
                             batchA.append(a_patch)
