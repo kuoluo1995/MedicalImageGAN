@@ -98,36 +98,36 @@ class Pix2PixGAN3D(BaseGanModel):
         self.sess.run(init_op)
         writer = tf.summary.FileWriter('../tensorboard_logs/{}/{}/{}'.format(self.dataset_name, self.name, self.tag),
                                        self.sess.graph)
-        data_generator = self.train_data_loader.get_data_generator()
-        data_size = self.train_data_loader.get_size()
+        train_generator = self.train_data_loader.get_data_generator()
+        train_size = self.train_data_loader.get_size()
 
         eval_generator = self.eval_data_loader.get_data_generator()
         best_eval_metric = float("-inf")
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
             eval_metric = 0
-            for step in range(data_size):
-                a_path, batchA, b_path, batchB = next(data_generator)
+            for step in range(train_size):
+                a_path, batchA, b_path, batchB = next(train_generator)
                 # Update G network and record fake outputs
                 fakeB, _, g_sum, g_loss = self.sess.run([self.fakeB, g_optimizer, self.g_sum, self.g_lossA2B],
                                                         feed_dict={self.realA: batchA, self.realB: batchB,
                                                                    self.lr_tensor: lr})
-                writer.add_summary(g_sum, epoch * data_size + step)
+                writer.add_summary(g_sum, epoch * train_size + step)
 
                 # Update D network
                 _, d_sum, d_loss = self.sess.run([d_optimizer, self.d_sum, self.d_lossB],
                                                  feed_dict={self.realB: batchB, self.fakeB_sample: fakeB,
                                                             self.lr_tensor: lr})
-                writer.add_summary(d_sum, epoch * data_size + step)
+                writer.add_summary(d_sum, epoch * train_size + step)
                 print('Epoch:{:>3d}/{:<3d} Step:{:>4d}/{:<4d} g_loss:{:<5.5f} d_loss:{:<5.5f}'.format(epoch, self.epoch,
-                                                                                                      step, data_size,
+                                                                                                      step, train_size,
                                                                                                       g_loss, d_loss))
 
                 # eval G network
                 a_path, batchA, b_path, batchB = next(eval_generator)
                 test_metric, test_sum = self.sess.run([self.test_metric, self.test_sum],
                                                       feed_dict={self.testA: batchA, self.testB: batchB})
-                writer.add_summary(test_sum, epoch * data_size + step)
+                writer.add_summary(test_sum, epoch * train_size + step)
                 eval_metric += test_metric['ssim_metrics']  # todo 带改善
             if eval_metric >= best_eval_metric:
                 self.save(self.checkpoint_dir, epoch, True)
