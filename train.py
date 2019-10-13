@@ -17,11 +17,11 @@ def train(args):
         data_loader_class = get_data_loader_by_name(dataset['data_loader'])
         train_dict = yaml_utils.read(dataset['train_path'])
         train_data_loader = data_loader_class(train_dict['dataset'], args['model']['batch_size'], train_dict['shape'],
-                                              args['model']['in_channels'], True)
+                                              args['model']['in_channels'], args['model']['out_channels'], True)
 
         eval_dict = yaml_utils.read(dataset['eval_path'])
         eval_data_loader = data_loader_class(eval_dict['dataset'], args['model']['batch_size'], eval_dict['shape'],
-                                             args['model']['in_channels'], False)
+                                             args['model']['in_channels'], args['model']['out_channels'], False)
 
         model_class = get_model_class_by_name(args['model']['name'])
         model = model_class(train_data_loader=train_data_loader, eval_data_loader=eval_data_loader,

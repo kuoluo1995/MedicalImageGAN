@@ -20,7 +20,7 @@ class Pix2PixGAN3D(BaseGanModel):
         base_patch = self.kwargs['dataset']['base_patch']
         self.realA = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
                                     name='realA')
-        self.realB = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
+        self.realB = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.out_channels],
                                     name='realB')
         self.fakeB = self.generator(self.realA, name='generatorA2B')
         self.metricB = {name: fn(self.realB, self.fakeB) for name, fn in self.metrics_fn.items()}
@@ -30,7 +30,7 @@ class Pix2PixGAN3D(BaseGanModel):
                                                                                                        self.realB)
 
         # train discriminator
-        self.fakeB_sample = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
+        self.fakeB_sample = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.out_channels],
                                            name='fakeB')
         realB_logit = self.discriminator(self.realB, reuse=True, name='discriminatorB')
         fakeB_logit = self.discriminator(self.fakeB_sample, reuse=True, name='discriminatorB')
@@ -46,7 +46,7 @@ class Pix2PixGAN3D(BaseGanModel):
         # eval
         self.testA = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
                                     name='testA')
-        self.testB = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.in_channels],
+        self.testB = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.out_channels],
                                     name='testB')
         self.test_fakeB = self.generator(self.testA, reuse=True, name='generatorA2B')
         self.test_loss = l1_loss(self.test_fakeB, self.testB)

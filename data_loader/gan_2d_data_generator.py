@@ -6,8 +6,8 @@ from utils import yaml_utils
 
 
 class Gan2dDataGenerator(BaseDataGenerator):
-    def __init__(self, dataset_list, batch_size, image_size, channels, is_training, **kwargs):
-        BaseDataGenerator.__init__(self, dataset_list, batch_size, image_size, channels, is_training)
+    def __init__(self, dataset_list, batch_size, image_size, in_channels, out_channels, is_training, **kwargs):
+        BaseDataGenerator.__init__(self, dataset_list, batch_size, image_size, in_channels, out_channels, is_training)
 
     def get_size(self):
         size = 0
@@ -32,9 +32,10 @@ class Gan2dDataGenerator(BaseDataGenerator):
                 a_path = npz['A_path']
                 b_path = npz['B_path']
                 for s_id in range(a_nii.shape[2]):
-                    a, b = self.get_multi_channel_image(s_id, a_nii, b_nii)
-                    batchA.append(a)
-                    batchB.append(b)
+                    a_image = self.get_multi_channel_image(s_id, a_nii, self.in_channels)
+                    b_image = self.get_multi_channel_image(s_id, b_nii, self.out_channels)
+                    batchA.append(a_image)
+                    batchB.append(b_image)
                     if len(batchA) == self.batch_size:
                         yield a_path, np.array(batchA), b_path, np.array(batchB)
                         batchA = list()
@@ -44,32 +45,24 @@ class Gan2dDataGenerator(BaseDataGenerator):
                 batchB.append(np.zeros((self.image_size[0], self.image_size[1], self.channels), dtype=float))
             yield a_path, np.array(batchA), b_path, np.array(batchB)
 
-    def get_multi_channel_image(self, s_id, a_nii, b_nii):
-        channels_imagesA = []
-        channels_imagesB = []
-        for _ in range(s_id, self.channels // 2):
-            channels_imagesA.append(np.zeros(self.image_size, dtype=float))
-            channels_imagesB.append(np.zeros(self.image_size, dtype=float))
-        padding = len(channels_imagesA)
+    def get_multi_channel_image(self, s_id, data, channels):
+        channels_images = []
+        for _ in range(s_id, channels // 2):
+            channels_images.append(np.zeros(self.image_size, dtype=float))
+        padding = len(channels_images)
 
-        for _id in range(s_id - self.channels // 2 + padding,
-                         min(s_id + self.channels - self.channels // 2, a_nii.shape[2])):
-            sliceA = transform.resize(a_nii[:, :, _id], self.image_size)
-            sliceB = transform.resize(b_nii[:, :, _id], self.image_size)
+        for _id in range(s_id - channels // 2 + padding, min(s_id + channels - channels // 2, data.shape[2])):
             if self.is_training:
                 # todo 数据增广
                 pass
-            channels_imagesA.append(sliceA)
-            channels_imagesB.append(sliceB)
-        padding = len(channels_imagesA)
+            channels_images.append(data[:, :, _id])
+        padding = len(channels_images)
 
-        for _ in range(self.channels - padding):
-            channels_imagesA.append(np.zeros(self.image_size, dtype=float))
-            channels_imagesB.append(np.zeros(self.image_size, dtype=float))
+        for _ in range(channels - padding):
+            channels_images.append(np.zeros(self.image_size, dtype=float))
 
-        channels_imagesA = np.array(channels_imagesA).transpose((1, 2, 0))
-        channels_imagesB = np.array(channels_imagesB).transpose((1, 2, 0))
-        return channels_imagesA, channels_imagesB
+        channels_images = np.array(channels_images).transpose((1, 2, 0))
+        return channels_images
 
 
 if __name__ == '__main__':
