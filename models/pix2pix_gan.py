@@ -52,7 +52,8 @@ class Pix2PixGAN(BaseGanModel):
         value_min = tf.reduce_min(self.realA)
         value_max = tf.reduce_max(self.realA)
         realA = (self.realA - value_min) / (value_max - value_min)
-        realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name), realA, max_outputs=1)
+        realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
+                                     realA[:, :, :, self.in_channels // 2], max_outputs=1)
 
         value_min = tf.reduce_min(self.fakeB)
         value_max = tf.reduce_max(self.fakeB)
