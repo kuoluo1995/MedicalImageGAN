@@ -28,7 +28,7 @@ class Pix2PixGAN(BaseGanModel):
                                                                                                        self.realB)
 
         # train discriminator
-        self.fakeB_sample = tf.placeholder(tf.float32, [None, image_size[0], image_size[1], self.in_channels],
+        self.fakeB_sample = tf.placeholder(tf.float32, [None, image_size[0], image_size[1], self.out_channels],
                                            name='fakeB')
         realB_logit = self.discriminator(self.realB, reuse=True, name='discriminatorB')
         fakeB_logit = self.discriminator(self.fakeB_sample, reuse=True, name='discriminatorB')
