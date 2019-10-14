@@ -23,7 +23,7 @@ class Pix2PixGAN3D(BaseGanModel):
         self.realB = tf.placeholder(tf.float32, [None, base_patch, base_patch, base_patch, self.out_channels],
                                     name='realB')
         self.fakeB = self.generator(self.realA, name='generatorA2B')
-        self.metricB = {name: fn(self.realB, self.fakeB) for name, fn in self.metrics_fn.items()}
+        self.metricB = {name: fn(self.fakeB, self.realB) for name, fn in self.metrics_fn.items()}
 
         fakeB_logit = self.discriminator(self.fakeB, name='discriminatorB')
         self.g_lossA2B = self.loss_fn(fakeB_logit, tf.ones_like(fakeB_logit)) + self._lambda * l1_loss(self.fakeB,
@@ -55,19 +55,19 @@ class Pix2PixGAN3D(BaseGanModel):
     def summary(self):
         value_min = tf.reduce_min(self.realA)
         value_max = tf.reduce_max(self.realA)
-        realA = (self.realA - value_min) / (value_max - value_min)
+        realA = (self.realA - value_min) / (value_max - value_min + 0.0001)
         realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
                                      realA[:, :, :, self.kwargs['dataset']['base_patch'] // 2, :], max_outputs=1)
 
         value_min = tf.reduce_min(self.fakeB)
         value_max = tf.reduce_max(self.fakeB)
-        fakeB = (self.fakeB - value_min) / (value_max - value_min)
+        fakeB = (self.fakeB - value_min) / (value_max - value_min + 0.0001)
         fakeB_sum = tf.summary.image('{}/{}/BFake'.format(self.dataset_name, self.name),
                                      fakeB[:, :, :, self.kwargs['dataset']['base_patch'] // 2, :], max_outputs=1)
 
         value_min = tf.reduce_min(self.realB)
         value_max = tf.reduce_max(self.realB)
-        realB = (self.realB - value_min) / (value_max - value_min)
+        realB = (self.realB - value_min) / (value_max - value_min + 0.0001)
         realB_sum = tf.summary.image('{}/{}/BReal'.format(self.dataset_name, self.name),
                                      realB[:, :, :, self.kwargs['dataset']['base_patch'] // 2, :], max_outputs=1)
         metric_sum = list()
@@ -123,15 +123,15 @@ class Pix2PixGAN3D(BaseGanModel):
                                                                                                       step, train_size,
                                                                                                       g_loss, d_loss))
 
-                # eval G network
-                a_path, batchA, b_path, batchB = next(eval_generator)
-                test_metric, test_sum = self.sess.run([self.test_metric, self.test_sum],
-                                                      feed_dict={self.testA: batchA, self.testB: batchB})
-                writer.add_summary(test_sum, epoch * train_size + step)
-                eval_metric += test_metric['ssim_metrics']  # todo 带改善
-            if eval_metric >= best_eval_metric:
-                self.save(self.checkpoint_dir, epoch, True)
-                best_eval_metric = eval_metric
+            #     # eval G network
+            #     a_path, batchA, b_path, batchB = next(eval_generator)
+            #     test_metric, test_sum = self.sess.run([self.test_metric, self.test_sum],
+            #                                           feed_dict={self.testA: batchA, self.testB: batchB})
+            #     writer.add_summary(test_sum, epoch * train_size + step)
+            #     eval_metric += test_metric['ssim_metrics']  # todo 带改善
+            # if eval_metric >= best_eval_metric:
+            #     self.save(self.checkpoint_dir, epoch, True)
+            #     best_eval_metric = eval_metric
             if epoch % self.save_freq == 0:
                 self.save(self.checkpoint_dir, epoch, False)
 

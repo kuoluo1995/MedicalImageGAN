@@ -1,22 +1,29 @@
 phase: train
 
+print_freq: 100
+save_freq: 10
+
 dataset:
     name: NF
     data_loader: gan_2d_data_generator
-    train_path: '/home/yf/datas/NF/T12STIR_train.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
-    eval_path: '/home/yf/datas/NF/T12STIR_eval.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
-    test_path: '/home/yf/datas/NF/T12STIR_test.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
+    train_path: '/home/yf/datas/NF/T12STIR_2d_train.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
+    eval_path: '/home/yf/datas/NF/T12STIR_2d_eval.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
+    test_path: '/home/yf/datas/NF/T12STIR_2d_test.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
 
 model:
     name: pix2pix_gan
-    in_channels: 5
+    epoch: 150
+    in_channels: 1
     lambda: 100.0
-    metrics: [ssim_metrics,mse_metrics,psnr_metrics]
     generator:
         name: unet
         filter_channels: 64
     discriminator:
         name: patch_gan
         filter_channels: 64
-    gan_loss:
-        name: lsgan_loss
+    loss: lsgan_loss
+    metrics: [ssim_metrics,mse_metrics,psnr_metrics]
+    scheduler:
+        name: linear_decay
+        learning_rate: 0.0002
+        epoch_decay: 50

@@ -21,7 +21,7 @@ class Pix2PixGAN(BaseGanModel):
         self.realA = tf.placeholder(tf.float32, [None, image_size[0], image_size[1], self.in_channels], name='realA')
         self.realB = tf.placeholder(tf.float32, [None, image_size[0], image_size[1], self.out_channels], name='realB')
         self.fakeB = self.generator(self.realA, name='generatorA2B')
-        self.metricB = {name: fn(self.fakeB, self.realB) for name, fn in self.metrics_fn.items()}
+        # self.metricB = {name: fn(self.fakeB, self.realB) for name, fn in self.metrics_fn.items()}
 
         fakeB_logit = self.discriminator(self.fakeB, name='discriminatorB')
         self.g_lossA2B = self.loss_fn(fakeB_logit, tf.ones_like(fakeB_logit)) + self._lambda * l1_loss(self.fakeB,
@@ -46,14 +46,15 @@ class Pix2PixGAN(BaseGanModel):
         self.testB = tf.placeholder(tf.float32, [None, image_size[0], image_size[1], self.out_channels], name='testB')
         self.test_fakeB = self.generator(self.testA, reuse=True, name='generatorA2B')
         self.test_loss = l1_loss(self.test_fakeB, self.testB)
-        self.test_metric = {name: fn(self.test_fakeB, self.testB) for name, fn in self.metrics_fn.items()}
+        # self.test_metric = {name: fn(self.test_fakeB, self.testB) for name, fn in self.metrics_fn.items()}
 
     def summary(self):
         value_min = tf.reduce_min(self.realA)
         value_max = tf.reduce_max(self.realA)
         realA = (self.realA - value_min) / (value_max - value_min)
         realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
-                                     realA[:, :, :, self.in_channels // 2], max_outputs=1)
+                                     realA[:, :, :, self.in_channels // 2:self.in_channels - self.in_channels // 2],
+                                     max_outputs=1)
 
         value_min = tf.reduce_min(self.fakeB)
         value_max = tf.reduce_max(self.fakeB)
@@ -65,11 +66,11 @@ class Pix2PixGAN(BaseGanModel):
         realB = (self.realB - value_min) / (value_max - value_min)
         realB_sum = tf.summary.image('{}/{}/BReal'.format(self.dataset_name, self.name), realB, max_outputs=1)
 
-        metric_sum = list()
-        for name, value in self.metricB.items():
-            metric_sum.append(tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value))
+        # metric_sum = list()
+        # for name, value in self.metricB.items():
+        #     metric_sum.append(tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value))
         g_loss_A2B_sum = tf.summary.scalar('{}/{}/GLossA2B'.format(self.dataset_name, self.name), self.g_lossA2B)
-        self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum, realB_sum, fakeB_sum] + metric_sum)
+        self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum, realB_sum, fakeB_sum])
 
         d_loss_realB_sum = tf.summary.scalar('{}/{}/DLossRealB'.format(self.dataset_name, self.name), self.d_loss_realB)
         d_loss_fakeB_sum = tf.summary.scalar('{}/{}/DLossFakeB'.format(self.dataset_name, self.name), self.d_loss_fakeB)
@@ -79,10 +80,10 @@ class Pix2PixGAN(BaseGanModel):
         self.d_sum = tf.summary.merge([d_loss_realB_sum, d_loss_fakeB_sum, d_loss_B_sum, lr_sum])
 
         test_loss = tf.summary.scalar('{}/{}/test_loss'.format(self.dataset_name, self.name), self.test_loss)
-        test_metric = list()
-        for name, value in self.test_metric.items():
-            test_metric.append(tf.summary.scalar('{}/{}/test_{}'.format(self.dataset_name, self.name, name), value))
-        self.test_sum = tf.summary.merge([test_loss] + test_metric)
+        # test_metric = list()
+        # for name, value in self.test_metric.items():
+        #     test_metric.append(tf.summary.scalar('{}/{}/test_{}'.format(self.dataset_name, self.name, name), value))
+        self.test_sum = tf.summary.merge([test_loss])
 
     def train(self):
         """Train cyclegan"""
@@ -97,10 +98,10 @@ class Pix2PixGAN(BaseGanModel):
         data_size = self.train_data_loader.get_size()
 
         eval_generator = self.eval_data_loader.get_data_generator()
-        best_eval_metric = float("-inf")
+        best_eval_metric = float('inf')
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
-            eval_metric = 0
+            eval_loss = 0
             for step in range(data_size):
                 a_path, batchA, b_path, batchB = next(data_generator)
 
@@ -121,13 +122,13 @@ class Pix2PixGAN(BaseGanModel):
 
                 # eval G network
                 a_path, batchA, b_path, batchB = next(eval_generator)
-                test_metric, test_sum = self.sess.run([self.test_metric, self.test_sum],
+                test_loss, test_sum = self.sess.run([self.test_loss, self.test_sum],
                                                       feed_dict={self.testA: batchA, self.testB: batchB})
                 writer.add_summary(test_sum, epoch * data_size + step)
-                eval_metric += test_metric['ssim_metrics']  # todo 带改善
-            if eval_metric >= best_eval_metric:
+                eval_loss += test_loss
+            if eval_loss <= best_eval_metric:
                 self.save(self.checkpoint_dir, epoch, True)
-                best_eval_metric = eval_metric
+                best_eval_metric = eval_loss
             if epoch % self.save_freq == 0:
                 self.save(self.checkpoint_dir, epoch, False)
 

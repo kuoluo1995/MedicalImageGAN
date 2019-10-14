@@ -7,7 +7,7 @@ from utils import yaml_utils, nii_utils
 A = 'T1'
 B = 'STIR'
 
-data_shape = [1088, 320, 32]
+data_shape = [1088, 320]
 
 source = '/home/yf/datas/NF'  # /home/yf/datas/NF E:/Dataset/Neurofibromatosis/source
 output = '/home/yf/datas/NF'  # E:/Dataset/Neurofibromatosis /home/yf/datas/NF
@@ -45,8 +45,8 @@ def resize_data(data_):
     w_scale = 1.0
     if shape[2] <= data_shape[2]:
         w_pad = data_shape[2] - shape[2]
-    else:
-        w_scale = data_shape[2] * 1.0 / shape[2]
+    # else:
+    #     w_scale = data_shape[2] * 1.0 / shape[2]
     data_ = np.pad(data_, ((0, d_pad), (0, h_pad), (0, w_pad)), 'constant')
     data_ = ndimage.interpolation.zoom(data_, (d_scale, h_scale, w_scale), order=0)
     return data_
@@ -57,6 +57,9 @@ def itensity_normalize_data(data_):
     mean = pixels.mean()
     std = pixels.std()
     out = (data_ - mean) / std
+    max_value = np.max(out)
+    min_value = np.min(out)
+    out = (out - min_value) / (max_value - min_value)
     return out
 
 
@@ -93,15 +96,15 @@ def processed_data():
 
         print('\r>>dataset {}/{} name: {}'.format(i, len(sourceA_dirs), sourceA_dirs[i]), end='')
         if a_nii.shape[2] == b_nii.shape[2] and sourceA_dirs[i] == sourceB_dirs[i]:
-            a_path = output + '/processed_dataset/' + Path(sourceA_dirs[i]).stem + '/' + A + '.nii'
-            b_path = output + '/processed_dataset/' + Path(sourceB_dirs[i]).stem + '/' + B + '.nii'
+            a_path = output + '/processed_dataset/3d/' + Path(sourceA_dirs[i]).stem + '/' + A + '.nii'
+            b_path = output + '/processed_dataset/3d/' + Path(sourceB_dirs[i]).stem + '/' + B + '.nii'
             Path(a_path).parent.mkdir(parents=True, exist_ok=True)
             Path(b_path).parent.mkdir(parents=True, exist_ok=True)
             a_header = nii_utils.nii_header_reader(source + '/' + A + '/' + sourceA_dirs[i])
             b_header = nii_utils.nii_header_reader(source + '/' + B + '/' + sourceB_dirs[i])
             nii_utils.nii_writer(a_path, a_header, a_nii)
             nii_utils.nii_writer(b_path, b_header, b_nii)
-            dataset_path = output + '/dataset/' + Path(sourceA_dirs[i]).stem + '.npz'
+            dataset_path = output + '/dataset/3d/' + Path(sourceA_dirs[i]).stem + '.npz'
             Path(dataset_path).parent.mkdir(parents=True, exist_ok=True)
             np.savez(dataset_path, A=a_nii, B=b_nii, A_path=a_path, B_path=b_path)
             dataset.append(dataset_path)
@@ -119,20 +122,20 @@ def processed_data():
     train_dataset = dataset[:len(dataset) * 8 // 10]
     print('\r! train dataset size: {}'.format(len(train_dataset)))
     train_dict = {'shape': data_shape, 'dataset': train_dataset}
-    yaml_utils.write(output + '/' + A + '2' + B + '_train.yaml', train_dict)
+    yaml_utils.write(output + '/' + A + '2' + B + '_3d_train.yaml', train_dict)
 
     eval_dataset = dataset[len(train_dataset): len(dataset) * 9 // 10]
     print('\r! eval dataset size: {}'.format(len(eval_dataset)))
     eval_dict = {'shape': data_shape, 'dataset': eval_dataset}
-    yaml_utils.write(output + '/' + A + '2' + B + '_eval.yaml', eval_dict)
+    yaml_utils.write(output + '/' + A + '2' + B + '_3d_eval.yaml', eval_dict)
 
     test_dataset = dataset[len(dataset) * 9 // 10:]
     print('\r! test dataset size: {}'.format(len(test_dataset)))
     test_dict = {'shape': data_shape, 'dataset': test_dataset}
-    yaml_utils.write(output + '/' + A + '2' + B + '_test.yaml', test_dict)
+    yaml_utils.write(output + '/' + A + '2' + B + '_3d_test.yaml', test_dict)
 
-    yaml_utils.write(output + '/error.yaml', error_data_info)
-    yaml_utils.write(output + '/dataset_info.yaml', dataset_info)
+    yaml_utils.write(output + '/3d_error.yaml', error_data_info)
+    yaml_utils.write(output + '/3d_dataset_info.yaml', dataset_info)
 
 
 if __name__ == '__main__':
