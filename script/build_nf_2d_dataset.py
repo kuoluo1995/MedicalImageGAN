@@ -9,8 +9,8 @@ B = 'STIR'
 
 data_shape = [1152, 384]  # [1088,320]
 
-source = 'E:/Dataset/Neurofibromatosis/source'  # /home/yf/datas/NF E:/Dataset/Neurofibromatosis/source
-output = 'E:/Dataset/Neurofibromatosis'  # E:/Dataset/Neurofibromatosis /home/yf/datas/NF
+source = '/home/yf/datas/NF'  # /home/yf/datas/NF E:/Dataset/Neurofibromatosis/source
+output = '/home/yf/datas/NF'  # E:/Dataset/Neurofibromatosis /home/yf/datas/NF
 
 
 def drop_invalid_range(data_):

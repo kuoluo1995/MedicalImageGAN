@@ -3,21 +3,21 @@ phase: train
 dataset:
     name: NF
     data_loader: gan_3d_data_generator
-    base_patch: 64
     train_path: '/home/yf/datas/NF/T12STIR_3d_train.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
     eval_path: '/home/yf/datas/NF/T12STIR_3d_eval.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
     test_path: '/home/yf/datas/NF/T12STIR_3d_test.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
 
 model:
     name: pix2pix_gan_3d
-    epoch: 150
+    epoch: 200
     lambda: 100.0
+    base_patch: [128,64,16]
     generator:
         name: unet_3d
-        filter_channels: 16
+        filter_channels: 64
     discriminator:
         name: patch_gan_3d
-        filter_channels: 16
+        filter_channels: 64
     loss: lsgan_loss
     metrics: [ssim_metrics,mse_metrics,psnr_metrics]
     scheduler:

@@ -17,20 +17,22 @@ def train(args):
         data_loader_class = get_data_loader_by_name(dataset['data_loader'])
         train_dict = yaml_utils.read(dataset['train_path'])
         train_data_loader = data_loader_class(train_dict['dataset'], args['model']['batch_size'], train_dict['shape'],
-                                              args['model']['in_channels'], args['model']['out_channels'], True)
+                                              args['model']['in_channels'], args['model']['out_channels'], True,
+                                              base_patch=args['model']['base_patch'])
 
         eval_dict = yaml_utils.read(dataset['eval_path'])
         eval_data_loader = data_loader_class(eval_dict['dataset'], args['model']['batch_size'], eval_dict['shape'],
-                                             args['model']['in_channels'], args['model']['out_channels'], False)
+                                             args['model']['in_channels'], args['model']['out_channels'], False,
+                                             base_patch=args['model']['base_patch'])
 
         model_class = get_model_class_by_name(args['model']['name'])
-        model = model_class(train_data_loader=train_data_loader, eval_data_loader=eval_data_loader,
-                            test_data_loader=None, sess=sess, **args)
+        model = model_class(image_size=train_data_loader.get_image_size(), train_data_loader=train_data_loader,
+                            eval_data_loader=eval_data_loader, test_data_loader=None, sess=sess, **args)
         model.train()
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-    config = get_config('base_2d_pix')
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    config = get_config('base_3d_pix')
     config['tag'] = 'basic'
     train(config)

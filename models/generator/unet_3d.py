@@ -11,21 +11,29 @@ def build_model(image, out_channels, filter_channels=64, reuse=False, name='3dun
         e2 = instance_norm3d(conv3d(leaky_relu(e1), filter_channels * 2, name='g_e2_conv'), 'g_bn_e2')
         e3 = instance_norm3d(conv3d(leaky_relu(e2), filter_channels * 4, name='g_e3_conv'), 'g_bn_e3')
         e4 = instance_norm3d(conv3d(leaky_relu(e3), filter_channels * 8, name='g_e4_conv'), 'g_bn_e4')
-        e5 = instance_norm3d(conv3d(leaky_relu(e4), filter_channels * 8, name='g_e5_conv'), 'g_bn_e5')
+        e5 = instance_norm3d(conv3d(leaky_relu(e4), filter_channels * 8, stride=(2, 2, 1),name='g_e5_conv'), 'g_bn_e5')
+        e6 = instance_norm3d(conv3d(leaky_relu(e5), filter_channels * 8, stride=(2, 2, 1), name='g_e6_conv'), 'g_bn_e6')
+        e7 = instance_norm3d(conv3d(leaky_relu(e6), filter_channels * 8, stride=(2, 1, 1), name='g_e7_conv'), 'g_bn_e7')
 
-        d1 = deconv3d(tf.nn.relu(e5), filter_channels * 8, name='g_d1')
+        d1 = deconv3d(tf.nn.relu(e7), filter_channels * 8, stride=(2, 1, 1), name='g_d1')
         d1 = tf.nn.dropout(d1, dropout_rate)
-        d1 = tf.concat([instance_norm3d(d1, 'g_bn_d1'), e4], 4)
+        d1 = tf.concat([instance_norm3d(d1, 'g_bn_d1'), e6], 4)
 
-        d2 = deconv3d(tf.nn.relu(d1), filter_channels * 4, name='g_d2')
-        d2 = tf.concat([instance_norm3d(d2, 'g_bn_d2'), e3], 4)
+        d2 = deconv3d(tf.nn.relu(d1), filter_channels * 8, stride=(2, 2, 1), name='g_d2')
+        d2 = tf.concat([instance_norm3d(d2, 'g_bn_d2'), e5], 4)
 
-        d3 = deconv3d(tf.nn.relu(d2), filter_channels * 2, name='g_d3')
-        d3 = tf.concat([instance_norm3d(d3, 'g_bn_d3'), e2], 4)
+        d3 = deconv3d(tf.nn.relu(d2), filter_channels * 8, stride=(2, 2, 1), name='g_d3')
+        d3 = tf.concat([instance_norm3d(d3, 'g_bn_d3'), e4], 4)
 
-        d4 = deconv3d(tf.nn.relu(d3), filter_channels, name='g_d4')
-        d4 = tf.concat([instance_norm3d(d4, 'g_bn_d4'), e1], 4)
+        d4 = deconv3d(tf.nn.relu(d3), filter_channels*4, name='g_d4')
+        d4 = tf.concat([instance_norm3d(d4, 'g_bn_d4'), e3], 4)
 
-        d8 = deconv3d(tf.nn.relu(d4), out_channels, name='g_d5')
+        d5 = deconv3d(tf.nn.relu(d4), filter_channels*2, name='g_d5')
+        d5 = tf.concat([instance_norm3d(d5, 'g_bn_d5'), e2], 4)
+
+        d6 = deconv3d(tf.nn.relu(d5), filter_channels, name='g_d6')
+        d6 = tf.concat([instance_norm3d(d6, 'g_bn_d6'), e1], 4)
+
+        d8 = deconv3d(tf.nn.relu(d6), out_channels, name='g_d8')
 
         return tf.nn.tanh(d8)

@@ -12,11 +12,12 @@ dataset:
 
 model:
     name: pix2pix_gan
-    epoch: 150
+    epoch: 200
     in_channels: 1
     lambda: 100.0
+    base_patch: None
     generator:
-        name: unet
+        name: unet_deep
         filter_channels: 64
     discriminator:
         name: patch_gan

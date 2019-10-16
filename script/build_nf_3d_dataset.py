@@ -43,8 +43,8 @@ def resize_data(data_):
         h_scale = data_shape[1] * 1.0 / shape[1]
     w_pad = 0
     w_scale = 1.0
-    if shape[2] <= data_shape[2]:
-        w_pad = data_shape[2] - shape[2]
+    # if shape[2] <= data_shape[2]:
+    #     w_pad = data_shape[2] - shape[2]
     # else:
     #     w_scale = data_shape[2] * 1.0 / shape[2]
     data_ = np.pad(data_, ((0, d_pad), (0, h_pad), (0, w_pad)), 'constant')

@@ -18,6 +18,7 @@ class BaseModel(ABC):
         self.save_freq = kwargs['save_freq']
         self.lr_tensor = tf.placeholder(tf.float32, None, name='learning_rate')
         self.dataset_name = kwargs['dataset']['name']
+        self.image_size = kwargs['image_size']
         # model
         model = kwargs['model']
         self.name = model['name']
