@@ -28,8 +28,8 @@ class Gan3dDataGenerator(BaseDataGenerator):
                 b_path = str(npz['B_path'])
                 d_s, d_d, h_s, h_d, w_s, w_d = self.get_cube_point(a_nii.shape)
                 # d=depth, h=height, w=width,,s=start d=end
-                a_patch = a_nii[d_s:d_d, h_s:h_d, w_s:w_d]
-                b_patch = b_nii[d_s:d_d, h_s:h_d, w_s:w_d]
+                a_patch = a_nii[d_s:d_d + 1, h_s:h_d + 1, w_s:w_d + 1]
+                b_patch = b_nii[d_s:d_d + 1, h_s:h_d + 1, w_s:w_d + 1]
                 a_patch, b_patch = self.get_multi_channel_image(a_patch, self.in_channels, b_patch, self.out_channels)
                 batchA.append(a_patch)
                 batchB.append(b_patch)

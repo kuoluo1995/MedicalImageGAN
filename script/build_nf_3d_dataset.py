@@ -14,8 +14,7 @@ output = '/home/yf/datas/NF'  # E:/Dataset/Neurofibromatosis /home/yf/datas/NF
 
 
 def drop_invalid_range(data_):
-    zero_value = data_[0, 0, 0]
-    no_zero_idxs = np.where(data_ != zero_value)
+    no_zero_idxs = np.where(data_ > 0)
     [max_d, max_h, max_w] = np.max(np.array(no_zero_idxs), axis=1)
     [min_d, min_h, min_w] = np.min(np.array(no_zero_idxs), axis=1)
     return [max_d, max_h, max_w], [min_d, min_h, min_w]
@@ -24,7 +23,7 @@ def drop_invalid_range(data_):
 def crop_data(data_, min_shape, max_shape):
     [min_d, min_h, min_w] = min_shape
     [max_d, max_h, max_w] = max_shape
-    return data_[min_d:max_d, min_h:max_h, min_w:max_w]
+    return data_[min_d:max_d + 1, min_h:max_h + 1, min_w:max_w + 1]
 
 
 def resize_data(data_):
@@ -53,7 +52,7 @@ def resize_data(data_):
 
 
 def itensity_normalize_data(data_):
-    pixels = data_[data_ > 0]
+    pixels = data_[data_ > 5]
     mean = pixels.mean()
     std = pixels.std()
     out = (data_ - mean) / std
@@ -75,27 +74,26 @@ def processed_data():
 
         a_nii = np.transpose(a_nii, (1, 0, 2))
         b_nii = np.transpose(b_nii, (1, 0, 2))
-
-        # drop out the invalid range
-        a_max_shape, a_min_shape = drop_invalid_range(a_nii)
-        b_max_shape, b_min_shape = drop_invalid_range(b_nii)
-        min_shape = np.max([a_min_shape, b_min_shape], axis=0)
-        max_shape = np.min([a_max_shape, b_max_shape], axis=0)
-
-        # crop data
-        a_nii = crop_data(a_nii, min_shape, max_shape)
-        b_nii = crop_data(b_nii, min_shape, max_shape)
-
-        # resize data
-        a_nii = resize_data(a_nii)
-        b_nii = resize_data(b_nii)
-
-        # normalization data
-        a_nii = itensity_normalize_data(a_nii)
-        b_nii = itensity_normalize_data(b_nii)
-
-        print('\r>>dataset {}/{} name: {}'.format(i, len(sourceA_dirs), sourceA_dirs[i]), end='')
         if a_nii.shape[2] == b_nii.shape[2] and sourceA_dirs[i] == sourceB_dirs[i]:
+            # drop out the invalid range
+            a_max_shape, a_min_shape = drop_invalid_range(a_nii)
+            b_max_shape, b_min_shape = drop_invalid_range(b_nii)
+            min_shape = np.max([a_min_shape, b_min_shape], axis=0)
+            max_shape = np.min([a_max_shape, b_max_shape], axis=0)
+
+            # crop data
+            a_nii = crop_data(a_nii, min_shape, max_shape)
+            b_nii = crop_data(b_nii, min_shape, max_shape)
+
+            # resize data
+            a_nii = resize_data(a_nii)
+            b_nii = resize_data(b_nii)
+
+            # normalization data
+            a_nii = itensity_normalize_data(a_nii)
+            b_nii = itensity_normalize_data(b_nii)
+
+            print('\r>>dataset {}/{} name: {}'.format(i + 1, len(sourceA_dirs), sourceA_dirs[i]), end='')
             a_path = output + '/processed_dataset/3d/' + Path(sourceA_dirs[i]).stem + '/' + A + '.nii'
             b_path = output + '/processed_dataset/3d/' + Path(sourceB_dirs[i]).stem + '/' + B + '.nii'
             Path(a_path).parent.mkdir(parents=True, exist_ok=True)
@@ -111,13 +109,14 @@ def processed_data():
             dataset_info.append(
                 'path:{} {}_shape:{}, {}_shape:{}'.format(str(sourceA_dirs[i]), A, tuple(a_nii.shape), B,
                                                           tuple(b_nii.shape)))
-        else:
-            error_data_info.append(
-                'dataset error, {}-name:{} shape:{}, {}-name:{} shape:{}'.format(A, sourceA_dirs[i], a_nii.shape, B,
-                                                                                 sourceB_dirs[i], b_nii.shape))
-            print(
-                '\r dataset error, {}-name:{} shape:{}, {}-name:{} shape:{}'.format(A, sourceA_dirs[i], a_nii.shape, B,
-                                                                                    sourceB_dirs[i], b_nii.shape))
+    else:
+        error_data_info.append(
+            'dataset error, {}-name:{} shape:{}, {}-name:{} shape:{}'.format(A, sourceA_dirs[i], a_nii.shape, B,
+                                                                             sourceB_dirs[i], b_nii.shape))
+        print(
+            '\r dataset error, {}-name:{} shape:{}, {}-name:{} shape:{}'.format(A, sourceA_dirs[i], a_nii.shape, B,
+                                                                                sourceB_dirs[i], b_nii.shape))
+
     np.random.shuffle(dataset)
     train_dataset = dataset[:len(dataset) * 8 // 10]
     print('\r! train dataset size: {}'.format(len(train_dataset)))
