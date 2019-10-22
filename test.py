@@ -28,5 +28,7 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     config = get_config('base_2d_pix')
     config['phase'] = 'test'
-    config['tag'] = 'basic'
+    config['tag'] = 'in_channels3_out_channels3'
+    config['in_channels'] = 3
+    config['out_channels'] = 3
     _test(config)

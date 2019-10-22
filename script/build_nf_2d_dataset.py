@@ -89,7 +89,7 @@ def processed_data():
             a_nii = itensity_normalize_data(a_nii)
             b_nii = itensity_normalize_data(b_nii)
 
-            print('\r>>dataset {}/{} name: {}'.format(i+1, len(sourceA_dirs), sourceA_dirs[i]), end='')
+            print('\r>>dataset {}/{} name: {}'.format(i + 1, len(sourceA_dirs), sourceA_dirs[i]), end='')
             a_path = output + '/processed_dataset/2d/' + Path(sourceA_dirs[i]).stem + '/' + A + '.nii'
             b_path = output + '/processed_dataset/2d/' + Path(sourceB_dirs[i]).stem + '/' + B + '.nii'
             Path(a_path).parent.mkdir(parents=True, exist_ok=True)
@@ -100,7 +100,8 @@ def processed_data():
             nii_utils.nii_writer(b_path, b_header, b_nii)
             dataset_path = output + '/dataset/2d/' + Path(sourceA_dirs[i]).stem + '.npz'
             Path(dataset_path).parent.mkdir(parents=True, exist_ok=True)
-            np.savez(dataset_path, A=a_nii, B=b_nii, A_path=a_path, B_path=b_path)
+            np.savez(dataset_path, A=a_nii, B=b_nii, A_path=a_path, B_path=b_path,
+                     B_source_path=source + '/' + B + '/' + sourceB_dirs[i])
             dataset.append(dataset_path)
             dataset_info.append(
                 'path:{} {}_shape:{}, {}_shape:{}'.format(str(sourceA_dirs[i]), A, tuple(a_nii.shape), B,

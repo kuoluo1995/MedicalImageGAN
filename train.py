@@ -34,7 +34,7 @@ def train(args):
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     config = get_config('base_2d_pix')
-    config['tag'] = 'basic'
+    config['tag'] = 'stride1'
     # config['in_channels'] = 3
     # config['out_channels'] = 3
     train(config)

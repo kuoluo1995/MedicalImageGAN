@@ -95,6 +95,7 @@ class Pix2PixGAN(BaseGanModel):
 
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
+        self.load(self.checkpoint_dir, is_best=True)
         writer = tf.summary.FileWriter('../tensorboard_logs/{}/{}/{}'.format(self.dataset_name, self.name, self.tag),
                                        self.sess.graph)
         data_generator = self.train_data_loader.get_data_generator()
@@ -151,21 +152,25 @@ class Pix2PixGAN(BaseGanModel):
             if pre_b_path != b_path:
                 if pre_b_path != '':
                     b_nii_head = nii_header_reader(pre_b_path)
-                    Path('result/').mkdir(parents=True, exist_ok=True)
+                    Path('./result/{}/{}/{}/'.format(self.dataset_name, self.name, self.tag)).mkdir(parents=True,
+                                                                                                    exist_ok=True)
                     # resize images
                     nii_model = resize_data(np.array(nii_model), b_nii_head['header'].get_data_shape())
-                    nii_writer('result/fake_{}.nii'.format(Path(pre_b_path).parent.stem), b_nii_head,
-                               np.array(nii_model))
+                    nii_writer(
+                        'result/{}/{}/{}/fake_{}.nii'.format(self.dataset_name, self.name, self.tag,
+                                                             Path(pre_b_path).parent.stem), b_nii_head,
+                        np.array(nii_model))
                     print('Path:{} loss:{}'.format(pre_b_path, sum_loss))
                     nii_model = list()
                     sum_loss = 0
                 pre_b_path = b_path
-            nii_model.append(np.squeeze(fakeB))
+            nii_model.append(fakeB[0, :, :, self.out_channels // 2])
             sum_loss += loss
         if len(nii_model) > 0:
             b_nii_head = nii_header_reader(pre_b_path)
             nii_model = resize_data(np.array(nii_model), b_nii_head['header'].get_data_shape())
-            nii_writer('result/fake_{}.nii'.format(Path(pre_b_path).parent.stem), b_nii_head,
+            nii_writer('result/{}/{}/{}/fake_{}.nii'.format(self.dataset_name, self.name, self.tag,
+                                                            Path(pre_b_path).parent.stem), b_nii_head,
                        np.array(nii_model))
             print('Path:{} loss:{}'.format(pre_b_path, sum_loss))
 
@@ -173,19 +178,20 @@ class Pix2PixGAN(BaseGanModel):
 def resize_data(data_, data_shape):  # resize for nf dataset
     data_ = np.transpose(data_, (1, 2, 0))
     shape = data_.shape
-    d_pad = 0
+    d = shape[0]
     d_scale = 1.0
     if shape[0] <= data_shape[0]:
-        d_pad = shape[0] - data_shape[0]
+        d = data_shape[0]
     else:
         d_scale = shape[0] * 1.0 / data_shape[0]
-    h_pad = 0
+
+    h = shape[1]
     h_scale = 1.0
     if shape[1] <= data_shape[1]:
-        h_pad = shape[1] - data_shape[1]
+        h = data_shape[1]
     else:
         h_scale = shape[1] * 1.0 / data_shape[1]
-    w_pad = shape[2] - data_shape[2]
-    data_ = np.pad(data_, ((0, d_pad), (0, h_pad), (0, w_pad)), 'constant')
+
     data_ = ndimage.interpolation.zoom(data_, (d_scale, h_scale, 1.0), order=0)
+    data_ = data_[:d, :h, :]
     return data_

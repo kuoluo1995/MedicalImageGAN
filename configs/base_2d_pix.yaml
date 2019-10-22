@@ -12,9 +12,9 @@ dataset:
 
 model:
     name: pix2pix_gan
-    epoch: 200
+    epoch: 300
     in_channels: 1
-    lambda: 100.0
+    lambda: 10.0
     base_patch: None
     generator:
         name: unet_deep
@@ -27,4 +27,4 @@ model:
     scheduler:
         name: linear_decay
         learning_rate: 0.0002
-        epoch_decay: 50
+        epoch_decay: 100

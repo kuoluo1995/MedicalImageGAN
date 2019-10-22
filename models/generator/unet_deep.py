@@ -7,7 +7,7 @@ def build_model(image, out_channels, filter_channels=64, reuse=False, name='unet
     with tf.variable_scope(name):
         if reuse:
             tf.get_variable_scope().reuse_variables()
-        e1 = instance_norm2d(conv2d(image, filter_channels, name='g_e1_conv'))
+        e1 = instance_norm2d(conv2d(image, filter_channels, stride=1, name='g_e1_conv'))
         e2 = instance_norm2d(conv2d(leaky_relu(e1), filter_channels * 2, name='g_e2_conv'), 'g_bn_e2')
         e3 = instance_norm2d(conv2d(leaky_relu(e2), filter_channels * 4, name='g_e3_conv'), 'g_bn_e3')
         e4 = instance_norm2d(conv2d(leaky_relu(e3), filter_channels * 8, name='g_e4_conv'), 'g_bn_e4')
@@ -40,6 +40,6 @@ def build_model(image, out_channels, filter_channels=64, reuse=False, name='unet
         d7 = deconv2d(tf.nn.relu(d6), filter_channels, name='g_d7')
         d7 = tf.concat([instance_norm2d(d7, 'g_bn_d7'), e1], 3)
 
-        d8 = deconv2d(tf.nn.relu(d7), out_channels, name='g_d8')
+        d8 = deconv2d(tf.nn.relu(d7), out_channels, stride=1, name='g_d8')
 
         return tf.nn.tanh(d8)
