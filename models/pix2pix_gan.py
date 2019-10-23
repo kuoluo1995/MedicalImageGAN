@@ -110,7 +110,8 @@ class Pix2PixGAN(BaseGanModel):
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
             g_loss_sum = d_loss_sum = 0
-            best_fakeB = best_realA = best_realB = np.zeros(shape=(None, self.image_size[0], self.image_size[1], 1))
+            best_fakeB = best_realA = best_realB = np.zeros(
+                shape=(self.batch_size, self.image_size[0], self.image_size[1], 1))
             best_g_loss = float('inf')
             for step in range(data_size):
                 a_path, batchA, b_path, batchB = next(train_generator)
@@ -129,16 +130,6 @@ class Pix2PixGAN(BaseGanModel):
                 print('Epoch:{:>3d}/{:<3d} Step:{:>4d}/{:<4d} g_loss:{:<5.5f} d_loss:{:<5.5f}'.format(epoch, self.epoch,
                                                                                                       step, data_size,
                                                                                                       g_loss, d_loss))
-            lr_summary = self.sess.run([self.lr_summary], feed_dict={self.lr_tensor: lr})
-            writer.add_summary(lr_summary, epoch)
-            g_summary = self.sess.run([self.g_loss_A2B_summary], feed_dict={self.g_lossA2B: g_loss_sum / data_size})
-            writer.add_summary(g_summary, epoch)
-            d_summary = self.sess.run([self.d_loss_B_summary], feed_dict={self.d_lossB: d_loss_sum / data_size})
-            writer.add_summary(d_summary, epoch)
-            image_summary = self.sess.run([self.g_image_summary],
-                                          feed_dict={self.realA: best_realA, self.fakeB: best_fakeB,
-                                                     self.realB: best_realB})
-            writer.add_summary(image_summary, epoch)
 
             # eval G network
             eval_generator = self.eval_data_loader.get_data_generator()
@@ -148,8 +139,16 @@ class Pix2PixGAN(BaseGanModel):
                 a_path, batchA, b_path, batchB = next(eval_generator)
                 test_loss = self.sess.run([self.test_loss], feed_dict={self.testA: batchA, self.testB: batchB})
                 t_loss_sum += test_loss
+
+            # draw summary
+            lr_summary = self.sess.run([self.lr_summary], feed_dict={self.lr_tensor: lr})
+            g_summary = self.sess.run([self.g_loss_A2B_summary], feed_dict={self.g_lossA2B: g_loss_sum / data_size})
+            d_summary = self.sess.run([self.d_loss_B_summary], feed_dict={self.d_lossB: d_loss_sum / data_size})
+            image_summary = self.sess.run([self.g_image_summary],
+                                          feed_dict={self.realA: best_realA, self.fakeB: best_fakeB,
+                                                     self.realB: best_realB})
             t_loss_summary = self.sess.run([self.t_loss_summary], feed_dict={self.test_loss: t_loss_sum / eval_size})
-            writer.add_summary(t_loss_summary, epoch)
+            writer.add_summary([lr_summary, g_summary, d_summary, image_summary, t_loss_summary], epoch)
 
             if t_loss_sum <= best_eval_loss:
                 self.save(self.checkpoint_dir, epoch, True)
