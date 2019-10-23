@@ -51,42 +51,47 @@ class Pix2PixGAN(BaseGanModel):
         # self.test_metric = {name: fn(self.test_fakeB, self.testB) for name, fn in self.metrics_fn.items()}
 
     def summary(self):
+        self.lr_summary = tf.summary.scalar('{}/{}/LearningRate'.format(self.dataset_name, self.name), self.lr_tensor)
+
         value_max = tf.reduce_max(self.realA)
         realA = self.realA / value_max  # value_min must be 0
-        realA_sum = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
-                                     realA[:, :, :, self.in_channels // 2:self.in_channels - self.in_channels // 2],
-                                     max_outputs=1)
+        realA_summary = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name),
+                                         realA[:, :, :, self.in_channels // 2:self.in_channels - self.in_channels // 2],
+                                         max_outputs=1)
 
         value_max = tf.reduce_max(self.fakeB)
         fakeB = self.fakeB / value_max
-        fakeB_sum = tf.summary.image('{}/{}/BFake'.format(self.dataset_name, self.name),
-                                     fakeB[:, :, :, self.out_channels // 2:self.out_channels - self.out_channels // 2],
-                                     max_outputs=1)
+        tf.clip_by_value(fakeB, 0, 1)
+        fakeB_summary = tf.summary.image('{}/{}/BFake'.format(self.dataset_name, self.name),
+                                         fakeB[:, :, :,
+                                         self.out_channels // 2:self.out_channels - self.out_channels // 2],
+                                         max_outputs=1)
 
         value_max = tf.reduce_max(self.realB)
         realB = self.realB / value_max
-        realB_sum = tf.summary.image('{}/{}/BReal'.format(self.dataset_name, self.name),
-                                     realB[:, :, :, self.out_channels // 2:self.out_channels - self.out_channels // 2],
-                                     max_outputs=1)
+        realB_summary = tf.summary.image('{}/{}/BReal'.format(self.dataset_name, self.name),
+                                         realB[:, :, :,
+                                         self.out_channels // 2:self.out_channels - self.out_channels // 2],
+                                         max_outputs=1)
+        self.g_image_summary = tf.summary.merge([realA_summary, realB_summary, fakeB_summary])
 
         # metric_sum = list()
         # for name, value in self.metricB.items():
         #     metric_sum.append(tf.summary.scalar('{}/{}/{}'.format(self.dataset_name, self.name, name), value))
-        g_loss_A2B_sum = tf.summary.scalar('{}/{}/GLossA2B'.format(self.dataset_name, self.name), self.g_lossA2B)
-        self.g_sum = tf.summary.merge([g_loss_A2B_sum, realA_sum, realB_sum, fakeB_sum])
+        self.g_loss_A2B_summary = tf.summary.scalar('{}/{}/GLossA2B'.format(self.dataset_name, self.name),
+                                                    self.g_lossA2B)
+        # self.g_sum = tf.summary.merge([g_loss_A2B_sum])
 
-        d_loss_realB_sum = tf.summary.scalar('{}/{}/DLossRealB'.format(self.dataset_name, self.name), self.d_loss_realB)
-        d_loss_fakeB_sum = tf.summary.scalar('{}/{}/DLossFakeB'.format(self.dataset_name, self.name), self.d_loss_fakeB)
-        d_loss_B_sum = tf.summary.scalar('{}/{}/DLossB'.format(self.dataset_name, self.name), self.d_lossB)
+        # d_loss_realB_sum = tf.summary.scalar('{}/{}/DLossRealB'.format(self.dataset_name, self.name), self.d_loss_realB)
+        # d_loss_fakeB_sum = tf.summary.scalar('{}/{}/DLossFakeB'.format(self.dataset_name, self.name), self.d_loss_fakeB)
+        self.d_loss_B_summary = tf.summary.scalar('{}/{}/DLossB'.format(self.dataset_name, self.name), self.d_lossB)
+        # self.d_sum = tf.summary.merge([d_loss_B_sum])
 
-        lr_sum = tf.summary.scalar('{}/{}/LearningRate'.format(self.dataset_name, self.name), self.lr_tensor)
-        self.d_sum = tf.summary.merge([d_loss_realB_sum, d_loss_fakeB_sum, d_loss_B_sum, lr_sum])
-
-        test_loss = tf.summary.scalar('{}/{}/test_loss'.format(self.dataset_name, self.name), self.test_loss)
+        self.t_loss_summary = tf.summary.scalar('{}/{}/test_loss'.format(self.dataset_name, self.name), self.test_loss)
         # test_metric = list()
         # for name, value in self.test_metric.items():
         #     test_metric.append(tf.summary.scalar('{}/{}/test_{}'.format(self.dataset_name, self.name, name), value))
-        self.test_sum = tf.summary.merge([test_loss])
+        # self.test_sum = tf.summary.merge([test_loss])
 
     def train(self):
         """Train cyclegan"""
@@ -95,44 +100,60 @@ class Pix2PixGAN(BaseGanModel):
 
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
-        self.load(self.checkpoint_dir, is_best=True)
+        # self.load(self.checkpoint_dir, is_best=True)
         writer = tf.summary.FileWriter('../tensorboard_logs/{}/{}/{}'.format(self.dataset_name, self.name, self.tag),
                                        self.sess.graph)
-        data_generator = self.train_data_loader.get_data_generator()
+        train_generator = self.train_data_loader.get_data_generator()
         data_size = self.train_data_loader.get_size()
 
-        eval_generator = self.eval_data_loader.get_data_generator()
-        best_eval_metric = float('inf')
+        best_eval_loss = float('inf')
         for epoch in range(self.epoch):
             lr = self.scheduler_fn(epoch)
-            eval_loss = 0
+            g_loss_sum = d_loss_sum = 0
+            best_fakeB = best_realA = best_realB = np.zeros(shape=(None, self.image_size[0], self.image_size[1], 1))
+            best_g_loss = float('inf')
             for step in range(data_size):
-                a_path, batchA, b_path, batchB = next(data_generator)
+                a_path, batchA, b_path, batchB = next(train_generator)
 
                 # Update G network and record fake outputs
-                fakeB, _, g_sum, g_loss = self.sess.run([self.fakeB, g_optimizer, self.g_sum, self.g_lossA2B],
-                                                        feed_dict={self.realA: batchA, self.realB: batchB,
-                                                                   self.lr_tensor: lr})
-                writer.add_summary(g_sum, epoch * data_size + step)
-
-                # Update D network
-                _, d_sum, d_loss = self.sess.run([d_optimizer, self.d_sum, self.d_lossB],
-                                                 feed_dict={self.realB: batchB, self.fakeB_sample: fakeB,
+                fakeB, _, g_loss = self.sess.run([self.fakeB, g_optimizer, self.g_lossA2B],
+                                                 feed_dict={self.realA: batchA, self.realB: batchB,
                                                             self.lr_tensor: lr})
-                writer.add_summary(d_sum, epoch * data_size + step)
+                if best_g_loss > g_loss:
+                    best_g_loss, best_fakeB, best_realA, best_realB = (g_loss, fakeB, batchA, batchB)
+                g_loss_sum += g_loss
+                # Update D network
+                _, d_loss = self.sess.run([d_optimizer, self.d_lossB],
+                                          feed_dict={self.realB: batchB, self.fakeB_sample: fakeB, self.lr_tensor: lr})
+                d_loss_sum += d_loss
                 print('Epoch:{:>3d}/{:<3d} Step:{:>4d}/{:<4d} g_loss:{:<5.5f} d_loss:{:<5.5f}'.format(epoch, self.epoch,
                                                                                                       step, data_size,
                                                                                                       g_loss, d_loss))
+            lr_summary = self.sess.run([self.lr_summary], feed_dict={self.lr_tensor: lr})
+            writer.add_summary(lr_summary, epoch)
+            g_summary = self.sess.run([self.g_loss_A2B_summary], feed_dict={self.g_lossA2B: g_loss_sum / data_size})
+            writer.add_summary(g_summary, epoch)
+            d_summary = self.sess.run([self.d_loss_B_summary], feed_dict={self.d_lossB: d_loss_sum / data_size})
+            writer.add_summary(d_summary, epoch)
+            image_summary = self.sess.run([self.g_image_summary],
+                                          feed_dict={self.realA: best_realA, self.fakeB: best_fakeB,
+                                                     self.realB: best_realB})
+            writer.add_summary(image_summary, epoch)
 
-                # eval G network
+            # eval G network
+            eval_generator = self.eval_data_loader.get_data_generator()
+            eval_size = self.eval_data_loader.get_size()
+            t_loss_sum = 0
+            for step in range(eval_size):
                 a_path, batchA, b_path, batchB = next(eval_generator)
-                test_loss, test_sum = self.sess.run([self.test_loss, self.test_sum],
-                                                    feed_dict={self.testA: batchA, self.testB: batchB})
-                writer.add_summary(test_sum, epoch * data_size + step)
-                eval_loss += test_loss
-            if eval_loss <= best_eval_metric:
+                test_loss = self.sess.run([self.test_loss], feed_dict={self.testA: batchA, self.testB: batchB})
+                t_loss_sum += test_loss
+            t_loss_summary = self.sess.run([self.t_loss_summary], feed_dict={self.test_loss: t_loss_sum / eval_size})
+            writer.add_summary(t_loss_summary, epoch)
+
+            if t_loss_sum <= best_eval_loss:
                 self.save(self.checkpoint_dir, epoch, True)
-                best_eval_metric = eval_loss
+                best_eval_loss = t_loss_sum
             if epoch % self.save_freq == 0:
                 self.save(self.checkpoint_dir, epoch, False)
 
