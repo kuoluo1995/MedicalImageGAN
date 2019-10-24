@@ -9,4 +9,5 @@ class BaseGanModel(BaseModel, ABC):
         model = self.kwargs['model']
         self.generator = get_model_fn('generator', out_channels=self.out_channels, is_training=self.is_training,
                                       **model['generator'])
-        self.discriminator = get_model_fn('discriminator', **model['discriminator'])
+        self.discriminator = get_model_fn('discriminator', out_channels=self.out_channels, is_training=self.is_training,
+                                          **model['discriminator'])

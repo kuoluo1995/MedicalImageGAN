@@ -15,8 +15,7 @@ def get_model_class_by_name(name):
 
     if issubclass(target_cls, str):
         raise NotImplementedError(
-            'In {}.py, there should be a subclass of BaseModel with class name that matches {} in lowercase.'.format(
-                name, target_cls))
+            'In {}.py, {} should be a subclass of BaseModel in lowercase.'.format(name, target_cls))
 
     return target_cls
 
@@ -29,9 +28,7 @@ def get_model_fn(model_type, **_config):
         sub_model = partial(sub_model, **_config)
         return sub_model
     else:
-        raise NotImplementedError(
-            'In {}.py, there should be a function with name that matches build_model in lowercase.'.format(
-                _config['name']))
+        raise NotImplementedError('In {}.py, there should be a function with name.'.format(_config['name']))
 
 
 if __name__ == '__main__':

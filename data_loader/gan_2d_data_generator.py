@@ -5,8 +5,8 @@ from utils import yaml_utils
 
 
 class Gan2dDataGenerator(BaseDataGenerator):
-    def __init__(self, dataset_list, batch_size, image_size, in_channels, out_channels, is_training, **kwargs):
-        BaseDataGenerator.__init__(self, dataset_list, batch_size, image_size, in_channels, out_channels, is_training)
+    def __init__(self, is_training, dataset_list, data_shape, batch_size, in_channels, out_channels, **kwargs):
+        BaseDataGenerator.__init__(self, is_training, dataset_list, data_shape, batch_size, in_channels, out_channels)
 
     def get_size(self):
         size = 0
@@ -15,62 +15,65 @@ class Gan2dDataGenerator(BaseDataGenerator):
             size += npz['A'].shape[2]
         return math.ceil(size / self.batch_size)
 
-    def get_image_size(self):
-        return self.image_size
+    def get_data_shape(self):
+        return self.data_shape
 
     def get_data_generator(self):
         while True:
-            batchA = list()
-            batchB = list()
+            batch_a = list()
+            batch_b = list()
             for item in self.dataset_list:
                 npz = np.load(item)
-                a_nii = npz['A']
-                b_nii = npz['B']
-                a_path = str(npz['A_path'])
-                b_path = str(npz['B_path'])
-                for s_id in range(a_nii.shape[2]):
-                    a_image, b_image = self.get_multi_channel_image(s_id, a_nii, self.in_channels, b_nii,
+                nii_a = npz['A']
+                nii_b = npz['B']
+                path_a = str(npz['path_a'])
+                path_b = str(npz['path_b'])
+                source_path_a = str(npz['source_path_a'])
+                source_path_b = str(npz['source_path_b'])
+                for s_id in range(nii_a.shape[2]):
+                    image_a, image_b = self.get_multi_channel_image(s_id, nii_a, self.in_channels, nii_b,
                                                                     self.out_channels)
-                    batchA.append(a_image)
-                    batchB.append(b_image)
-                    if len(batchA) == self.batch_size:
-                        yield a_path, np.array(batchA), b_path, np.array(batchB)
-                        batchA = list()
-                        batchB = list()
-                if len(batchA) > 0:
-                    for _ in range(self.batch_size - len(batchA)):
-                        batchA.append(np.zeros((self.image_size[0], self.image_size[1], self.in_channels), dtype=float))
-                        batchB.append(
-                            np.zeros((self.image_size[0], self.image_size[1], self.out_channels), dtype=float))
-                    yield a_path, np.array(batchA), b_path, np.array(batchB)
-                    batchA = list()
-                    batchB = list()
+                    batch_a.append(image_a)
+                    batch_b.append(image_b)
+                    if len(batch_a) == self.batch_size:
+                        yield path_a, source_path_a, np.array(batch_a), path_b, source_path_b, np.array(batch_b)
+                        batch_a = list()
+                        batch_b = list()
+                if len(batch_a) > 0:
+                    for _ in range(self.batch_size - len(batch_a)):
+                        batch_a.append(
+                            np.zeros((self.data_shape[0], self.data_shape[1], self.in_channels), dtype=float))
+                        batch_b.append(
+                            np.zeros((self.data_shape[0], self.data_shape[1], self.out_channels), dtype=float))
+                    yield path_a, source_path_a, np.array(batch_a), path_b, source_path_b, np.array(batch_b)
+                    batch_a = list()
+                    batch_b = list()
 
-    def get_multi_channel_image(self, s_id, a_data, a_channels, b_data, b_channels):
+    def get_multi_channel_image(self, s_id, nii_a, channels_a, nii_b, channels_b):
+        channels_images_a = []
+        channels_images_b = []
+        for _ in range(s_id, channels_a // 2):
+            channels_images_a.append(np.zeros((self.data_shape[0], self.data_shape[1]), dtype=float))
+        for _ in range(s_id, channels_b // 2):
+            channels_images_b.append(np.zeros((self.data_shape[0], self.data_shape[1]), dtype=float))
+        padding_a = len(channels_images_a)
+        padding_b = len(channels_images_b)
+
         itensity = 0
         if self.is_training:  # todo 数据增广
             itensity = np.random.rand() * 0.1
+        for _id in range(s_id - channels_a // 2 + padding_a, min(s_id + channels_a - channels_a // 2, nii_a.shape[2])):
+            channels_images_a.append(nii_a[:, :, _id] + itensity)
+        for _id in range(s_id - channels_b // 2 + padding_b, min(s_id + channels_b - channels_b // 2, nii_b.shape[2])):
+            channels_images_b.append(nii_b[:, :, _id] + itensity)
+        padding_a = len(channels_images_a)
+        padding_b = len(channels_images_b)
 
-        channels_images_a = []
-        for _ in range(s_id, a_channels // 2):
-            channels_images_a.append(np.zeros((self.image_size[0], self.image_size[1]), dtype=float))
-        padding = len(channels_images_a)
-        for _id in range(s_id - a_channels // 2 + padding, min(s_id + a_channels - a_channels // 2, a_data.shape[2])):
-            channels_images_a.append(a_data[:, :, _id] + itensity)
-        padding = len(channels_images_a)
-        for _ in range(a_channels - padding):
-            channels_images_a.append(np.zeros((self.image_size[0], self.image_size[1]), dtype=float))
+        for _ in range(channels_a - padding_a):
+            channels_images_a.append(np.zeros((self.data_shape[0], self.data_shape[1]), dtype=float))
+        for _ in range(channels_b - padding_b):
+            channels_images_b.append(np.zeros((self.data_shape[0], self.data_shape[1]), dtype=float))
         channels_images_a = np.array(channels_images_a).transpose((1, 2, 0))
-
-        channels_images_b = []
-        for _ in range(s_id, b_channels // 2):
-            channels_images_b.append(np.zeros((self.image_size[0], self.image_size[1]), dtype=float))
-        padding = len(channels_images_b)
-        for _id in range(s_id - b_channels // 2 + padding, min(s_id + b_channels - b_channels // 2, b_data.shape[2])):
-            channels_images_b.append(b_data[:, :, _id] + itensity)
-        padding = len(channels_images_b)
-        for _ in range(b_channels - padding):
-            channels_images_b.append(np.zeros((self.image_size[0], self.image_size[1]), dtype=float))
         channels_images_b = np.array(channels_images_b).transpose((1, 2, 0))
         return channels_images_a, channels_images_b
 

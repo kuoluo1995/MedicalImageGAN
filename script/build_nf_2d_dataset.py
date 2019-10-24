@@ -45,92 +45,92 @@ def resize_data(data_):
     return data_
 
 
-def itensity_normalize_data(data_):
+def normalize_itensity(data_):
+    # normalize each slice
     for s_id in range(data_.shape[2]):
         pixels = data_[:, :, s_id]
         pixels = pixels[pixels > 5]
         mean = pixels.mean()
         std = pixels.std()
-        out = (data_[:, :, s_id] - mean) / std
-        max_value = np.max(out)
-        min_value = np.min(out)
-        data_[:, :, s_id] = (out - min_value) / (max_value - min_value)
+        data_[:, :, s_id] = (data_[:, :, s_id] - mean) / std
+    # normalize to [0,1]
+    max_value = np.max(data_)
+    min_value = np.min(data_)
+    data_ = (data_ - min_value) / (max_value - min_value)
     return data_
 
 
 def processed_data():
-    sourceA_dirs = listdir(source + '/' + A)
-    sourceB_dirs = listdir(source + '/' + B)
+    source_dirs_a = listdir(source + '/' + A)
+    source_dirs_b = listdir(source + '/' + B)
     dataset = list()
     dataset_info = list()
     error_data_info = list()
-    for i in range(len(sourceA_dirs)):
-        a_nii = nii_utils.nii_reader(source + '/' + A + '/' + sourceA_dirs[i])
-        b_nii = nii_utils.nii_reader(source + '/' + B + '/' + sourceB_dirs[i])
+    for i in range(len(source_dirs_a)):
+        nii_a = nii_utils.nii_reader(source + '/' + A + '/' + source_dirs_a[i])
+        nii_b = nii_utils.nii_reader(source + '/' + B + '/' + source_dirs_b[i])
 
-        a_nii = np.transpose(a_nii, (1, 0, 2))
-        b_nii = np.transpose(b_nii, (1, 0, 2))
-        if a_nii.shape[2] == b_nii.shape[2] and sourceA_dirs[i] == sourceB_dirs[i]:
+        nii_a = np.transpose(nii_a, (1, 0, 2))
+        nii_b = np.transpose(nii_b, (1, 0, 2))
+        if nii_a.shape[2] == nii_b.shape[2] and source_dirs_a[i] == source_dirs_b[i]:
             # drop out the invalid range
-            a_max_shape, a_min_shape = drop_invalid_range(a_nii)
-            b_max_shape, b_min_shape = drop_invalid_range(b_nii)
-            min_shape = np.max([a_min_shape, b_min_shape], axis=0)
-            max_shape = np.min([a_max_shape, b_max_shape], axis=0)
+            max_shape_a, min_shape_a = drop_invalid_range(nii_a)
+            max_shape_b, min_shape_b = drop_invalid_range(nii_b)
+            min_shape = np.max([min_shape_a, min_shape_b], axis=0)
+            max_shape = np.min([max_shape_a, max_shape_b], axis=0)
 
             # crop data
-            a_nii = crop_data(a_nii, min_shape, max_shape)
-            b_nii = crop_data(b_nii, min_shape, max_shape)
+            nii_a = crop_data(nii_a, min_shape, max_shape)
+            nii_b = crop_data(nii_b, min_shape, max_shape)
 
             # resize data
-            a_nii = resize_data(a_nii)
-            b_nii = resize_data(b_nii)
+            nii_a = resize_data(nii_a)
+            nii_b = resize_data(nii_b)
 
             # normalization data
-            a_nii = itensity_normalize_data(a_nii)
-            b_nii = itensity_normalize_data(b_nii)
+            nii_a = normalize_itensity(nii_a)
+            nii_b = normalize_itensity(nii_b)
 
-            print('\r>>dataset {}/{} name: {}'.format(i + 1, len(sourceA_dirs), sourceA_dirs[i]), end='')
-            a_path = output + '/processed_dataset/2d/' + Path(sourceA_dirs[i]).stem + '/' + A + '.nii'
-            b_path = output + '/processed_dataset/2d/' + Path(sourceB_dirs[i]).stem + '/' + B + '.nii'
-            Path(a_path).parent.mkdir(parents=True, exist_ok=True)
-            Path(b_path).parent.mkdir(parents=True, exist_ok=True)
-            a_header = nii_utils.nii_header_reader(source + '/' + A + '/' + sourceA_dirs[i])
-            b_header = nii_utils.nii_header_reader(source + '/' + B + '/' + sourceB_dirs[i])
-            nii_utils.nii_writer(a_path, a_header, a_nii)
-            nii_utils.nii_writer(b_path, b_header, b_nii)
-            dataset_path = output + '/dataset/2d/' + Path(sourceA_dirs[i]).stem + '.npz'
+            print('\r>>dataset {}/{} name: {}'.format(i + 1, len(source_dirs_a), source_dirs_a[i]), end='')
+            path_a = output + '/2d/' + Path(source_dirs_a[i]).stem + '/' + A + '.nii'
+            path_b = output + '/2d/' + Path(source_dirs_b[i]).stem + '/' + B + '.nii'
+            Path(path_a).parent.mkdir(parents=True, exist_ok=True)
+            Path(path_b).parent.mkdir(parents=True, exist_ok=True)
+            header_a = nii_utils.nii_header_reader(source + '/' + A + '/' + source_dirs_a[i])
+            header_b = nii_utils.nii_header_reader(source + '/' + B + '/' + source_dirs_b[i])
+            nii_utils.nii_writer(path_a, header_a, nii_a)
+            nii_utils.nii_writer(path_b, header_b, nii_b)
+            dataset_path = output + '/2d/' + Path(source_dirs_a[i]).stem + '.npz'
             Path(dataset_path).parent.mkdir(parents=True, exist_ok=True)
-            np.savez(dataset_path, A=a_nii, B=b_nii, A_path=a_path, B_path=b_path,
-                     B_source_path=source + '/' + B + '/' + sourceB_dirs[i])
+            np.savez(dataset_path, A=nii_a, B=nii_b, path_a=path_a, path_b=path_b,
+                     source_path_a=source + '/' + A + '/' + source_dirs_a[i],
+                     source_path_b=source + '/' + B + '/' + source_dirs_b[i])
             dataset.append(dataset_path)
             dataset_info.append(
-                'path:{} {}_shape:{}, {}_shape:{}'.format(str(sourceA_dirs[i]), A, tuple(a_nii.shape), B,
-                                                          tuple(b_nii.shape)))
+                '{} {}:{},{}:{}'.format(str(source_dirs_a[i]), A, tuple(nii_a.shape), B, tuple(nii_b.shape)))
         else:
-            error_data_info.append(
-                'dataset error, {}-name:{} shape:{}, {}-name:{} shape:{}'.format(A, sourceA_dirs[i], a_nii.shape, B,
-                                                                                 sourceB_dirs[i], b_nii.shape))
-            print(
-                '\r dataset error, {}-name:{} shape:{}, {}-name:{} shape:{}'.format(A, sourceA_dirs[i], a_nii.shape, B,
-                                                                                    sourceB_dirs[i], b_nii.shape))
+            error_data_info.append('{}:{} {},{}:{} {}'.format(A, source_dirs_a[i], nii_a.shape, B, source_dirs_b[i],
+                                                              nii_b.shape))
+            print('\r dataset error, {}:{} {},{}:{} {}'.format(A, source_dirs_a[i], nii_a.shape, B, source_dirs_b[i],
+                                                               nii_b.shape))
     np.random.shuffle(dataset)
     train_dataset = dataset[:len(dataset) * 8 // 10]
     print('\r! train dataset size: {}'.format(len(train_dataset)))
-    train_dict = {'shape': data_shape, 'dataset': train_dataset}
-    yaml_utils.write(output + '/' + A + '2' + B + '_2d_train.yaml', train_dict)
+    train_dict = {'data_shape': data_shape, 'dataset_list': train_dataset}
+    yaml_utils.write(output + '/train_2d_' + A + '2' + B + '.yaml', train_dict)
 
     eval_dataset = dataset[len(train_dataset): len(dataset) * 9 // 10]
     print('\r! eval dataset size: {}'.format(len(eval_dataset)))
-    eval_dict = {'shape': data_shape, 'dataset': eval_dataset}
-    yaml_utils.write(output + '/' + A + '2' + B + '_2d_eval.yaml', eval_dict)
+    eval_dict = {'data_shape': data_shape, 'dataset_list': eval_dataset}
+    yaml_utils.write(output + '/eval_2d_' + A + '2' + B + '.yaml', eval_dict)
 
     test_dataset = dataset[len(dataset) * 9 // 10:]
     print('\r! test dataset size: {}'.format(len(test_dataset)))
-    test_dict = {'shape': data_shape, 'dataset': test_dataset}
-    yaml_utils.write(output + '/' + A + '2' + B + '_2d_test.yaml', test_dict)
+    test_dict = {'data_shape': data_shape, 'dataset_list': test_dataset}
+    yaml_utils.write(output + '/test_2d_' + A + '2' + B + '.yaml', test_dict)
 
-    yaml_utils.write(output + '/2d_error.yaml', error_data_info)
-    yaml_utils.write(output + '/2d_dataset_info.yaml', dataset_info)
+    yaml_utils.write(output + '/error_2d.yaml', error_data_info)
+    yaml_utils.write(output + '/dataset_info_2d.yaml', dataset_info)
 
 
 if __name__ == '__main__':

@@ -13,7 +13,5 @@ def get_data_loader_by_name(name):
 
     if issubclass(target_cls, str):
         raise NotImplementedError(
-            'In {}.py, there should be a subclass of BaseDataGenerator with class name that matches {} in lowercase.'
-                .format(name, target_cls))
-
+            'In {}.py, {} should be a subclass of BaseDataGenerator in lowercase.'.format(name, target_cls))
     return target_cls

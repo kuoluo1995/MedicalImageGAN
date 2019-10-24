@@ -12,7 +12,7 @@ def get_config(name):
 def dict_update(_dict, extend_dict):
     for key, value in extend_dict.items():
         if isinstance(value, dict) and key in _dict.keys() and isinstance(_dict[key], dict):
-            _dict[key] = dict_update(_dict[key], extend_dict[key])
+            _dict[key] = dict_update(_dict[key], value)
         else:
             _dict[key] = value
     return _dict

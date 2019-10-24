@@ -7,9 +7,9 @@ def get_scheduler_fn(**config):
     return scheduler_fn
 
 
-def linear_decay(epoch, learning_rate, total_epoch, epoch_decay, **kwargs):
-    if epoch < epoch_decay:
+def linear_decay(epoch, learning_rate, total_epoch, decay_epoch, **kwargs):
+    if epoch < decay_epoch:
         lr = learning_rate
     else:
-        lr = learning_rate * (1 - 1 / (total_epoch - epoch_decay) * (epoch - epoch_decay))
+        lr = learning_rate * (1 - 1 / (total_epoch - decay_epoch) * (epoch - decay_epoch))
     return lr

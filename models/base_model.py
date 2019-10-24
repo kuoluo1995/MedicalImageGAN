@@ -13,28 +13,30 @@ class BaseModel(ABC):
         self.kwargs = BaseModel._get_extend_kwargs(kwargs)
         self.tag = kwargs['tag']
         self.sess = kwargs['sess']
-        self.is_training = (kwargs['phase'] == 'train')
+        self.is_training = kwargs['is_training']
+        self.total_epoch = kwargs['total_epoch']
         self.print_freq = kwargs['print_freq']
         self.save_freq = kwargs['save_freq']
-        self.lr_tensor = tf.placeholder(tf.float32, None, name='learning_rate')
-        self.dataset_name = kwargs['dataset']['name']
-        self.image_size = kwargs['image_size']
-        # model
-        model = kwargs['model']
-        self.name = model['name']
-        self.epoch = model['epoch']
-        self.batch_size = model['batch_size']
-        self.in_channels = model['in_channels']
-        self.out_channels = model['out_channels']
-        self.filter_channels = model['filter_channels']
-        self.loss_fn = get_loss_fn_by_name(model['loss'])
-        self.metrics_fn = {metric: get_metrics_fn_by_name(metric) for metric in model['metrics']}
-        self.scheduler_fn = get_scheduler_fn(total_epoch=self.epoch, **model['scheduler'])
-        self.checkpoint_dir = Path(model['checkpoint_dir']) / self.dataset_name / self.name / self.tag
+        self.batch_size = kwargs['batch_size']
+        self.in_channels = kwargs['in_channels']
+        self.out_channels = kwargs['out_channels']
 
+        self.dataset_name = kwargs['dataset']['name']
+        self.data_shape = kwargs['data_shape']
         self.train_data_loader = kwargs['train_data_loader']
         self.eval_data_loader = kwargs['eval_data_loader']
         self.test_data_loader = kwargs['test_data_loader']
+
+        # model
+        model = kwargs['model']
+        self.name = model['name']
+        self.filter_channels = model['filter_channels']
+        self.loss_fn = get_loss_fn_by_name(model['loss'])
+        self.metrics_fn = {metric: get_metrics_fn_by_name(metric) for metric in model['metrics']}
+        self.scheduler_fn = get_scheduler_fn(total_epoch=self.total_epoch, **model['scheduler'])
+        self.lr_tensor = tf.placeholder(tf.float32, None, name='learning_rate')
+        self.checkpoint_dir = Path(model['checkpoint_dir']) / self.dataset_name / self.name / self.tag
+        self.saver = None
 
     @abstractmethod
     def build_model(self, **kwargs):
@@ -64,18 +66,18 @@ class BaseModel(ABC):
             checkpoint_dir = Path(checkpoint_dir) / 'best'
         else:
             checkpoint_dir = Path(checkpoint_dir) / 'train'
-        ckpt = tf.train.get_checkpoint_state(str(checkpoint_dir))
-        if ckpt and ckpt.model_checkpoint_path:
-            ckpt_name = Path(ckpt.model_checkpoint_path).stem
-            self.saver.restore(self.sess, str(checkpoint_dir / ckpt_name))
+        checkpoint = tf.train.get_checkpoint_state(str(checkpoint_dir))
+        if checkpoint and checkpoint.model_checkpoint_path:
+            checkpoint_name = Path(checkpoint.model_checkpoint_path).stem
+            self.saver.restore(self.sess, str(checkpoint_dir / checkpoint_name))
         else:
             print('Loading checkpoint failed')
 
     @staticmethod
     def _get_extend_kwargs(kwargs):
-        extend_config = 'configs/models/' + kwargs['model']['name'] + '.yaml'
-        if Path(extend_config).exists():
-            extend_config = yaml_utils.read(extend_config)
+        config_path = 'configs/models/' + kwargs['model']['name'] + '.yaml'
+        if Path(config_path).exists():
+            extend_config = yaml_utils.read(config_path)
             if extend_config is not None:
                 kwargs['model'] = dict_update(kwargs['model'], extend_config)
         return kwargs

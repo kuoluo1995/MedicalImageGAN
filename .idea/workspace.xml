@@ -5,13 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="64d7f1e0-e78f-4c60-b715-09c201e3fc54" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/script/edge.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/script/filter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/MedicalImageGAN.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MedicalImageGAN.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/base_2d_pix.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/base_2d_pix.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/base_3d_pix.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/base_3d_pix.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_loader/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_loader/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_loader/base_data_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_loader/base_data_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_loader/gan_2d_data_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_loader/gan_2d_data_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/base_gan_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/base_gan_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/base_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/base_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/discriminator/patch_gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/discriminator/patch_gan.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/generator/unet.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/generator/unet_deep.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/generator/unet_nf.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/pix2pix_gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/pix2pix_gan.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/script/histogram.py" beforeDir="false" afterPath="$PROJECT_DIR$/script/histogram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/utils/scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/utils/scheduler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/script/build_nf_2d_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/script/build_nf_2d_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/config_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/config_utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,27 +44,116 @@
     <expand />
     <select />
   </component>
+  <component name="DockManager">
+    <window id="1">
+      <content type="file-editors">
+        <state>
+          <splitter split-orientation="horizontal" split-proportion="0.40770465">
+            <split-first>
+              <leaf>
+                <file pinned="false" current-in-tab="false">
+                  <entry file="file://$PROJECT_DIR$/script/build_nf_2d_dataset.py">
+                    <provider selected="true" editor-type-id="text-editor">
+                      <state relative-caret-position="3024">
+                        <caret line="128" column="41" selection-start-line="128" selection-start-column="31" selection-end-line="128" selection-end-column="41" />
+                        <folding>
+                          <element signature="e#0#18#0" expanded="true" />
+                        </folding>
+                      </state>
+                    </provider>
+                  </entry>
+                </file>
+                <file pinned="false" current-in-tab="true">
+                  <entry file="file://$PROJECT_DIR$/configs/base_2d_pix.yaml">
+                    <provider selected="true" editor-type-id="text-editor">
+                      <state relative-caret-position="35">
+                        <caret line="1" column="6" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
+                      </state>
+                    </provider>
+                  </entry>
+                </file>
+              </leaf>
+            </split-first>
+            <split-second>
+              <splitter split-orientation="vertical" split-proportion="0.60714287">
+                <split-first>
+                  <leaf>
+                    <file pinned="false" current-in-tab="true">
+                      <entry file="file://$PROJECT_DIR$/data_loader/gan_2d_data_generator.py">
+                        <provider selected="true" editor-type-id="text-editor">
+                          <state relative-caret-position="-455">
+                            <caret line="17" column="29" lean-forward="true" selection-start-line="17" selection-start-column="29" selection-end-line="17" selection-end-column="29" />
+                            <folding>
+                              <element signature="e#0#11#0" expanded="true" />
+                            </folding>
+                          </state>
+                        </provider>
+                      </entry>
+                    </file>
+                    <file pinned="false" current-in-tab="false">
+                      <entry file="file://$PROJECT_DIR$/models/base_model.py">
+                        <provider selected="true" editor-type-id="text-editor">
+                          <state relative-caret-position="849">
+                            <caret line="37" column="85" selection-start-line="37" selection-start-column="85" selection-end-line="37" selection-end-column="85" />
+                            <folding>
+                              <element signature="e#0#23#0" expanded="true" />
+                            </folding>
+                          </state>
+                        </provider>
+                      </entry>
+                    </file>
+                    <file pinned="false" current-in-tab="false">
+                      <entry file="file://$PROJECT_DIR$/train.py">
+                        <provider selected="true" editor-type-id="text-editor">
+                          <state relative-caret-position="-770">
+                            <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+                          </state>
+                        </provider>
+                      </entry>
+                    </file>
+                  </leaf>
+                </split-first>
+                <split-second>
+                  <leaf>
+                    <file pinned="false" current-in-tab="true">
+                      <entry file="file://$PROJECT_DIR$/data_loader/base_data_generator.py">
+                        <provider selected="true" editor-type-id="text-editor">
+                          <state relative-caret-position="105">
+                            <caret line="3" column="24" lean-forward="true" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
+                          </state>
+                        </provider>
+                      </entry>
+                    </file>
+                  </leaf>
+                </split-second>
+              </splitter>
+            </split-second>
+          </splitter>
+        </state>
+      </content>
+    </window>
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/train.py">
+        <entry file="file://$PROJECT_DIR$/models/pix2pix_gan.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="38" column="17" selection-start-line="38" selection-start-column="17" selection-end-line="38" selection-end-column="17" />
+            <state relative-caret-position="140">
+              <caret line="13" column="16" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
               <folding>
-                <element signature="e#0#9#0" expanded="true" />
+                <element signature="e#0#24#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/models/pix2pix_gan.py">
+        <entry file="file://$PROJECT_DIR$/utils/nii_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="516">
-              <caret line="121" column="40" lean-forward="true" selection-start-line="121" selection-start-column="40" selection-end-line="121" selection-end-column="40" />
+            <state relative-caret-position="507">
+              <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
               <folding>
-                <element signature="e#0#24#0" expanded="true" />
+                <element signature="e#0#14#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -70,11 +170,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.is_training</find>
-      <find>instance_norm</find>
-      <find>ImageSummary</find>
-      <find>TensorBoard</find>
-      <find>AReal</find>
       <find>psnr</find>
       <find>mse</find>
       <find>data_shape</find>
@@ -87,17 +182,56 @@
       <find>eval_metric</find>
       <find>diameter</find>
       <find>data_generator</find>
+      <find>self.test_loss</find>
+      <find>b_image</find>
+      <find>A</find>
+      <find>b_path</find>
+      <find>itensity_normalize_data</find>
+      <find>batchB</find>
+      <find>a_data</find>
+      <find>a_path</find>
+      <find>extend_config</find>
+      <find>kwargs['phase']</find>
+      <find>epoch_decay</find>
+      <find>self.realA</find>
+      <find>realB</find>
+      <find>testA</find>
+      <find>self.testA</find>
+      <find>image_size</find>
+      <find>ckpt</find>
+      <find>realA</find>
     </findStrings>
     <replaceStrings>
-      <replace>instance_norm3d</replace>
-      <replace>instance_norm2d</replace>
-      <replace>base_patch</replace>
-      <replace>train_size</replace>
-      <replace>channels</replace>
-      <replace>channels_images_a</replace>
-      <replace>image</replace>
-      <replace>filter_size</replace>
-      <replace>train_generator</replace>
+      <replace>niiA</replace>
+      <replace>niib</replace>
+      <replace>source_dirs_a</replace>
+      <replace>source_dirs_b</replace>
+      <replace>max_shape_a</replace>
+      <replace>min_shape_a</replace>
+      <replace>max_shape_b</replace>
+      <replace>min_shape_b</replace>
+      <replace>header_a</replace>
+      <replace>header_b</replace>
+      <replace>normalize_itensity</replace>
+      <replace>batch_a</replace>
+      <replace>batch_b</replace>
+      <replace>path_a</replace>
+      <replace>path_b</replace>
+      <replace>image_a</replace>
+      <replace>image_b</replace>
+      <replace>nii_a</replace>
+      <replace>channels_a</replace>
+      <replace>nii_b</replace>
+      <replace>channels_b</replace>
+      <replace>config_path</replace>
+      <replace>decay_epoch</replace>
+      <replace>self.real_a</replace>
+      <replace>real_b</replace>
+      <replace>fake_b</replace>
+      <replace>test_b</replace>
+      <replace>data_shape</replace>
+      <replace>checkpoint</replace>
+      <replace>test_a</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -112,7 +246,6 @@
         <option value="$PROJECT_DIR$/eval.py" />
         <option value="$PROJECT_DIR$/data_loader/gan_2d_generator.py" />
         <option value="$PROJECT_DIR$/data_loader/base_generator.py" />
-        <option value="$PROJECT_DIR$/data_loader/__init__.py" />
         <option value="$PROJECT_DIR$/models/discriminator/3d_patch_gan.py" />
         <option value="$PROJECT_DIR$/configs/models/pix2pix_3d_gan.yaml" />
         <option value="$PROJECT_DIR$/models/pix2pix_3dgan.py" />
@@ -120,7 +253,6 @@
         <option value="$PROJECT_DIR$/configs/base_pix.yaml" />
         <option value="$PROJECT_DIR$/models/cycle_gan.py" />
         <option value="$PROJECT_DIR$/models/discriminator/patch_gan_3d.py" />
-        <option value="$PROJECT_DIR$/models/discriminator/patch_gan.py" />
         <option value="$PROJECT_DIR$/models/utils/metrics_funcation.py" />
         <option value="$PROJECT_DIR$/configs/base_cycle.yaml" />
         <option value="$PROJECT_DIR$/build_dataset.py" />
@@ -129,27 +261,34 @@
         <option value="$PROJECT_DIR$/script/build_nf_dataset.py" />
         <option value="$PROJECT_DIR$/script/build_brats_dataset.py" />
         <option value="$PROJECT_DIR$/configs/base_2d_pix_3channnel.yaml" />
-        <option value="$PROJECT_DIR$/data_loader/base_data_generator.py" />
-        <option value="$PROJECT_DIR$/models/base_model.py" />
-        <option value="$PROJECT_DIR$/models/generator/unet.py" />
         <option value="$PROJECT_DIR$/utils/nii_utils.py" />
-        <option value="$PROJECT_DIR$/data_loader/gan_2d_data_generator.py" />
         <option value="$PROJECT_DIR$/configs/base_2d_pix_3channel.yaml" />
         <option value="$PROJECT_DIR$/models/generator/unet_3d.py" />
-        <option value="$PROJECT_DIR$/configs/base_3d_pix.yaml" />
         <option value="$PROJECT_DIR$/models/generator/resnet.py" />
         <option value="$PROJECT_DIR$/test.py" />
-        <option value="$PROJECT_DIR$/script/build_nf_2d_dataset.py" />
         <option value="$PROJECT_DIR$/models/pix2pix_gan_3d.py" />
         <option value="$PROJECT_DIR$/data_loader/gan_3d_data_generator.py" />
         <option value="$PROJECT_DIR$/script/build_nf_3d_dataset.py" />
-        <option value="$PROJECT_DIR$/models/generator/unet_deep.py" />
-        <option value="$PROJECT_DIR$/train.py" />
-        <option value="$PROJECT_DIR$/configs/base_2d_pix.yaml" />
         <option value="$PROJECT_DIR$/script/edgit.py" />
         <option value="$PROJECT_DIR$/script/filter.py" />
-        <option value="$PROJECT_DIR$/models/pix2pix_gan.py" />
         <option value="$PROJECT_DIR$/script/histogram.py" />
+        <option value="$PROJECT_DIR$/models/generator/unet_deep.py" />
+        <option value="$PROJECT_DIR$/models/generator/unet.py" />
+        <option value="$PROJECT_DIR$/configs/base_3d_pix.yaml" />
+        <option value="$PROJECT_DIR$/data_loader/__init__.py" />
+        <option value="$PROJECT_DIR$/script/build_nf_2d_dataset.py" />
+        <option value="$PROJECT_DIR$/data_loader/gan_2d_data_generator.py" />
+        <option value="$PROJECT_DIR$/utils/config_utils.py" />
+        <option value="$PROJECT_DIR$/train.py" />
+        <option value="$PROJECT_DIR$/models/utils/scheduler.py" />
+        <option value="$PROJECT_DIR$/models/__init__.py" />
+        <option value="$PROJECT_DIR$/models/generator/unet_nf.py" />
+        <option value="$PROJECT_DIR$/models/discriminator/patch_gan.py" />
+        <option value="$PROJECT_DIR$/models/base_gan_model.py" />
+        <option value="$PROJECT_DIR$/configs/base_2d_pix.yaml" />
+        <option value="$PROJECT_DIR$/models/base_model.py" />
+        <option value="$PROJECT_DIR$/data_loader/base_data_generator.py" />
+        <option value="$PROJECT_DIR$/models/pix2pix_gan.py" />
       </list>
     </option>
   </component>
@@ -180,6 +319,12 @@
               <item name="MedicalImageGAN" type="b2602c69:ProjectViewProjectNode" />
               <item name="MedicalImageGAN" type="462c0819:PsiDirectoryNode" />
               <item name="configs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MedicalImageGAN" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MedicalImageGAN" type="462c0819:PsiDirectoryNode" />
+              <item name="configs" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="MedicalImageGAN" type="b2602c69:ProjectViewProjectNode" />
@@ -267,7 +412,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.histogram">
+  <component name="RunManager" selected="Python.train">
     <configuration name="build_nf_2d_dataset" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="MedicalImageGAN" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -380,10 +525,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.train" />
+        <item itemvalue="Python.build_nf_2d_dataset" />
         <item itemvalue="Python.histogram" />
         <item itemvalue="Python.filter" />
-        <item itemvalue="Python.build_nf_2d_dataset" />
-        <item itemvalue="Python.train" />
         <item itemvalue="Python.test" />
       </list>
     </recent_temporary>
@@ -460,21 +605,8 @@
       <workItem from="1571716033912" duration="2224000" />
       <workItem from="1571720191998" duration="4170000" />
       <workItem from="1571744991953" duration="8593000" />
-      <workItem from="1571801937231" duration="7546000" />
-    </task>
-    <task id="LOCAL-00053" summary="add more accuracy">
-      <created>1570553283083</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1570553283083</updated>
-    </task>
-    <task id="LOCAL-00054" summary="add more accuracy">
-      <created>1570553492417</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1570553492417</updated>
+      <workItem from="1571801937231" duration="14883000" />
+      <workItem from="1571831846593" duration="28670000" />
     </task>
     <task id="LOCAL-00055" summary="add more accuracy">
       <created>1570553751933</created>
@@ -805,7 +937,21 @@
       <option name="project" value="LOCAL" />
       <updated>1571716400710</updated>
     </task>
-    <option name="localTasksCounter" value="102" />
+    <task id="LOCAL-00102" summary="add some filter">
+      <created>1571819995131</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1571819995132</updated>
+    </task>
+    <task id="LOCAL-00103" summary="add some filter">
+      <created>1571822089207</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1571822089207</updated>
+    </task>
+    <option name="localTasksCounter" value="104" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -817,7 +963,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="306001000" />
+    <option name="totallyTimeSpent" value="342008000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -834,19 +980,19 @@
     <layout>
       <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="1" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="2" visible="true" weight="0.13272922" />
+      <window_info active="true" content_ui="combo" id="Project" order="2" visible="true" weight="0.1337953" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.57036245" weight="0.20982143" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49840087" weight="0.25558037" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.57036245" weight="0.4497768" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49840087" weight="0.3984375" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32924107" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32919955" />
-      <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.6242004" weight="0.27901787" />
+      <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.6242004" weight="0.4095982" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.70042646" visible="true" weight="0.484375" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.70042646" weight="0.21205357" />
       <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.29957357" side_tool="true" weight="0.3091518" />
       <window_info anchor="bottom" id="Python Console" order="13" sideWeight="0.49946696" weight="0.32924107" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -898,7 +1044,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add test and metric" />
     <MESSAGE value="test metric" />
     <MESSAGE value="change model save function" />
     <MESSAGE value="add_3d_pix_gan" />
@@ -923,14 +1068,15 @@
     <MESSAGE value="finish 2d and 3d gan" />
     <MESSAGE value="repair bugs" />
     <MESSAGE value="change 2d stride=1" />
-    <option name="LAST_COMMIT_MESSAGE" value="change 2d stride=1" />
+    <MESSAGE value="add some filter" />
+    <option name="LAST_COMMIT_MESSAGE" value="add some filter" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/data_loader/gan_2d_data_generator.py</url>
-          <line>78</line>
+          <line>81</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -981,14 +1127,14 @@
     <SUITE FILE_PATH="coverage/MedicalImageGAN$test.coverage" NAME="test Coverage Results" MODIFIED="1571582465784" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$build_brats_dataset.coverage" NAME="build_brats_dataset Coverage Results" MODIFIED="1570948126191" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$pix2pix_gan_3d.coverage" NAME="pix2pix_gan_3d Coverage Results" MODIFIED="1570549909530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/models" />
-    <SUITE FILE_PATH="coverage/MedicalImageGAN$build_nf_2d_dataset.coverage" NAME="build_nf_2d_dataset Coverage Results" MODIFIED="1571298833841" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
+    <SUITE FILE_PATH="coverage/MedicalImageGAN$build_nf_2d_dataset.coverage" NAME="build_nf_2d_dataset Coverage Results" MODIFIED="1571885079377" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$pytest_in_test_py.coverage" NAME="pytest in test.py Coverage Results" MODIFIED="1568102939166" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$pytest_for_test_test.coverage" NAME="pytest for test.test Coverage Results" MODIFIED="1568103059952" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$build_nf_dataset.coverage" NAME="build_nf_dataset Coverage Results" MODIFIED="1570907006137" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$gan_2d_data_generator.coverage" NAME="gan_2d_data_generator Coverage Results" MODIFIED="1570923853220" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_loader" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$build_dataset.coverage" NAME="build_dataset Coverage Results" MODIFIED="1570580844736" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$openers.coverage" NAME="openers Coverage Results" MODIFIED="1571054336296" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/89760744/nibabel" />
-    <SUITE FILE_PATH="coverage/MedicalImageGAN$train.coverage" NAME="train Coverage Results" MODIFIED="1571545568683" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MedicalImageGAN$train.coverage" NAME="train Coverage Results" MODIFIED="1571887259462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$build_nf_3d_dataset.coverage" NAME="build_nf_3d_dataset Coverage Results" MODIFIED="1571298872223" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/script" />
     <SUITE FILE_PATH="coverage/MedicalImageGAN$unet_3d.coverage" NAME="unet_3d Coverage Results" MODIFIED="1569251529602" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/models/generator" />
   </component>
@@ -1002,6 +1148,26 @@
       </expression>
     </expressions>
     <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>writer.add_summary(scalar_summary, epoch + 1)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>writer.add_summary(image_summary, epoch + 1)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>writer.add_summary(image_summary[0], epoch + 1)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>np.mean(test_loss)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>image[neighbour_z, neighbour_y, neighbour_x]</expression-string>
         <language-id>Python</language-id>
@@ -1027,98 +1193,9 @@
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>fakeB[0, :, :, self.out_channels // 2]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>self.base_patch[2]</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>self.base_patch[2]//2</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>nii_shape[2] -self.base_patch[2]//2</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/utils/config_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="6" column="25" lean-forward="true" selection-start-line="6" selection-start-column="25" selection-end-line="6" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/dcm_utils.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_loader/base_data_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="5" column="29" lean-forward="true" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/base_gan_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="4" column="24" selection-start-line="4" selection-start-column="24" selection-end-line="4" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="1757" selection-start-line="1757" selection-end-line="1757" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/89760744/tensorflow/python/training/saver.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="113">
-          <caret line="1537" selection-start-line="1537" selection-end-line="1537" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/89760744/tensorflow/python/client/session.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="35">
-          <caret line="1347" selection-start-line="1347" selection-end-line="1347" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/89760744/numpy/lib/arraypad.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="1171" selection-start-line="1171" selection-end-line="1171" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/89760744/nibabel/nifti1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="2028" column="29" selection-start-line="2028" selection-start-column="29" selection-end-line="2028" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/828128772/pathlib.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="647" selection-start-line="647" selection-end-line="647" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/configs/base_cycle.yaml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="280">
@@ -1134,16 +1211,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/base_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="61" column="8" selection-start-line="61" selection-start-column="8" selection-end-line="61" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/89760744/tensorflow/contrib/layers/python/layers/layers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="729">
@@ -1151,67 +1218,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/utils/layers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1505">
-          <caret line="49" column="34" selection-start-line="49" selection-start-column="34" selection-end-line="49" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/configs/models/cycle_gan.yaml">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configs/base_3d_pix.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="413">
-          <caret line="18" column="26" selection-start-line="18" selection-start-column="26" selection-end-line="18" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configs/models/pix2pix_gan.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_loader/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="6" column="14" selection-start-line="6" selection-start-column="14" selection-end-line="6" selection-end-column="14" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/models/generator/resnet.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="280">
           <caret line="8" column="21" lean-forward="true" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/discriminator/patch_gan_3d.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="6" column="17" lean-forward="true" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/discriminator/patch_gan.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="472">
-          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
@@ -1227,27 +1240,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/utils/loss_funcation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="524">
-          <caret line="15" column="5" lean-forward="true" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Anaconda3/envs/gan_tf/Lib/site-packages/nibabel/loadsave.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="139">
           <caret line="52" selection-start-line="52" selection-end-line="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/generator/unet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="612">
-          <caret line="32" lean-forward="true" selection-start-line="32" selection-end-line="32" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1269,13 +1265,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="42">
           <caret line="219" selection-start-line="219" selection-end-line="219" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configs/base.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="141">
-          <caret line="17" column="16" lean-forward="true" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="16" />
         </state>
       </provider>
     </entry>
@@ -1330,57 +1319,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_loader/gan_3d_data_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1785">
-          <caret line="54" column="65" selection-start-line="54" selection-start-column="65" selection-end-line="54" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/nii_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="665">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_loader/gan_2d_data_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="8" column="111" selection-start-line="8" selection-start-column="111" selection-end-line="8" selection-end-column="111" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/generator/unet_deep.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-280">
-          <caret line="11" column="102" lean-forward="true" selection-start-line="11" selection-start-column="102" selection-end-line="11" selection-end-column="102" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/script/build_nf_2d_dataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3640">
-          <caret line="108" column="13" selection-start-line="108" selection-start-column="13" selection-end-line="108" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configs/base_2d_pix.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="623">
-          <caret line="29" column="23" selection-start-line="29" selection-start-column="23" selection-end-line="29" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="980">
@@ -1432,22 +1370,230 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/pix2pix_gan.py">
+    <entry file="file://$PROJECT_DIR$/models/generator/unet_deep.py" />
+    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/89760744/tensorflow/python/ops/math_ops.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="516">
-          <caret line="121" column="40" lean-forward="true" selection-start-line="121" selection-start-column="40" selection-end-line="121" selection-end-column="40" />
+        <state relative-caret-position="-28">
+          <caret line="1428" column="4" selection-start-line="1428" selection-start-column="4" selection-end-line="1428" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/base_3d_pix.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="245">
+          <caret line="7" column="32" selection-start-line="7" selection-start-column="32" selection-end-line="7" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/remote_sources/1191261938/89760744/tensorflow/python/summary/writer/writer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="177">
+          <caret line="125" selection-start-line="125" selection-end-line="125" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Anaconda3/envs/gan_tf/Lib/pathlib.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="386" column="39" selection-start-line="386" selection-start-column="39" selection-end-line="386" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/models/pix2pix_gan.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/base.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="367">
+          <caret line="13" column="14" lean-forward="true" selection-start-line="13" selection-start-column="14" selection-end-line="13" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script/build_nf_2d_dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3024">
+          <caret line="128" column="41" selection-start-line="128" selection-start-column="31" selection-end-line="128" selection-end-column="41" />
           <folding>
-            <element signature="e#0#24#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_loader/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="5" column="37" lean-forward="true" selection-start-line="5" selection-start-column="37" selection-end-line="5" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/config_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="14" column="44" selection-start-line="14" selection-start-column="44" selection-end-line="14" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/utils/loss_funcation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="8" column="19" lean-forward="true" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/utils/metrics_funcation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/utils/layers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1439">
+          <caret line="5" column="15" selection-start-line="5" selection-start-column="15" selection-end-line="5" selection-end-column="15" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="27" column="12" lean-forward="true" selection-start-line="27" selection-start-column="12" selection-end-line="27" selection-end-column="12" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/discriminator/patch_gan_3d.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="6" column="17" lean-forward="true" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/base_gan_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="12" column="67" lean-forward="true" selection-start-line="12" selection-start-column="67" selection-end-line="12" selection-end-column="67" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/generator/unet_nf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="4" column="100" selection-start-line="4" selection-start-column="81" selection-end-line="4" selection-end-column="100" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/discriminator/patch_gan.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="38" column="17" selection-start-line="38" selection-start-column="17" selection-end-line="38" selection-end-column="17" />
+        <state relative-caret-position="-770">
+          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/utils/scheduler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="5" column="47" selection-start-line="5" selection-start-column="47" selection-end-line="5" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/base_2d_pix.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="35">
+          <caret line="1" column="6" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/base_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="849">
+          <caret line="37" column="85" selection-start-line="37" selection-start-column="85" selection-end-line="37" selection-end-column="85" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_loader/gan_2d_data_generator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-455">
+          <caret line="17" column="29" lean-forward="true" selection-start-line="17" selection-start-column="29" selection-end-line="17" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_loader/gan_3d_data_generator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1627">
+          <caret line="54" column="65" selection-start-line="54" selection-start-column="65" selection-end-line="54" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_loader/base_data_generator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="3" column="24" lean-forward="true" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/python_stubs/1191261938/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="5114" column="8" selection-start-line="5114" selection-start-column="8" selection-end-line="5114" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/nii_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="507">
+          <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/pix2pix_gan.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="13" column="16" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
           </folding>
         </state>
       </provider>
