@@ -18,10 +18,14 @@ def train(args):
         data_loader_class = get_data_loader_by_name(dataset['data_loader'])
 
         train_dict = yaml_utils.read(dataset['train_path'])
-        train_data_loader = data_loader_class(True, **train_dict, **args)
+        # train_data_loader = data_loader_class(True, **train_dict, **args) # 2d data generator
+        train_data_loader = data_loader_class(True, base_patch=model_dict['base_patch'], **train_dict,
+                                              **args)  # 3d data generator
 
         eval_dict = yaml_utils.read(dataset['eval_path'])
-        eval_data_loader = data_loader_class(False, **eval_dict, **args)
+        # eval_data_loader = data_loader_class(False, **eval_dict, **args) # 2d data generator
+        eval_data_loader = data_loader_class(False, base_patch=model_dict['base_patch'], **eval_dict,
+                                             **args)  # 3d data generator
 
         model_class = get_model_class_by_name(model_dict['name'])
         model = model_class(data_shape=train_data_loader.get_data_shape(), train_data_loader=train_data_loader,
@@ -30,8 +34,8 @@ def train(args):
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    config = get_config('base_2d_pix')
+    os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+    config = get_config('base_3d_pix')
     config['tag'] = 'basic'
     # config['in_channels'] = 3
     # config['out_channels'] = 3

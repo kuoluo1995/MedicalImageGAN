@@ -1,8 +1,7 @@
-from pathlib import Path
-
 import numpy as np
 import tensorflow as tf
 from scipy import ndimage
+from pathlib import Path
 
 from models.base_gan_model import BaseGanModel
 from models.utils.loss_funcation import l1_loss
@@ -22,7 +21,7 @@ class Pix2PixGAN(BaseGanModel):
         data_shape = self.data_shape
         self.real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='real_a')
         self.real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='real_b')
-        self.fake_b = self.generator(self.real_a, name='generator_a2b')
+        self.fake_b = self.generator(self.real_a, is_training=True, name='generator_a2b')
 
         fake_logit_b = self.discriminator(self.fake_b, name='discriminator_b')
         self.g_loss_a2b = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + self._lambda * l1_loss(self.fake_b,
@@ -45,14 +44,14 @@ class Pix2PixGAN(BaseGanModel):
         # eval or test
         self.test_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='test_a')
         self.test_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='test_b')
-        self.test_fake_b = self.generator(self.test_a, reuse=True, name='generator_a2b')
+        self.test_fake_b = self.generator(self.test_a, reuse=True, is_training=False, name='generator_a2b')
         self.test_loss_a2b = l1_loss(self.test_fake_b, self.test_b)
         # self.test_metric = {name: fn(self.test_fake_b, self.test_b) for name, fn in self.metrics_fn.items()}
 
     def summary(self):
         value_max = tf.reduce_max(self.real_a)
-        test_a = self.real_a[:, :, :, self.in_channels // 2:self.in_channels - self.in_channels // 2] / value_max
-        test_a_summary = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name), test_a, max_outputs=1)
+        real_a = self.real_a[:, :, :, self.in_channels // 2:self.in_channels - self.in_channels // 2] / value_max
+        real_a_summary = tf.summary.image('{}/{}/AReal'.format(self.dataset_name, self.name), real_a, max_outputs=1)
 
         value_max = tf.reduce_max(self.fake_b)
         fake_b = self.fake_b[:, :, :, self.out_channels // 2:self.out_channels - self.out_channels // 2] / value_max
@@ -62,7 +61,7 @@ class Pix2PixGAN(BaseGanModel):
         value_max = tf.reduce_max(self.real_b)
         real_b = self.real_b[:, :, :, self.out_channels // 2:self.out_channels - self.out_channels // 2] / value_max
         real_b_summary = tf.summary.image('{}/{}/BReal'.format(self.dataset_name, self.name), real_b, max_outputs=1)
-        self.g_image_summary = tf.summary.merge([test_a_summary, real_b_summary, fake_b_summary])
+        self.g_image_summary = tf.summary.merge([real_a_summary, real_b_summary, fake_b_summary])
 
         lr_summary = tf.summary.scalar('{}/{}/LearningRate'.format(self.dataset_name, self.name), self.lr_tensor)
         # metric_sum = list()
@@ -76,7 +75,7 @@ class Pix2PixGAN(BaseGanModel):
             [lr_summary, g_loss_a2b_summary, d_loss_b_summary, test_loss_a2b_summary])
 
     def train(self):
-        """Train cyclegan"""
+        """Train pix2pix"""
         g_optimizer = tf.train.AdamOptimizer(self.lr_tensor, beta1=0.5).minimize(self.g_loss_a2b, var_list=self.g_vars)
         d_optimizer = tf.train.AdamOptimizer(self.lr_tensor, beta1=0.5).minimize(self.d_loss_b, var_list=self.d_vars)
 

@@ -2,8 +2,8 @@ from abc import abstractmethod
 
 
 class BaseDataGenerator:
-    def __init__(self, is_training, dataset_list, data_shape, batch_size, in_channels, out_channels):
-        self.is_training = is_training
+    def __init__(self, is_augmented, dataset_list, data_shape, batch_size, in_channels, out_channels):
+        self.is_augmented = is_augmented
         self.dataset_list = dataset_list
         self.data_shape = data_shape
         self.batch_size = batch_size

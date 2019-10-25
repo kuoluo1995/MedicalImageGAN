@@ -5,8 +5,8 @@ from utils import yaml_utils
 
 
 class Gan2dDataGenerator(BaseDataGenerator):
-    def __init__(self, is_training, dataset_list, data_shape, batch_size, in_channels, out_channels, **kwargs):
-        BaseDataGenerator.__init__(self, is_training, dataset_list, data_shape, batch_size, in_channels, out_channels)
+    def __init__(self, is_augmented, dataset_list, data_shape, batch_size, in_channels, out_channels, **kwargs):
+        BaseDataGenerator.__init__(self, is_augmented, dataset_list, data_shape, batch_size, in_channels, out_channels)
 
     def get_size(self):
         size = 0
@@ -20,6 +20,8 @@ class Gan2dDataGenerator(BaseDataGenerator):
 
     def get_data_generator(self):
         while True:
+            if self.is_augmented:
+                np.random.shuffle(self.dataset_list)
             batch_a = list()
             batch_b = list()
             for item in self.dataset_list:
@@ -60,7 +62,7 @@ class Gan2dDataGenerator(BaseDataGenerator):
         padding_b = len(channels_images_b)
 
         itensity = 0
-        if self.is_training:  # todo 数据增广
+        if self.is_augmented:  # todo 数据增广
             itensity = np.random.rand() * 0.1
         for _id in range(s_id - channels_a // 2 + padding_a, min(s_id + channels_a - channels_a // 2, nii_a.shape[2])):
             channels_images_a.append(nii_a[:, :, _id] + itensity)
