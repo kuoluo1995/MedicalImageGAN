@@ -1,6 +1,5 @@
 is_training: true
 total_epoch: 200
-print_freq: 100
 save_freq: 10
 batch_size: 1
 in_channels: 1

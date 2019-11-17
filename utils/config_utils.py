@@ -4,7 +4,6 @@ from utils import yaml_utils
 def get_config(name):
     base_config = yaml_utils.read('configs/base.yaml')
     config_ = dict_update(base_config, yaml_utils.read('configs/' + name + '.yaml'))
-    config_['tag'] = name
     return config_
 
 

@@ -1,6 +1,5 @@
 is_training: true
 total_epoch: 400
-print_freq: 100
 save_freq: 100
 batch_size: 1
 in_channels: 1
@@ -22,7 +21,7 @@ model:
     scheduler:
         name: linear_decay
         learning_rate: 0.0002
-        decay_epoch: 100
+        decay_epoch: 200
 
     lambda: 10.0
     base_patch: [64,64,4]

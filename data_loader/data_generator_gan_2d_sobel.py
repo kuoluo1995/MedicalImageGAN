@@ -1,10 +1,13 @@
+import cv2
 import math
 import numpy as np
+
+from data_loader import preprocess
 from data_loader.base_data_generator import BaseDataGenerator
 from utils import yaml_utils
 
 
-class Gan2dDataGenerator(BaseDataGenerator):
+class DataGeneratorGan2dSobel(BaseDataGenerator):
     def __init__(self, is_augmented, dataset_list, data_shape, batch_size, in_channels, out_channels, **kwargs):
         BaseDataGenerator.__init__(self, is_augmented, dataset_list, data_shape, batch_size, in_channels, out_channels)
 
@@ -26,8 +29,8 @@ class Gan2dDataGenerator(BaseDataGenerator):
             batch_b = list()
             for item in self.dataset_list:
                 npz = np.load(item)
-                nii_a = npz['A']
-                nii_b = npz['B']
+                nii_a = preprocess(npz['A'])  # [0, 1] => [-1, 1]
+                nii_b = preprocess(npz['B'])  # [0, 1] => [-1, 1]
                 path_a = str(npz['path_a'])
                 path_b = str(npz['path_b'])
                 source_path_a = str(npz['source_path_a'])
@@ -54,34 +57,40 @@ class Gan2dDataGenerator(BaseDataGenerator):
     def get_multi_channel_image(self, s_id, nii_a, channels_a, nii_b, channels_b):
         channels_images_a = []
         channels_images_b = []
-        for _ in range(s_id, channels_a // 2):
-            channels_images_a.append(np.zeros((self.data_shape[0], self.data_shape[1]), dtype=float))
-        for _ in range(s_id, channels_b // 2):
-            channels_images_b.append(np.zeros((self.data_shape[0], self.data_shape[1]), dtype=float))
-        padding_a = len(channels_images_a)
-        padding_b = len(channels_images_b)
 
-        itensity = 0
-        if self.is_augmented:  # todo 数据增广
-            itensity = np.random.rand() * 0.1
-        for _id in range(s_id - channels_a // 2 + padding_a, min(s_id + channels_a - channels_a // 2, nii_a.shape[2])):
-            channels_images_a.append(nii_a[:, :, _id] + itensity)
-        for _id in range(s_id - channels_b // 2 + padding_b, min(s_id + channels_b - channels_b // 2, nii_b.shape[2])):
-            channels_images_b.append(nii_b[:, :, _id] + itensity)
-        padding_a = len(channels_images_a)
-        padding_b = len(channels_images_b)
+        if self.is_augmented:
+            flip = True if np.random.rand() > 0.5 else False
+            scale_size = (286, 286)
+            slice_a = cv2.resize(nii_a[:, :, s_id], scale_size, interpolation=cv2.INTER_AREA)
+            slice_b = cv2.resize(nii_b[:, :, s_id], scale_size, interpolation=cv2.INTER_AREA)
+            offset_y = np.random.randint(0, scale_size[0] - self.data_shape[0])
+            offset_x = np.random.randint(0, scale_size[1] - self.data_shape[1])
+            slice_a = slice_a[offset_y:offset_y + self.data_shape[0], offset_x:offset_x + self.data_shape[1]]
+            slice_b = slice_b[offset_y:offset_y + self.data_shape[0], offset_x:offset_x + self.data_shape[1]]
+            if flip:
+                slice_a = np.fliplr(slice_a)
+                slice_b = np.fliplr(slice_b)
+        else:
+            slice_a = nii_a[:, :, s_id]
+            slice_b = nii_b[:, :, s_id]
 
-        for _ in range(channels_a - padding_a):
-            channels_images_a.append(np.zeros((self.data_shape[0], self.data_shape[1]), dtype=float))
-        for _ in range(channels_b - padding_b):
-            channels_images_b.append(np.zeros((self.data_shape[0], self.data_shape[1]), dtype=float))
+        channels_images_a.append(slice_a)
+        sobel_x = cv2.Sobel(slice_a, cv2.CV_64F, 1, 0, ksize=9)
+        channels_images_a.append(sobel_x)
+        sobel_y = cv2.Sobel(slice_a, cv2.CV_64F, 0, 1, ksize=9)
+        channels_images_a.append(sobel_y)
+        sobel_xy = cv2.Sobel(slice_a, cv2.CV_64F, 1, 1, ksize=9)
+        channels_images_a.append(sobel_xy)
+
+        channels_images_b.append(slice_b)
+
         channels_images_a = np.array(channels_images_a).transpose((1, 2, 0))
         channels_images_b = np.array(channels_images_b).transpose((1, 2, 0))
         return channels_images_a, channels_images_b
 
 
 if __name__ == '__main__':
-    dataset = yaml_utils.read('E:/Dataset/Neurofibromatosis/t12stir_train.yaml')
-    train_generator = Gan2dDataGenerator(dataset, 8, (512, 256), 1, True)
+    dataset_dict = yaml_utils.read('E:/Dataset/Neurofibromatosis/t12stir_train.yaml')
+    train_generator = DataGeneratorGan2d(False, dataset_dict['dataset_list'], dataset_dict['data_shape'], 1, 1, 1)
     data = train_generator.get_data_generator()
     print(next(data))
