@@ -10,9 +10,9 @@ out_channels: 1
 dataset:
     name: NF
     data_loader: data_generator_gan_2d_sobel
-    train_path: '/home/yf/dataset/NF/train_2d_patch_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
-    eval_path: '/home/yf/dataset/NF/eval_2d_patch_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
-    test_path: '/home/yf/dataset/NF/eval_2d_patch_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
+    train_path: '/home/yf/dataset/NF/train_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
+    eval_path: '/home/yf/dataset/NF/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
+    test_path: '/home/yf/dataset/NF/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
 
 model:
     name: pix2pix_gan_sobel

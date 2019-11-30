@@ -2,7 +2,7 @@ is_training: true
 test_model: train # or best
 pre_epoch: 0
 total_epoch: 250
-save_freq: 20
+save_freq: 10
 batch_size: 1
 in_channels: 1
 out_channels: 1
@@ -27,7 +27,7 @@ model:
 
     lambda: 1000.0
     generator:
-        name: 2d_unet_patch_nf
+        name: 2d_width_unet_patch_nf
         filter_channels: 64
     discriminator:
         name: patch_gan

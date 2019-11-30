@@ -11,11 +11,43 @@ def leaky_relu(x, a=0.2, name='leaky_relu'):
         return (0.5 * (1 + a)) * x + (0.5 * (1 - a)) * tf.abs(x)
 
 
-def conv2d(batch_input, out_channels, name='conv2d'):
+def reflection_padding(x, pad, name='reflection_padding'):
+    with tf.variable_scope(name):
+        padding = [[0, 0], [pad, pad], [pad, pad], [0, 0]]
+        return tf.keras.layers.Lambda(lambda b: tf.pad(b, padding, mode='REFLECT'))(x)
+
+
+def sobel_edges(batch_input, name='sobel_edge'):
+    with tf.variable_scope(name):
+        sobel_x = tf.constant([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], tf.float32)
+        sobel_x_filter = tf.reshape(sobel_x, [3, 3, 1, 1])
+        sobel_y_filter = tf.transpose(sobel_x_filter, [1, 0, 2, 3])
+        filtered_x = tf.nn.conv2d(batch_input, sobel_x_filter, strides=[1, 1, 1, 1], padding='SAME')
+        filtered_y = tf.nn.conv2d(batch_input, sobel_y_filter, strides=[1, 1, 1, 1], padding='SAME')
+        return filtered_x, filtered_y
+
+
+def down_sampling(batch_input, i):
+    return tf.layers.average_pooling2d(batch_input, 2 ** i, 2 ** i)
+
+
+def conv2d(batch_input, out_channels, kernel_size=4, strides=(2, 2), padding='same', name='conv2d'):
     with tf.variable_scope(name):
         initializer = tf.random_normal_initializer(0, 0.02)
-        return tf.layers.conv2d(batch_input, out_channels, kernel_size=4, strides=(2, 2), padding='same',
+        if padding == 'reflect':
+            batch_input = reflection_padding(batch_input, kernel_size // 2)
+            padding = 'valid'
+        return tf.layers.conv2d(batch_input, out_channels, kernel_size=kernel_size, strides=strides, padding=padding,
                                 kernel_initializer=initializer)
+
+
+def res_block2d(batch_input, out_channels, padding='reflect', name='res_block2d'):
+    with tf.variable_scope(name):
+        output = batch_input
+        output = leaky_relu(
+            instance_norm2d(conv2d(output, out_channels, kernel_size=3, strides=(1, 1), padding=padding)))
+        output = instance_norm2d(conv2d(output, out_channels, kernel_size=3, strides=(1, 1), padding=padding))
+        return batch_input + output
 
 
 def separable_conv2d(batch_input, out_channels, name='separable_conv2d'):
@@ -32,18 +64,21 @@ def discrim_conv2d(batch_input, out_channels, stride, name='discrim_conv2d'):
                                 kernel_initializer=tf.random_normal_initializer(0, 0.02))
 
 
-def conv3d(batch_input, out_channels, name='conv3d'):
+def conv3d(batch_input, out_channels, kernel_size=4, strides=(2, 2, 2), padding='same', name='conv3d'):
     with tf.variable_scope(name):
         initializer = tf.random_normal_initializer(0, 0.02)
-        return tf.layers.conv3d(batch_input, out_channels, kernel_size=4, strides=(2, 2, 2), padding='same',
+        if padding == 'reflect':
+            batch_input = reflection_padding(batch_input, kernel_size // 2)
+            padding = 'valid'
+        return tf.layers.conv3d(batch_input, out_channels, kernel_size=kernel_size, strides=strides, padding=padding,
                                 kernel_initializer=initializer)
 
 
-def deconv2d(batch_input, out_channels, name='deconv2d'):
+def deconv2d(batch_input, out_channels, kernel_size=4, name='deconv2d'):
     with tf.variable_scope(name):
         initializer = tf.random_normal_initializer(0, 0.02)
-        return tf.layers.conv2d_transpose(batch_input, out_channels, kernel_size=4, strides=(2, 2), padding='same',
-                                          kernel_initializer=initializer)
+        return tf.layers.conv2d_transpose(batch_input, out_channels, kernel_size=kernel_size, strides=(2, 2),
+                                          padding='same', kernel_initializer=initializer)
 
 
 def separable_deconv2d(batch_input, out_channels, name='separable_deconv2d'):
@@ -56,11 +91,18 @@ def separable_deconv2d(batch_input, out_channels, name='separable_deconv2d'):
                                           depthwise_initializer=initializer, pointwise_initializer=initializer)
 
 
-def deconv3d(batch_input, out_channels, name='deconv3d'):
+def deconv3d(batch_input, out_channels, kernel_size=4, strides=(2, 2, 2), name='deconv3d'):
     with tf.variable_scope(name):
         initializer = tf.random_normal_initializer(0, 0.02)
-        return tf.layers.conv3d(batch_input, out_channels, kernel_size=4, strides=(2, 2, 2), padding='same',
-                                kernel_initializer=initializer)
+        return tf.layers.conv3d_transpose(batch_input, out_channels, kernel_size=kernel_size, strides=strides,
+                                          padding='same', kernel_initializer=initializer)
+
+
+def discrim_conv3d(batch_input, out_channels, strides, name='discrim_conv3d'):
+    with tf.variable_scope(name):
+        padded_input = tf.pad(batch_input, [[0, 0], [1, 1], [1, 1], [1, 1], [0, 0]], mode='CONSTANT')
+        return tf.layers.conv3d(padded_input, out_channels, kernel_size=4, strides=strides,
+                                padding='valid', kernel_initializer=tf.random_normal_initializer(0, 0.02))
 
 
 def instance_norm2d(x, name='instance_norm2d'):

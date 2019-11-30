@@ -2,16 +2,25 @@ import numpy as np
 import tensorflow as tf
 from pathlib import Path
 
-from models.base_gan_model import BaseGanModel
+from models import get_model_fn, BaseModel
+from models.utils.layers import down_sampling
 from models.utils.loss_funcation import l1_loss
 from utils import yaml_utils
 from utils.nii_utils import nii_header_reader, nii_writer
 
 
-class Pix2PixGAN(BaseGanModel):
+class Pix2PixHDGAN(BaseModel):
     def __init__(self, **kwargs):
-        BaseGanModel.__init__(self, **kwargs)
+        BaseModel.__init__(self, **kwargs)
+        self.kwargs = Pix2PixHDGAN._get_extend_kwargs(self.kwargs)
+        model = self.kwargs['model']
         self._lambda = self.kwargs['model']['lambda']
+        self.num_scales = self.kwargs['model']['num_scales']
+        self.global_generator = get_model_fn('generator', out_channels=self.out_channels,
+                                             **model['global_generator'])
+        self.enhancer_generator = get_model_fn('generator', out_channels=self.out_channels,
+                                               **model['enhancer_generator'])
+        self.discriminator = get_model_fn('discriminator', out_channels=self.out_channels, **model['discriminator'])
         self.build_model()
         self.summary()
         self.train_saver = tf.train.Saver()
@@ -20,31 +29,46 @@ class Pix2PixGAN(BaseGanModel):
     def build_model(self):
         # train generator
         data_shape = self.data_shape
-        self.real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='real_a')
-        self.real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='real_b')
-        self._fake_b = self.generator(self.real_a, is_training=True, name='generator_a2b')
-        fake_ab = tf.concat([self.real_a, self._fake_b], 3)
-        fake_logit_b = self.discriminator(fake_ab, name='discriminator_b')
-        self.g_loss_a2b = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + self._lambda * l1_loss(self._fake_b,
-                                                                                                          self.real_b)
+        self.real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], 'real_a')
+        self.real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], 'real_b')
+        real_a_scales = [None] * 3
+        real_b_scales = [None] * 3
+        for i in range(self.num_scales):
+            with tf.name_scope('scale_' + str(i)):
+                if i == 0:
+                    real_a_scales[i] = self.real_a
+                    real_b_scales[i] = self.real_b
+                else:
+                    with tf.name_scope('real_a'):
+                        real_a_scales[i] = down_sampling(real_a_scales, i)
+                    with tf.name_scope('real_b'):
+                        real_b_scales[i] = down_sampling(real_b_scales, i)
+        # Create coarse image
+        coarse_image, coarse_feature_map = self.global_generator(self.real_a[1], is_training=True,
+                                                                 name='coarse_generator')
+        fake_b_scales = [None] * 3
+        fake_b_scales.append(self.global_generator([self.real_a, coarse_feature_map], training=True))
+        for i in range(1, 3):
+            fake_b_scales.append(down_sampling(fake_b_scales[0], i))
 
-        # train discriminator
-        self.fake_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='fake_b')
-        real_ab = tf.concat([self.real_a, self.real_b], 3)
-        fake_ab = tf.concat([self.real_a, self.fake_b], 3)
-        real_logit_b = self.discriminator(real_ab, reuse=True, name='discriminator_b')
-        fake_logit_b = self.discriminator(fake_ab, reuse=True, name='discriminator_b')
-        d_loss_real_b = self.loss_fn(real_logit_b, tf.ones_like(real_logit_b))
-        d_loss_fake_b = self.loss_fn(fake_logit_b, tf.zeros_like(fake_logit_b))
-        self.d_loss_b = d_loss_real_b + d_loss_fake_b
+        generator_total_loss = 0
+        discriminator_total_loss = 0
 
-        train_vars = tf.trainable_variables()
-        self.g_vars = [var for var in train_vars if 'generator' in var.name]
-        self.d_vars = [var for var in train_vars if 'discriminator' in var.name]
-
-        # eval or test
-        self.test_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='test_a')
-        self.test_fake_b = self.generator(self.test_a, reuse=True, is_training=False, name='generator_a2b')
+        # Discriminate each scale
+        for i in range(3):
+            with tf.name_scope('scale_' + str(i)):
+                # Define discriminators
+                real_logit_b = self.discriminator([real_a_scales[i], real_b_scales[i]], training=True,
+                                                  name='discriminator_b_' + str(i))
+                fake_logit_b = self.discriminator([real_a_scales[i], fake_b_scales[i]], training=True, reuse=True,
+                                                  name='discriminator_b_' + str(i))
+                g_loss_a2b = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + self._lambda * l1_loss(
+                    fake_b_scales[i], real_b_scales[i])
+                generator_total_loss += g_loss_a2b
+                d_loss_real_b = self.loss_fn(real_logit_b, tf.ones_like(real_logit_b))
+                d_loss_fake_b = self.loss_fn(fake_logit_b, tf.zeros_like(fake_logit_b))
+                d_loss_b = d_loss_real_b + d_loss_fake_b
+                discriminator_total_loss += d_loss_b
 
     def summary(self):
         data_shape = self.data_shape
@@ -70,7 +94,10 @@ class Pix2PixGAN(BaseGanModel):
 
     def train(self):
         """Train pix2pix"""
-        g_optimizer = tf.train.AdamOptimizer(self.lr_tensor, beta1=0.5).minimize(self.g_loss_a2b, var_list=self.g_vars)
+        coarse_g_optimizer = tf.train.AdamOptimizer(self.lr_tensor, beta1=0.5).minimize(self.g_loss_a2b,
+                                                                                        var_list=self.cg_vars)
+        enhancer_g_optimiaze = tf.train.AdamOptimizer(self.lr_tensor, beta1=0.5).minimize(self.g_loss_a2b,
+                                                                                          var_list=self.eg_vars)
         d_optimizer = tf.train.AdamOptimizer(self.lr_tensor, beta1=0.5).minimize(self.d_loss_b, var_list=self.d_vars)
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
@@ -114,7 +141,7 @@ class Pix2PixGAN(BaseGanModel):
                 path_a, _, batch_a, path_b, _, batch_b = next(eval_generator)
                 if current_path_b != path_b:
                     if step > 0:
-                        metrics = {name: fn(np.array(nii_b), np.array(fake_nii_b)) for name, fn in
+                        metrics = {name: fn(np.array(fake_nii_b), np.array(nii_b)) for name, fn in
                                    self.metrics_fn.items()}
                         eval_metric_sum += float(metrics['ssim_metrics'])
                         num_eval_nii += 1
@@ -129,9 +156,7 @@ class Pix2PixGAN(BaseGanModel):
 
             # draw summary
             image_summary = self.sess.run(self.image_summary,
-                                          feed_dict={self.image_real_a: best_real_a[:, :, :,
-                                                                        self.in_channels // 2:self.in_channels // 2 + 1],
-                                                     self.image_fake_b: best_fake_b,
+                                          feed_dict={self.image_real_a: best_real_a, self.image_fake_b: best_fake_b,
                                                      self.image_real_b: best_real_b})
             scalar_summary = self.sess.run(self.scalar_summary,
                                            feed_dict={self.lr_tensor: lr, self.scalar_g_loss: g_loss_sum / train_size,
@@ -177,7 +202,7 @@ class Pix2PixGAN(BaseGanModel):
     def _save_test_result(self, current_path_b, fake_nii_b, nii_b):
         fake_nii_b = np.transpose(fake_nii_b, (1, 2, 0))
         nii_b = np.transpose(nii_b, (1, 2, 0))
-        metrics = {name: fn(nii_b, fake_nii_b) for name, fn in self.metrics_fn.items()}
+        metrics = {name: fn(fake_nii_b, nii_b) for name, fn in self.metrics_fn.items()}
         metrics_str = ''
         for name, value in metrics.items():
             metrics_str += name + ':' + str(value) + ' '

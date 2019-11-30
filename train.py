@@ -34,13 +34,20 @@ def train(args):
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '2'
-    # config = get_config('patch_2d_pix')
-    # config['tag'] = 'base'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+    config = get_config('res_2d_pix')
+    config['tag'] = 'half_base'
 
     # config = get_config('tumor_loss_2d_pix')
     # config['tag'] = 'base'
 
-    config = get_config('sobel_2d_pix')
-    config['tag'] = 'base'
+    # config = get_config('sobel_2d_pix')
+    # config['tag'] = 'base'
+
+    # config = get_config('patch_width_2d_pix')
+    # config['tag'] = 'half_channels3'
+    # config['in_channels'] = 3
+
+    # config = get_config('res_sobel_2d_pix')
+    # config['tag'] = 'half_base'
     train(config)

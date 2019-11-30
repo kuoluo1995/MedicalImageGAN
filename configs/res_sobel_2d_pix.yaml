@@ -1,7 +1,7 @@
 is_training: true
 test_model: train # or best
 pre_epoch: 0
-total_epoch: 250
+total_epoch: 300
 save_freq: 20
 batch_size: 1
 in_channels: 1
@@ -15,7 +15,7 @@ dataset:
     test_path: '/home/yf/dataset/NF/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
 
 model:
-    name: pix2pix_gan
+    name: pix2pix_gan_res_edge
     filter_channels: 64 # it is useless
     loss: lsgan_loss
     metrics: [ssim_metrics,mse_metrics,nmse_metrics,psnr_metrics]
@@ -25,7 +25,8 @@ model:
         learning_rate: 0.0002
         decay_epoch: 100
 
-    lambda: 1000.0
+    image_lambda: 10.0
+    edge_lambda: 100.0
     generator:
         name: 2d_unet_patch_nf
         filter_channels: 64

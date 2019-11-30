@@ -30,8 +30,9 @@ def _test(args):
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '3'
-    config = get_config('tumor_loss_2d_pix')
-    config['tag'] = 'sigmoid'
+    config = get_config('patch_width_2d_pix')
+    config['tag'] = 'half_channels3'
+    config['in_channels'] = 3
     config['is_training'] = False
-    config['model']['generator']['name'] = '2d_unet_patch_nf_sigmoid'
+    config['test_model'] = 'best'
     _test(config)

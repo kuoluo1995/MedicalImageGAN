@@ -63,7 +63,7 @@ class BaseModel(ABC):
         if checkpoint:
             # saver.restore(self.sess, checkpoint.model_checkpoint_path)
             saver.restore(self.sess, checkpoint)
-            self.pre_epoch = int(checkpoint.model_checkpoint_path.split('/')[-1].split('-')[-1])  # todo without test
+            self.pre_epoch = int(checkpoint.split('/')[-1].split('-')[-1])
         else:
             print('Loading checkpoint failed')
             self.pre_epoch = 0

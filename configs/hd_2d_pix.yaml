@@ -1,36 +1,38 @@
 is_training: true
 test_model: train # or best
 pre_epoch: 0
-total_epoch: 400
+total_epoch: 250
 save_freq: 20
 batch_size: 1
-in_channels: 4
+in_channels: 1
 out_channels: 1
 
 dataset:
     name: NF
-    data_loader: data_generator_gan_2d_sobel
+    data_loader: data_generator_gan_2d
     train_path: '/home/yf/dataset/NF/train_2d_patch_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
     eval_path: '/home/yf/dataset/NF/eval_2d_patch_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
     test_path: '/home/yf/dataset/NF/eval_2d_patch_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
 
 model:
-    name: pix2pix_gan_sobel_tumor
+    name: pix2pixhd_gan
     filter_channels: 64 # it is useless
     loss: lsgan_loss
-    metrics: [ssim_metrics,mse_metrics,psnr_metrics]
+    metrics: [ssim_metrics,mse_metrics,nmse_metrics,psnr_metrics]
     checkpoint_dir: ./_checkpoint
     scheduler:
         name: linear_decay
         learning_rate: 0.0002
-        decay_epoch: 150
+        decay_epoch: 100
 
     lambda: 1000.0
-    tumor_loss_threshold: 0.5
-    tumor_lambda: 10.0
-    generator:
+    num_scales: 3
+    global_generator:
+        name: global_generator
+        filter_channels: 16
+    enhancer_generator:
         name: 2d_unet_patch_nf
-        filter_channels: 32
+        filter_channels: 16
     discriminator:
         name: patch_gan
         filter_channels: 32

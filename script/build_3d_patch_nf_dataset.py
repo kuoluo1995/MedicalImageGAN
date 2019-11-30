@@ -1,16 +1,17 @@
 import numpy as np
 from os import listdir
 from pathlib import Path
-from utils import yaml_utils, nii_utils, cv3d_utils
+from scipy import ndimage
+from utils import yaml_utils, nii_utils
 
 A = 'T1'
 B = 'STIR'
 
-tag = '2d_patch'
-data_shape = [256, 256]  # [1088,320] [1152, 384] [1024, 512]
+tag = '3d_patch_half'
+data_shape = [256, 256, 16]
 
 source = '/home/yf/dataset/NF'  # /home/yf/dataset/NF E:/Dataset/Neurofibromatosis/source
-output = '/home/yf/dataset/NF'  # /home/yf/dataset/NF E:/Dataset/Neurofibromatosis
+output = '/home/yf/dataset/NF'  # E:/Dataset/Neurofibromatosis /home/yf/dataset/NF
 
 
 def drop_invalid_range(data_):
@@ -20,6 +21,14 @@ def drop_invalid_range(data_):
     return [max_d, max_h, max_w], [min_d, min_h, min_w]
 
 
+def norm_data_shape(data_, d, h, w):
+    shape = data_.shape
+    d_scale = d * 1.0 / shape[0]
+    h_scale = h * 1.0 / shape[1]
+    w_scale = 1.0
+    return ndimage.interpolation.zoom(data_, (d_scale, h_scale, w_scale), order=0)
+
+
 def crop_data(data_, min_shape, max_shape):
     [min_d, min_h, min_w] = min_shape
     [max_d, max_h, max_w] = max_shape
@@ -27,18 +36,19 @@ def crop_data(data_, min_shape, max_shape):
 
 
 def resize_data(data_):
+    shape = data_.shape
+    data_ = np.pad(data_, ((0, 0), (0, 0), (data_shape[2] - shape[2], 0)), mode='reflect')
     return data_[180: 180 + data_shape[0], :data_shape[1]]
 
 
 def normalize_itensity(data_):
     # normalize each slice
-    for s_id in range(data_.shape[2]):
-        pixels = data_[:, :, s_id][data_[:, :, s_id] > 0]
-        if len(pixels) > 0:
-            mean = pixels.mean()
-            std = pixels.std()
-            if std > 0:
-                data_[:, :, s_id] = ((data_[:, :, s_id]).astype(np.float) - mean) / std
+    pixels = data_[data_ > 0]
+    if len(pixels) > 0:
+        mean = pixels.mean()
+        std = pixels.std()
+        if std > 0:
+            data_ = (data_.astype(np.float) - mean) / std
     # normalize to [0,1]
     max_value = np.max(data_)
     min_value = np.min(data_)
@@ -58,7 +68,14 @@ def processed_data():
 
         nii_a = np.transpose(nii_a, (1, 0, 2))
         nii_b = np.transpose(nii_b, (1, 0, 2))
-        if nii_a.shape[2] == nii_b.shape[2] and source_dirs_a[i] == source_dirs_b[i]:
+        if nii_a.shape[2] == 20 and nii_b.shape[2] == 20 and source_dirs_a[i] == source_dirs_b[i]:
+            # norm data shape
+            shape_a = nii_a.shape
+            shape_b = nii_b.shape
+            max_shape = np.min([shape_a, shape_b], axis=0)
+            nii_a = norm_data_shape(nii_a, *max_shape)
+            nii_b = norm_data_shape(nii_b, *max_shape)
+
             # drop out the invalid range
             max_shape_a, min_shape_a = drop_invalid_range(nii_a)
             max_shape_b, min_shape_b = drop_invalid_range(nii_b)
@@ -66,26 +83,19 @@ def processed_data():
             max_shape = np.min([max_shape_a, max_shape_b], axis=0)
 
             # crop data
+            min_shape[2] = 9
             nii_a = crop_data(nii_a, min_shape, max_shape)
             nii_b = crop_data(nii_b, min_shape, max_shape)
 
             # resize data
             nii_a = resize_data(nii_a)
             nii_b = resize_data(nii_b)
-
-            # # image pre_process
-            # nii_a = cv2.GaussianBlur(nii_a, (5, 5), 10)
-            # nii_b = cv2.GaussianBlur(nii_b, (5, 5), 10)
-
             # normalization data
             nii_a = np.clip(nii_a, 0, 1500)
             nii_b = np.clip(nii_b, 0, 800)
 
             nii_a = normalize_itensity(nii_a)
             nii_b = normalize_itensity(nii_b)
-
-            nii_a = cv3d_utils.gamma_transform(nii_a, 0.8)
-            nii_b = cv3d_utils.gamma_transform(nii_b, 0.8)
 
             print('\r>>dataset {}/{} name: {}'.format(i + 1, len(source_dirs_a), source_dirs_a[i]), end='')
             path_a = output + '/' + tag + '/' + Path(source_dirs_a[i]).stem + '/' + A + '.nii'
@@ -109,6 +119,7 @@ def processed_data():
                                                               nii_b.shape))
             print('\r dataset error, {}:{} {},{}:{} {}'.format(A, source_dirs_a[i], nii_a.shape, B, source_dirs_b[i],
                                                                nii_b.shape))
+
     np.random.shuffle(dataset)
     train_dataset = dataset[:len(dataset) * 9 // 10]
     print('\r! train dataset size: {}'.format(len(train_dataset)))
