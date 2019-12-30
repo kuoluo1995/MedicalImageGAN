@@ -1,13 +1,13 @@
 is_training: true
 total_epoch: 200
 save_freq: 10
-batch_size: 1
-in_channels: 1
-out_channels: 1
 
 dataset:
     name:
     data_loader: base_data_generator
+    batch_size: 1
+    in_channels: 1
+    out_channels: 1
     train_path: ''
     eval_path: ''
     test_path: ''

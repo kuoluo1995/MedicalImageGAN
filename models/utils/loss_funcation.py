@@ -15,3 +15,8 @@ def sce_loss(logits, labels):
 
 def l1_loss(logits, labels):
     return tf.reduce_mean(tf.abs(logits - labels))
+
+
+def ssim_loss(logits, labels):
+    ssim = tf.image.ssim(logits, labels, max_val=1.0)
+    return tf.reduce_mean(ssim)

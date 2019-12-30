@@ -18,6 +18,15 @@ class BaseDataGenerator:
     def get_size(self):
         pass
 
+    def get_batch_size(self):
+        return self.batch_size
+
+    def get_in_channels(self):
+        return self.in_channels
+
+    def get_out_channels(self):
+        return self.out_channels
+
     @abstractmethod
     def get_data_generator(self):
         pass

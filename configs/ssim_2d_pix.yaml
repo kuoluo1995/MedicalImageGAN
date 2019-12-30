@@ -1,0 +1,34 @@
+is_training: true
+test_model: train # or best
+pre_epoch: 0
+total_epoch: 250
+save_freq: 20
+
+dataset:
+    name: NF
+    data_loader: data_generator_gan_2d
+    batch_size: 16
+    in_channels: 1
+    out_channels: 1
+    train_path: '/home/yf/dataset/NF/train_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
+    eval_path: '/home/yf/dataset/NF/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
+    test_path: '/home/yf/dataset/NF/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
+
+model:
+    name: pix2pix_gan_ssim
+    filter_channels: 64 # it is useless
+    loss: lsgan_loss
+    metrics: [ssim_metrics,mse_metrics,nmse_metrics,psnr_metrics]
+    checkpoint_dir: ./_checkpoint
+    scheduler:
+        name: linear_decay
+        learning_rate: 0.0002
+        decay_epoch: 100
+
+    lambda: 10.0
+    generator:
+        name: 2d_unet_patch_nf
+        filter_channels: 64
+    discriminator:
+        name: patch_gan
+        filter_channels: 64

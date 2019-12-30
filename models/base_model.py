@@ -18,12 +18,12 @@ class BaseModel(ABC):
         self.pre_epoch = kwargs['pre_epoch']
         self.total_epoch = kwargs['total_epoch']
         self.save_freq = kwargs['save_freq']
-        self.batch_size = kwargs['batch_size']
-        self.in_channels = kwargs['in_channels']
-        self.out_channels = kwargs['out_channels']
 
         self.dataset_name = kwargs['dataset']['name']
+        self.batch_size = kwargs['batch_size']
         self.data_shape = kwargs['data_shape']
+        self.in_channels = kwargs['in_channels']
+        self.out_channels = kwargs['out_channels']
         self.train_data_loader = kwargs['train_data_loader']
         self.eval_data_loader = kwargs['eval_data_loader']
         self.test_data_loader = kwargs['test_data_loader']
@@ -46,7 +46,7 @@ class BaseModel(ABC):
         pass
 
     @abstractmethod
-    def train(self):
+    def train(self, **kwargs):
         pass
 
     @abstractmethod

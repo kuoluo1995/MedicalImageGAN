@@ -14,29 +14,31 @@ def train(args):
     with tf.Session(config=tf_config) as sess:
         # dataset
         dataset = args['dataset']
-        model_dict = args['model']
         data_loader_class = get_data_loader_by_name(dataset['data_loader'])
 
         train_dict = yaml_utils.read(dataset['train_path'])
-        train_data_loader = data_loader_class(True, **train_dict, **args)  # 2d data generator
+        train_data_loader = data_loader_class(True, **train_dict, **dataset)  # 2d data generator
         # train_data_loader = data_loader_class(True, base_patch=model_dict['base_patch'], **train_dict,
         #                                       **args)  # 3d data generator
 
         eval_dict = yaml_utils.read(dataset['eval_path'])
-        eval_data_loader = data_loader_class(False, **eval_dict, **args)  # 2d data generator
+        eval_data_loader = data_loader_class(False, **eval_dict, **dataset)  # 2d data generator
         # eval_data_loader = data_loader_class(False, base_patch=model_dict['base_patch'], **eval_dict,
         #                                      **args)  # 3d data generator
-
+        model_dict = args['model']
         model_class = get_model_class_by_name(model_dict['name'])
-        model = model_class(data_shape=train_data_loader.get_data_shape(), train_data_loader=train_data_loader,
+        model = model_class(data_shape=train_data_loader.get_data_shape(),
+                            batch_size=train_data_loader.get_batch_size(),
+                            in_channels=train_data_loader.get_in_channels(),
+                            out_channels=train_data_loader.get_out_channels(), train_data_loader=train_data_loader,
                             eval_data_loader=eval_data_loader, test_data_loader=None, sess=sess, **args)
         model.train()
 
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '3'
-    config = get_config('res_2d_pix')
-    config['tag'] = 'half_base'
+    config = get_config('ssim_2d_pix')
+    config['tag'] = 'gloss_ssim'
 
     # config = get_config('tumor_loss_2d_pix')
     # config['tag'] = 'base'
