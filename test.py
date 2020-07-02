@@ -19,7 +19,7 @@ def _test(args):
 
         test_dict = yaml_utils.read(dataset['test_path'])
         test_data_loader = data_loader_class(False, **test_dict, **args)  # 2d data generator
-        # # 3d data generator
+        # 3d data generator
         # test_data_loader = data_loader_class(False, base_patch=model_dict['base_patch'], **test_dict, **args)
 
         model_class = get_model_class_by_name(model_dict['name'])
@@ -29,10 +29,17 @@ def _test(args):
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '3'
-    config = get_config('patch_width_2d_pix')
-    config['tag'] = 'half_channels3'
-    config['in_channels'] = 3
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    # config = get_config('ssim_soble_2d_pix')
+    # config = get_config('patch_2d_pix')
+    # config['tag'] = 'bass'
+    # config = get_config('sobel_2d_pix')
+    # config['tag'] = 'sobel_channels'
+    # config = get_config('edge_2d_pix')
+    # config['tag'] = 'edge'
+    config = get_config('ssim_2d_pix')
+    config['tag'] = 'ssim'
+    config['batch_size'] = 1
     config['is_training'] = False
-    config['test_model'] = 'best'
+    config['test_model'] = 'train'
     _test(config)

@@ -3,16 +3,15 @@ import tensorflow as tf
 from pathlib import Path
 
 from models.base_gan_model import BaseGanModel
-from models.utils.loss_funcation import l1_loss, ssim_loss
+from models.utils.loss_funcation import l1_loss
 from utils import yaml_utils
 from utils.nii_utils import nii_header_reader, nii_writer
 
 
-class Pix2PixGANSSIM(BaseGanModel):
+class Pix2PixGANChannels(BaseGanModel):
     def __init__(self, **kwargs):
         BaseGanModel.__init__(self, **kwargs)
         self._lambda = self.kwargs['model']['lambda']
-        self.ssim_lambda = 6
         self.build_model()
         self.summary()
         self.train_saver = tf.train.Saver()
@@ -24,21 +23,20 @@ class Pix2PixGANSSIM(BaseGanModel):
         self.real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='real_a')
         self.real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='real_b')
         self._fake_b = self.generator(self.real_a, is_training=True, name='generator_a2b')
-        fake_ab = tf.concat([self.real_a, self._fake_b], 3)
+        fake_ab = tf.concat([self.real_a[:, :, :, 1:2], self._fake_b], 3)
         fake_logit_b = self.discriminator(fake_ab, name='discriminator_b')
-        self.g_loss_a2b = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + \
-                          self._lambda * l1_loss(self._fake_b, self.real_b) + \
-                          self.ssim_lambda * (1 - ssim_loss(self._fake_b, self.real_b))
+        self.g_loss_a2b = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + self._lambda * l1_loss(self._fake_b,
+                                                                                                          self.real_b)
 
         # train discriminator
         self.fake_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='fake_b')
-        real_ab = tf.concat([self.real_a, self.real_b], 3)
-        fake_ab = tf.concat([self.real_a, self.fake_b], 3)
+        real_ab = tf.concat([self.real_a[:, :, :, 1:2], self.real_b], 3)
+        fake_ab = tf.concat([self.real_a[:, :, :, 1:2], self.fake_b], 3)
         real_logit_b = self.discriminator(real_ab, reuse=True, name='discriminator_b')
         fake_logit_b = self.discriminator(fake_ab, reuse=True, name='discriminator_b')
         d_loss_real_b = self.loss_fn(real_logit_b, tf.ones_like(real_logit_b))
         d_loss_fake_b = self.loss_fn(fake_logit_b, tf.zeros_like(fake_logit_b))
-        self.d_loss_b = d_loss_real_b + d_loss_fake_b + self.ssim_lambda * (1 - ssim_loss(self._fake_b, self.real_b))
+        self.d_loss_b = d_loss_real_b + d_loss_fake_b
 
         train_vars = tf.trainable_variables()
         self.g_vars = [var for var in train_vars if 'generator' in var.name]
@@ -159,11 +157,21 @@ class Pix2PixGANSSIM(BaseGanModel):
         current_path_b = ''
         nii_b = list()
         fake_nii_b = list()
+        count = 0
+        avg_ssim = 0
+        avg_psnr = 0
+        avg_mse = 0
+        avg_nmse = 0
         for step in range(test_size + 1):
             path_a, source_path_a, batch_a, path_b, source_path_b, batch_b = next(test_generator)
             if current_path_b != path_b:
                 if step > 0:
                     info = self._save_test_result(current_path_b, np.array(fake_nii_b), np.array(nii_b))
+                    count += 1
+                    avg_ssim += info['ssim_metrics']
+                    avg_psnr += info['psnr_metrics']
+                    avg_mse += info['mse_metrics']
+                    avg_nmse += info['nmse_metrics']
                     result_info.append(info)
                     nii_b = list()
                     fake_nii_b = list()
@@ -173,6 +181,8 @@ class Pix2PixGANSSIM(BaseGanModel):
             fake_b = self.sess.run(self.test_fake_b, feed_dict={self.test_a: batch_a})
             nii_b.append(batch_b[0, :, :, self.out_channels // 2])
             fake_nii_b.append(fake_b[0, :, :, self.out_channels // 2])
+        result_info.append({'avg_ssim': avg_ssim / count, 'avg_psnr': avg_psnr / count, 'avg_mse': avg_mse / count,
+                            'avg_nmse': avg_nmse / count})
         yaml_utils.write('result/{}/{}/{}/{}/info.yaml'.format(self.dataset_name, self.name, self.tag, self.test_model),
                          result_info)
 

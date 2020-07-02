@@ -1,22 +1,22 @@
 is_training: true
 test_model: train # or best
 pre_epoch: 0
-total_epoch: 250
+total_epoch: [60, 60, 100, 100, 140, 140, 180, 180, 220, 220, 250, 250, 250, 250]
 save_freq: 20
 process_sizes: [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7]
+batch_size: 8
+in_channels: 1
+out_channels: 1
 
 dataset:
     name: NF
     data_loader: data_generator_pggan_2d
-    batch_size: 16
-    in_channels: 1
-    out_channels: 1
-    train_path: '/home/yf/dataset/NF/train_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
-    eval_path: '/home/yf/dataset/NF/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
-    test_path: '/home/yf/dataset/NF/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
+    train_path: '/home/handongming/yf/data/nf/train_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
+    eval_path: '/home/handongming/yf/data/nf/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
+    test_path: '/home/handongming/yf/data/nf/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
 
 model:
-    name: pix2pix_pggan
+    name: pix2pix_gan_pg
     filter_channels: 64 # it is useless
     loss: lsgan_loss
     metrics: [ssim_metrics,mse_metrics,nmse_metrics,psnr_metrics]
@@ -24,13 +24,13 @@ model:
     log_dir: ../tensorboard_logs
     scheduler:
         name: linear_decay
-        learning_rate: 0.0002
+        learning_rate: 0.0001
         decay_epoch: 100
 
-    lambda: 1000.0
+    lambda: 10.0
     generator:
-        name: 2d_unet_patch_nf
+        name: pg_2d_unet_patch_nf
         filter_channels: 64
     discriminator:
-        name: patch_gan
+        name: pg_patch_gan
         filter_channels: 64

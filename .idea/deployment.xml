@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="Harvard">
+  <component name="PublishConfigData" autoUpload="Always" serverName="vag_server">
     <serverData>
       <paths name="Harvard">
         <serverdata>
           <mappings>
             <mapping deploy="PythonProject/MedicalImageGAN" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="my_server">
+        <serverdata>
+          <mappings>
+            <mapping deploy="projects/MedicalImageGAN" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="vag_server">
+        <serverdata>
+          <mappings>
+            <mapping deploy="MedicalImageGAN" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

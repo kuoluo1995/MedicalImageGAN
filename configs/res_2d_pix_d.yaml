@@ -4,18 +4,18 @@ pre_epoch: 0
 total_epoch: 250
 save_freq: 20
 batch_size: 8
-in_channels: 4
+in_channels: 1
 out_channels: 1
 
 dataset:
     name: NF
-    data_loader: data_generator_gan_2d_sobel
+    data_loader: data_generator_gan_2d
     train_path: '/home/handongming/yf/data/nf/train_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_train.yaml
     eval_path: '/home/handongming/yf/data/nf/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_eval.yaml
     test_path: '/home/handongming/yf/data/nf/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
 
 model:
-    name: pix2pix_gan_sobel
+    name: pix2pix_gan_res_d
     filter_channels: 64 # it is useless
     loss: lsgan_loss
     metrics: [ssim_metrics,mse_metrics,nmse_metrics,psnr_metrics]
@@ -25,7 +25,7 @@ model:
         learning_rate: 0.0001
         decay_epoch: 100
 
-    lambda: 4.0
+    lambda: 10.0
     generator:
         name: 2d_unet_patch_nf
         filter_channels: 64

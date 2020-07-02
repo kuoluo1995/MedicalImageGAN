@@ -15,7 +15,7 @@ dataset:
     test_path: '/home/handongming/yf/data/nf/eval_2d_patch_half_T12STIR.yaml' # E:/Dataset/Neurofibromatosis/t12stir_test.yaml
 
 model:
-    name: pix2pix_gan_sobel
+    name: pix2pix_gan_ssim_sobel
     filter_channels: 64 # it is useless
     loss: lsgan_loss
     metrics: [ssim_metrics,mse_metrics,nmse_metrics,psnr_metrics]

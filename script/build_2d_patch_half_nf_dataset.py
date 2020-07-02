@@ -10,8 +10,8 @@ B = 'STIR'
 tag = '2d_patch_half'
 data_shape = [256, 256]  # [1088,320] [1152, 384] [1024, 512]
 
-source = '/home/yf/dataset/NF'  # /home/yf/dataset/NF E:/Dataset/Neurofibromatosis/source
-output = '/home/yf/dataset/NF'  # /home/yf/dataset/NF E:/Dataset/Neurofibromatosis
+source = '/home/handongming/yf/data/nf'  # /home/yf/dataset/NF E:/Dataset/Neurofibromatosis/source
+output = '/home/handongming/yf/data/nf'  # /home/yf/dataset/NF E:/Dataset/Neurofibromatosis
 
 
 def drop_invalid_range(data_):

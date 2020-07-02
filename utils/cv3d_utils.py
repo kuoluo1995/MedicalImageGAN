@@ -3,7 +3,7 @@ import math
 import numpy as np
 import SimpleITK as sitk
 from utils import nii_utils
-from PIL import Image, ImageFilter
+# from PIL import Image, ImageFilter
 
 
 # 直方图均衡化

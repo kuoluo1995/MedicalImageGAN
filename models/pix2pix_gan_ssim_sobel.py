@@ -8,7 +8,7 @@ from utils import yaml_utils
 from utils.nii_utils import nii_header_reader, nii_writer
 
 
-class Pix2PixGANSSIM(BaseGanModel):
+class Pix2PixGANSSIMSobel(BaseGanModel):
     def __init__(self, **kwargs):
         BaseGanModel.__init__(self, **kwargs)
         self._lambda = self.kwargs['model']['lambda']
@@ -24,7 +24,7 @@ class Pix2PixGANSSIM(BaseGanModel):
         self.real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='real_a')
         self.real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='real_b')
         self._fake_b = self.generator(self.real_a, is_training=True, name='generator_a2b')
-        fake_ab = tf.concat([self.real_a, self._fake_b], 3)
+        fake_ab = tf.concat([self.real_a[:, :, :, 0:1], self._fake_b], 3)
         fake_logit_b = self.discriminator(fake_ab, name='discriminator_b')
         self.g_loss_a2b = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + \
                           self._lambda * l1_loss(self._fake_b, self.real_b) + \
@@ -32,8 +32,8 @@ class Pix2PixGANSSIM(BaseGanModel):
 
         # train discriminator
         self.fake_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='fake_b')
-        real_ab = tf.concat([self.real_a, self.real_b], 3)
-        fake_ab = tf.concat([self.real_a, self.fake_b], 3)
+        real_ab = tf.concat([self.real_a[:, :, :, 0:1], self.real_b], 3)
+        fake_ab = tf.concat([self.real_a[:, :, :, 0:1], self.fake_b], 3)
         real_logit_b = self.discriminator(real_ab, reuse=True, name='discriminator_b')
         fake_logit_b = self.discriminator(fake_ab, reuse=True, name='discriminator_b')
         d_loss_real_b = self.loss_fn(real_logit_b, tf.ones_like(real_logit_b))

@@ -3,6 +3,7 @@ import tensorflow as tf
 
 from models.base_gan_model import BaseGanModel
 from models.pix2pix_gan import Pix2PixGAN
+from models.utils.loss_funcation import l1_loss
 
 
 class Pix2PixGANSobel(Pix2PixGAN):
@@ -13,6 +14,57 @@ class Pix2PixGANSobel(Pix2PixGAN):
         self.summary()
         self.train_saver = tf.train.Saver()
         self.best_saver = tf.train.Saver()
+
+    def build_model(self):
+        # train generator
+        data_shape = self.data_shape
+        self.real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='real_a')
+        self.real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='real_b')
+        self._fake_b = self.generator(self.real_a, is_training=True, name='generator_a2b')
+        fake_ab = tf.concat([self.real_a[:, :, :, 0:1], self._fake_b], 3)
+        fake_logit_b = self.discriminator(fake_ab, name='discriminator_b')
+        self.g_loss_a2b = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + self._lambda * l1_loss(self._fake_b,
+                                                                                                          self.real_b)
+
+        # train discriminator
+        self.fake_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='fake_b')
+        real_ab = tf.concat([self.real_a[:, :, :, 0:1], self.real_b], 3)
+        fake_ab = tf.concat([self.real_a[:, :, :, 0:1], self.fake_b], 3)
+        real_logit_b = self.discriminator(real_ab, reuse=True, name='discriminator_b')
+        fake_logit_b = self.discriminator(fake_ab, reuse=True, name='discriminator_b')
+        d_loss_real_b = self.loss_fn(real_logit_b, tf.ones_like(real_logit_b))
+        d_loss_fake_b = self.loss_fn(fake_logit_b, tf.zeros_like(fake_logit_b))
+        self.d_loss_b = d_loss_real_b + d_loss_fake_b
+
+        train_vars = tf.trainable_variables()
+        self.g_vars = [var for var in train_vars if 'generator' in var.name]
+        self.d_vars = [var for var in train_vars if 'discriminator' in var.name]
+
+        # eval or test
+        self.test_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='test_a')
+        self.test_fake_b = self.generator(self.test_a, reuse=True, is_training=False, name='generator_a2b')
+
+    def summary(self):
+        data_shape = self.data_shape
+        self.image_real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], 1], name='image_real_a')
+        real_a_summary = tf.summary.image('{}/AReal'.format(self.dataset_name), self.image_real_a, max_outputs=1)
+
+        self.image_fake_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], 1], name='image_fake_b')
+        fake_b_summary = tf.summary.image('{}/BFake'.format(self.dataset_name), self.image_fake_b, max_outputs=1)
+
+        self.image_real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], 1], name='image_real_b')
+        real_b_summary = tf.summary.image('{}/BReal'.format(self.dataset_name), self.image_real_b, max_outputs=1)
+
+        self.image_summary = tf.summary.merge([real_a_summary, real_b_summary, fake_b_summary])
+
+        lr_summary = tf.summary.scalar('{}/LearningRate'.format(self.dataset_name), self.lr_tensor)
+        self.scalar_g_loss = tf.placeholder(tf.float32, None, name='scalar_g_loss')
+        g_loss_summary = tf.summary.scalar('{}/GLossA2B'.format(self.dataset_name), self.scalar_g_loss)
+        self.scalar_d_loss = tf.placeholder(tf.float32, None, name='scalar_d_loss')
+        d_loss_summary = tf.summary.scalar('{}/DLossB'.format(self.dataset_name), self.scalar_d_loss)
+        self.scalar_metric = tf.placeholder(tf.float32, None, name='scalar_metric')
+        eval_metric_summary = tf.summary.scalar('{}/MetricA2B'.format(self.dataset_name), self.scalar_metric)
+        self.scalar_summary = tf.summary.merge([lr_summary, g_loss_summary, d_loss_summary, eval_metric_summary])
 
     def train(self):
         """Train pix2pix"""

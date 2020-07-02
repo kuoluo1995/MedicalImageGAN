@@ -25,6 +25,7 @@ class Pix2PixGANRES(BaseGanModel):
         self.res = (self.real_b - self.real_a) / 2
         self.fake_res = self.generator(self.real_a, is_training=True, name='generator_a2b')
         fake_b = self.real_a + self.fake_res * 2
+        fake_b = tf.clip_by_value(fake_b, -1, 1)
         fake_ab = tf.concat([self.real_a, fake_b], 3)
         fake_logit_b = self.discriminator(fake_ab, name='discriminator_b')
         self.g_loss = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + self._lambda * l1_loss(self.fake_res,
@@ -36,11 +37,12 @@ class Pix2PixGANRES(BaseGanModel):
         self.fake_res_sample = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels],
                                               name='res')
         fake_b = self.real_a + self.fake_res_sample * 2
+        fake_b = tf.clip_by_value(fake_b, -1, 1)
         fake_ab = tf.concat([self.real_a, fake_b], 3)
         fake_logit_b = self.discriminator(fake_ab, reuse=True, name='discriminator_b')
         d_loss_real_b = self.loss_fn(real_logit_b, tf.ones_like(real_logit_b))
         d_loss_fake_b = self.loss_fn(fake_logit_b, tf.zeros_like(fake_logit_b))
-        self.d_loss_b = d_loss_real_b + d_loss_fake_b
+        self.d_loss_b = d_loss_real_b + d_loss_fake_b + l1_loss(self.fake_res, self.res)
 
         train_vars = tf.trainable_variables()
         self.g_vars = [var for var in train_vars if 'generator' in var.name]

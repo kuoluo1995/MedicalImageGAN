@@ -1,6 +1,25 @@
 import tensorflow as tf
+import numpy as np
 
 EPS = 1e-12
+
+
+def get_int_shape(shape):
+    return [-1 if i is None else i for i in shape.as_list()]
+
+
+min_filters = 256  # 512
+
+
+def get_out_channels(num):
+    return min(1024 // (2 ** (num * 1)), min_filters)
+
+
+def get_weight(shape, gain):
+    fan_in = np.prod(shape[:-1])
+    std = gain / np.sqrt(fan_in)
+    wscale = tf.constant(np.float32(std), name='wscale')
+    return tf.get_variable('weight', shape=shape, initializer=tf.initializers.random_normal()) * wscale
 
 
 def leaky_relu(x, a=0.2, name='leaky_relu'):
@@ -31,6 +50,30 @@ def down_sampling(batch_input, i):
     return tf.layers.average_pooling2d(batch_input, 2 ** i, 2 ** i)
 
 
+def upscale(x, scale):
+    _, h, w, _ = get_int_shape(x.get_shape())
+    return tf.image.resize_nearest_neighbor(x, (h * scale, w * scale))
+
+
+def minbatch_concat(x, eps=1e-8, averaging='all'):
+    shape = get_int_shape(x.get_shape())
+    adjusted_std = lambda _x: tf.sqrt(
+        tf.reduce_mean((_x - tf.reduce_mean(_x, axis=0, keep_dims=True)) ** 2, axis=0, keep_dims=True) + eps)
+    vals = adjusted_std(x)
+    if averaging == 'all':
+        vals = tf.reduce_mean(vals, keepdims=True)
+    vals = tf.tile(vals, multiples=[shape[0], shape[1], shape[2], 1])
+    return tf.concat([x, vals], axis=3)
+
+def pg_fully_connect(x, filters, gain, name='my_dense'):
+    shape = get_int_shape(x.get_shape())
+    with tf.variable_scope(name):
+        w = get_weight([shape[1], filters], gain=gain)
+        w = tf.cast(w, x.dtype)
+        bias = tf.get_variable('bias', [filters], initializer=tf.constant_initializer(0.0))
+        output = tf.matmul(x, w) + bias
+        return output
+
 def conv2d(batch_input, out_channels, kernel_size=4, strides=(2, 2), padding='same', name='conv2d'):
     with tf.variable_scope(name):
         initializer = tf.random_normal_initializer(0, 0.02)
@@ -39,6 +82,20 @@ def conv2d(batch_input, out_channels, kernel_size=4, strides=(2, 2), padding='sa
             padding = 'valid'
         return tf.layers.conv2d(batch_input, out_channels, kernel_size=kernel_size, strides=strides, padding=padding,
                                 kernel_initializer=initializer)
+
+
+def pg_conv2d(x, filters, kernel_size, strides, padding, gain, name='pg_conv2d'):
+    shape = get_int_shape(x.get_shape())
+    with tf.variable_scope(name):
+        w = get_weight([kernel_size, kernel_size, shape[-1], filters], gain=gain)
+        w = tf.cast(w, x.dtype)
+        if padding == 'OTHER':
+            padding = 'VALID'
+            x = tf.pad(x, [[0, 0], [3, 3], [3, 3], [0, 0]], 'CONSTANT')
+        x = tf.nn.conv2d(x, w, strides=[1, strides, strides, 1], padding=padding)
+        biases = tf.get_variable('biases', [filters], initializer=tf.constant_initializer(0.0))
+        x = tf.reshape(tf.nn.bias_add(x, biases), get_int_shape(x.get_shape()))
+        return x
 
 
 def res_block2d(batch_input, out_channels, padding='reflect', name='res_block2d'):
@@ -103,6 +160,11 @@ def discrim_conv3d(batch_input, out_channels, strides, name='discrim_conv3d'):
         padded_input = tf.pad(batch_input, [[0, 0], [1, 1], [1, 1], [1, 1], [0, 0]], mode='CONSTANT')
         return tf.layers.conv3d(padded_input, out_channels, kernel_size=4, strides=strides,
                                 padding='valid', kernel_initializer=tf.random_normal_initializer(0, 0.02))
+
+
+def pix_norm(x, eps=1e-8, name='pixel_norm'):
+    with tf.variable_scope(name):
+        return x * tf.rsqrt(tf.reduce_mean(tf.square(x), axis=3, keep_dims=True) + eps)
 
 
 def instance_norm2d(x, name='instance_norm2d'):

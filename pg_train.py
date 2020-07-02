@@ -26,7 +26,7 @@ def train(args):
     process_sizes = args['process_sizes']
     checkpoint_dir = Path(model_dict['checkpoint_dir']) / dataset['name'] / model_dict['name'] / args['tag']
     log_dir = Path(model_dict['log_dir']) / dataset['name'] / model_dict['name'] / args['tag']
-    model_class = get_model_class_by_name(model_dict['name'])
+
     for i in range(1, len(process_sizes)):
         is_transition = True if i % 2 == 0 else False
         output_size = [2 ** (process_sizes[i] + 1), 2 ** (process_sizes[i] + 1)]  # 4,8,16,32,64,128,256
@@ -35,23 +35,19 @@ def train(args):
         read_path = checkpoint_dir / str(process_sizes[i - 1])
         log_path = log_dir / '{}_{}x{}'.format(i, *output_size)
         log_path.mkdir(parents=True, exist_ok=True)
-
         with tf.Session(config=tf_config) as sess:
+            model_class = get_model_class_by_name(model_dict['name'])
             model = model_class(data_shape=train_data_loader.get_data_shape(),
-                                batch_size=train_data_loader.get_batch_size(),
-                                in_channels=train_data_loader.get_in_channels(),
-                                out_channels=train_data_loader.get_out_channels(),
                                 train_data_loader=train_data_loader, eval_data_loader=eval_data_loader,
-                                test_data_loader=None,
-                                is_transition=is_transition, output_size=output_size, process_size=process_sizes[i],
-                                save_path=str(save_path), read_path=str(read_path), log_path=str(log_path),
-                                model_id=i, max_id=len(process_sizes), sess=sess, **args)
+                                test_data_loader=None, is_transition=is_transition, output_size=output_size,
+                                process_size=process_sizes[i], save_path=str(save_path), read_path=str(read_path),
+                                log_path=str(log_path), model_id=i, max_id=len(process_sizes), sess=sess, **args)
             model.train(tf_config)
         tf.reset_default_graph()
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '3'
     config = get_config('pg_pix2d')
-    config['tag'] = 'half_base'
+    config['tag'] = 'base'
     train(config)

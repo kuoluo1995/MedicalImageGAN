@@ -8,11 +8,12 @@ from utils import yaml_utils
 from utils.nii_utils import nii_header_reader, nii_writer
 
 
-class Pix2PixGANSSIM(BaseGanModel):
+class Pix2PixGANSSIMEdge(BaseGanModel):
     def __init__(self, **kwargs):
         BaseGanModel.__init__(self, **kwargs)
-        self._lambda = self.kwargs['model']['lambda']
-        self.ssim_lambda = 6
+        self.i_lambda = 3
+        self.e_lambda = 3
+        self.ssim_lambda = 4
         self.build_model()
         self.summary()
         self.train_saver = tf.train.Saver()
@@ -24,11 +25,14 @@ class Pix2PixGANSSIM(BaseGanModel):
         self.real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='real_a')
         self.real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='real_b')
         self._fake_b = self.generator(self.real_a, is_training=True, name='generator_a2b')
+        fake_b_edges = tf.image.sobel_edges(self._fake_b)
+        real_b_edges = tf.image.sobel_edges(self.real_b)
         fake_ab = tf.concat([self.real_a, self._fake_b], 3)
         fake_logit_b = self.discriminator(fake_ab, name='discriminator_b')
         self.g_loss_a2b = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + \
-                          self._lambda * l1_loss(self._fake_b, self.real_b) + \
-                          self.ssim_lambda * (1 - ssim_loss(self._fake_b, self.real_b))
+                          self.i_lambda * l1_loss(self._fake_b, self.real_b) + \
+                          self.ssim_lambda * (1 - ssim_loss(self._fake_b, self.real_b)) + \
+                          self.e_lambda * l1_loss(fake_b_edges, real_b_edges)
 
         # train discriminator
         self.fake_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='fake_b')
@@ -38,7 +42,9 @@ class Pix2PixGANSSIM(BaseGanModel):
         fake_logit_b = self.discriminator(fake_ab, reuse=True, name='discriminator_b')
         d_loss_real_b = self.loss_fn(real_logit_b, tf.ones_like(real_logit_b))
         d_loss_fake_b = self.loss_fn(fake_logit_b, tf.zeros_like(fake_logit_b))
-        self.d_loss_b = d_loss_real_b + d_loss_fake_b + self.ssim_lambda * (1 - ssim_loss(self._fake_b, self.real_b))
+        fake_b_edges = tf.image.sobel_edges(self.fake_b)
+        real_b_edges = tf.image.sobel_edges(self.real_b)
+        self.d_loss_b = d_loss_real_b + d_loss_fake_b + self.ssim_lambda * (1 - ssim_loss(self.fake_b, self.real_b)) + self.e_lambda * l1_loss(fake_b_edges, real_b_edges)
 
         train_vars = tf.trainable_variables()
         self.g_vars = [var for var in train_vars if 'generator' in var.name]

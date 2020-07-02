@@ -157,11 +157,21 @@ class Pix2PixGAN(BaseGanModel):
         current_path_b = ''
         nii_b = list()
         fake_nii_b = list()
+        count = 0
+        avg_ssim = 0
+        avg_psnr = 0
+        avg_mse = 0
+        avg_nmse = 0
         for step in range(test_size + 1):
             path_a, source_path_a, batch_a, path_b, source_path_b, batch_b = next(test_generator)
             if current_path_b != path_b:
                 if step > 0:
                     info = self._save_test_result(current_path_b, np.array(fake_nii_b), np.array(nii_b))
+                    count += 1
+                    avg_ssim += info['ssim_metrics']
+                    avg_psnr += info['psnr_metrics']
+                    avg_mse += info['mse_metrics']
+                    avg_nmse += info['nmse_metrics']
                     result_info.append(info)
                     nii_b = list()
                     fake_nii_b = list()
@@ -171,6 +181,8 @@ class Pix2PixGAN(BaseGanModel):
             fake_b = self.sess.run(self.test_fake_b, feed_dict={self.test_a: batch_a})
             nii_b.append(batch_b[0, :, :, self.out_channels // 2])
             fake_nii_b.append(fake_b[0, :, :, self.out_channels // 2])
+        result_info.append({'avg_ssim': avg_ssim / count, 'avg_psnr': avg_psnr / count, 'avg_mse': avg_mse / count,
+                            'avg_nmse': avg_nmse / count})
         yaml_utils.write('result/{}/{}/{}/{}/info.yaml'.format(self.dataset_name, self.name, self.tag, self.test_model),
                          result_info)
 

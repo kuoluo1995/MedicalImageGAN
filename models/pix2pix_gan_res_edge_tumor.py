@@ -3,16 +3,18 @@ import tensorflow as tf
 from pathlib import Path
 
 from models.base_gan_model import BaseGanModel
-from models.utils.loss_funcation import l1_loss, ssim_loss
+from models.utils.loss_funcation import l1_loss
 from utils import yaml_utils
 from utils.nii_utils import nii_header_reader, nii_writer
 
 
-class Pix2PixGANSSIM(BaseGanModel):
+class Pix2PixGANRESEdgeTumor(BaseGanModel):
     def __init__(self, **kwargs):
         BaseGanModel.__init__(self, **kwargs)
-        self._lambda = self.kwargs['model']['lambda']
-        self.ssim_lambda = 6
+        self.i_lambda = self.kwargs['model']['image_lambda']
+        self.e_lambda = self.kwargs['model']['edge_lambda']
+        self._tumor_loss_threshold = self.kwargs['model']['tumor_loss_threshold']
+        self._tumor_lambda = self.kwargs['model']['tumor_lambda']
         self.build_model()
         self.summary()
         self.train_saver = tf.train.Saver()
@@ -23,22 +25,36 @@ class Pix2PixGANSSIM(BaseGanModel):
         data_shape = self.data_shape
         self.real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='real_a')
         self.real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='real_b')
-        self._fake_b = self.generator(self.real_a, is_training=True, name='generator_a2b')
-        fake_ab = tf.concat([self.real_a, self._fake_b], 3)
+        self.res = (self.real_b - self.real_a) / 2
+        self.fake_res = self.generator(self.real_a, is_training=True, name='generator_a2b')
+        fake_b = self.real_a + self.fake_res * 2
+        fake_b = tf.clip_by_value(fake_b, -1, 1)
+
+        fake_b_edges = tf.image.sobel_edges(fake_b)
+        real_b_edges = tf.image.sobel_edges(self.real_b)
+
+        # to improve detail
+        real_b_detail = tf.clip_by_value(self.res, -1, self._tumor_loss_threshold)
+        fake_b_detail = tf.clip_by_value(self.fake_res, -1, self._tumor_loss_threshold)
+        fake_b_tumor = tf.clip_by_value(self.fake_res, self._tumor_loss_threshold, 1)
+        real_b_tumor = tf.clip_by_value(self.res, self._tumor_loss_threshold, 1)
+
+        fake_ab = tf.concat([self.real_a, fake_b], 3)
         fake_logit_b = self.discriminator(fake_ab, name='discriminator_b')
-        self.g_loss_a2b = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + \
-                          self._lambda * l1_loss(self._fake_b, self.real_b) + \
-                          self.ssim_lambda * (1 - ssim_loss(self._fake_b, self.real_b))
+        self.g_loss = self.loss_fn(fake_logit_b, tf.ones_like(fake_logit_b)) + self.e_lambda * l1_loss(fake_b_edges, real_b_edges) + self.i_lambda * l1_loss(
+            fake_b_detail, real_b_detail) + self._tumor_lambda * l1_loss(fake_b_tumor, real_b_tumor)
 
         # train discriminator
-        self.fake_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels], name='fake_b')
         real_ab = tf.concat([self.real_a, self.real_b], 3)
-        fake_ab = tf.concat([self.real_a, self.fake_b], 3)
         real_logit_b = self.discriminator(real_ab, reuse=True, name='discriminator_b')
+        self.fake_res_sample = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.out_channels],
+                                              name='res')
+        fake_b = self.real_a + self.fake_res_sample * 2
+        fake_ab = tf.concat([self.real_a, fake_b], 3)
         fake_logit_b = self.discriminator(fake_ab, reuse=True, name='discriminator_b')
         d_loss_real_b = self.loss_fn(real_logit_b, tf.ones_like(real_logit_b))
         d_loss_fake_b = self.loss_fn(fake_logit_b, tf.zeros_like(fake_logit_b))
-        self.d_loss_b = d_loss_real_b + d_loss_fake_b + self.ssim_lambda * (1 - ssim_loss(self._fake_b, self.real_b))
+        self.d_loss_b = d_loss_real_b + d_loss_fake_b
 
         train_vars = tf.trainable_variables()
         self.g_vars = [var for var in train_vars if 'generator' in var.name]
@@ -46,12 +62,18 @@ class Pix2PixGANSSIM(BaseGanModel):
 
         # eval or test
         self.test_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], self.in_channels], name='test_a')
-        self.test_fake_b = self.generator(self.test_a, reuse=True, is_training=False, name='generator_a2b')
+        self.test_fake_res = self.generator(self.test_a, reuse=True, is_training=False, name='generator_a2b')
 
     def summary(self):
         data_shape = self.data_shape
         self.image_real_a = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], 1], name='image_real_a')
         real_a_summary = tf.summary.image('{}/AReal'.format(self.dataset_name), self.image_real_a, max_outputs=1)
+
+        self.image_fake_res = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], 1], name='image_fake_res')
+        fake_res_summary = tf.summary.image('{}/FakeRes'.format(self.dataset_name), self.image_fake_res, max_outputs=1)
+
+        self.image_real_res = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], 1], name='image_real_res')
+        real_res_summary = tf.summary.image('{}/RealRes'.format(self.dataset_name), self.image_real_res, max_outputs=1)
 
         self.image_fake_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], 1], name='image_fake_b')
         fake_b_summary = tf.summary.image('{}/BFake'.format(self.dataset_name), self.image_fake_b, max_outputs=1)
@@ -59,7 +81,8 @@ class Pix2PixGANSSIM(BaseGanModel):
         self.image_real_b = tf.placeholder(tf.float32, [None, data_shape[0], data_shape[1], 1], name='image_real_b')
         real_b_summary = tf.summary.image('{}/BReal'.format(self.dataset_name), self.image_real_b, max_outputs=1)
 
-        self.image_summary = tf.summary.merge([real_a_summary, real_b_summary, fake_b_summary])
+        self.image_summary = tf.summary.merge(
+            [real_a_summary, real_b_summary, fake_b_summary, fake_res_summary, real_res_summary])
 
         lr_summary = tf.summary.scalar('{}/LearningRate'.format(self.dataset_name), self.lr_tensor)
         self.scalar_g_loss = tf.placeholder(tf.float32, None, name='scalar_g_loss')
@@ -72,7 +95,7 @@ class Pix2PixGANSSIM(BaseGanModel):
 
     def train(self):
         """Train pix2pix"""
-        g_optimizer = tf.train.AdamOptimizer(self.lr_tensor, beta1=0.5).minimize(self.g_loss_a2b, var_list=self.g_vars)
+        g_optimizer = tf.train.AdamOptimizer(self.lr_tensor, beta1=0.5).minimize(self.g_loss, var_list=self.g_vars)
         d_optimizer = tf.train.AdamOptimizer(self.lr_tensor, beta1=0.5).minimize(self.d_loss_b, var_list=self.d_vars)
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
@@ -86,21 +109,22 @@ class Pix2PixGANSSIM(BaseGanModel):
             lr = self.scheduler_fn(epoch)
             g_loss_sum = d_loss_sum = 0  # sum one epoch g_loss and d_loss
             best_g_loss = float('inf')  # request min g_loss
-            best_real_a = best_fake_b = best_real_b = np.zeros(
+            best_real_a = best_fake_b = best_real_b = best_fake_res = best_real_res = np.zeros(
                 shape=(self.batch_size, self.data_shape[0], self.data_shape[1], 1))
             for step in range(train_size):
                 _, _, batch_a, _, _, batch_b = next(train_generator)
                 # Update G network and record fake outputs
-                fake_b, _, g_loss = self.sess.run([self._fake_b, g_optimizer, self.g_loss_a2b],
-                                                  feed_dict={self.real_a: batch_a, self.real_b: batch_b,
-                                                             self.lr_tensor: lr})
+                fake_res, res, _, g_loss = self.sess.run([self.fake_res, self.res, g_optimizer, self.g_loss],
+                                                         feed_dict={self.real_a: batch_a, self.real_b: batch_b,
+                                                                    self.lr_tensor: lr})
                 if best_g_loss >= g_loss:  # min g_loss to show image
-                    best_g_loss, best_real_a, best_fake_b, best_real_b = (g_loss, batch_a, fake_b, batch_b)
+                    best_g_loss, best_real_a, best_fake_b, best_real_b, best_fake_res, best_real_res = (
+                        g_loss, batch_a, batch_a + fake_res, batch_b, fake_res, res)
                 g_loss_sum += g_loss
                 # Update D network
                 _, d_loss = self.sess.run([d_optimizer, self.d_loss_b],
-                                          feed_dict={self.real_a: batch_a, self.real_b: batch_b, self.fake_b: fake_b,
-                                                     self.lr_tensor: lr})
+                                          feed_dict={self.real_a: batch_a, self.real_b: batch_b,
+                                                     self.fake_res_sample: fake_res, self.lr_tensor: lr})
                 d_loss_sum += d_loss
                 print('{}/{} Epoch:{:>3d}/{:<3d} Step:{:>4d}/{:<4d} g_loss:{:<5.5f} d_loss:{:<5.5f}'
                       .format(self.name, self.tag, epoch, self.total_epoch, step, train_size, g_loss, d_loss))
@@ -116,7 +140,7 @@ class Pix2PixGANSSIM(BaseGanModel):
                 path_a, _, batch_a, path_b, _, batch_b = next(eval_generator)
                 if current_path_b != path_b:
                     if step > 0:
-                        metrics = {name: fn(np.array(nii_b), np.array(fake_nii_b)) for name, fn in
+                        metrics = {name: fn(np.array(fake_nii_b), np.array(nii_b)) for name, fn in
                                    self.metrics_fn.items()}
                         eval_metric_sum += float(metrics['ssim_metrics'])
                         num_eval_nii += 1
@@ -125,15 +149,14 @@ class Pix2PixGANSSIM(BaseGanModel):
                     current_path_b = path_b
                     if step == eval_size:  # finnish eval
                         break
-                fake_b = self.sess.run(self.test_fake_b, feed_dict={self.test_a: batch_a})
+                fake_res_b = self.sess.run(self.test_fake_res, feed_dict={self.test_a: batch_a})
                 nii_b.append(batch_b[0, :, :, self.out_channels // 2])
-                fake_nii_b.append(fake_b[0, :, :, self.out_channels // 2])
+                fake_nii_b.append(batch_a[0, :, :, self.in_channels // 2] + fake_res_b[0, :, :, self.out_channels // 2])
 
             # draw summary
             image_summary = self.sess.run(self.image_summary,
-                                          feed_dict={self.image_real_a: best_real_a[:, :, :,
-                                                                        self.in_channels // 2:self.in_channels // 2 + 1],
-                                                     self.image_fake_b: best_fake_b,
+                                          feed_dict={self.image_real_a: best_real_a, self.image_fake_res: best_fake_res,
+                                                     self.image_real_res: best_real_res, self.image_fake_b: best_fake_b,
                                                      self.image_real_b: best_real_b})
             scalar_summary = self.sess.run(self.scalar_summary,
                                            feed_dict={self.lr_tensor: lr, self.scalar_g_loss: g_loss_sum / train_size,
@@ -170,16 +193,16 @@ class Pix2PixGANSSIM(BaseGanModel):
                 current_path_b = path_b
                 if step == test_size:
                     break
-            fake_b = self.sess.run(self.test_fake_b, feed_dict={self.test_a: batch_a})
+            fake_res = self.sess.run(self.test_fake_res, feed_dict={self.test_a: batch_a})
             nii_b.append(batch_b[0, :, :, self.out_channels // 2])
-            fake_nii_b.append(fake_b[0, :, :, self.out_channels // 2])
+            fake_nii_b.append(batch_a[0, :, :, self.in_channels // 2] + fake_res[0, :, :, self.out_channels // 2])
         yaml_utils.write('result/{}/{}/{}/{}/info.yaml'.format(self.dataset_name, self.name, self.tag, self.test_model),
                          result_info)
 
     def _save_test_result(self, current_path_b, fake_nii_b, nii_b):
         fake_nii_b = np.transpose(fake_nii_b, (1, 2, 0))
         nii_b = np.transpose(nii_b, (1, 2, 0))
-        metrics = {name: fn(nii_b, fake_nii_b) for name, fn in self.metrics_fn.items()}
+        metrics = {name: fn(fake_nii_b, nii_b) for name, fn in self.metrics_fn.items()}
         metrics_str = ''
         for name, value in metrics.items():
             metrics_str += name + ':' + str(value) + ' '
